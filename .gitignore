@@ -6,5 +6,7 @@
 *.war
 *.ear
 
-/nbproject/private
+
+EugeneLab/build/
+EugeneLab/nbproject/private/
 *private*
