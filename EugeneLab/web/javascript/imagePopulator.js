@@ -10,13 +10,13 @@ $(document).ready(function() {
     $.get("EugeneServlet", command, function(response) {
         var i =0;
         $.each(response, function() {
-            var type=this["fileName"].split("\.")[0]
+            var type=this["fileName"].split("\.")[0];
             $("#part-list").append('<li id="' + type + '"><img src="images/sbol_visual_jpeg/' + this["fileName"] + '"></li>');
-            $("#image" + i).doubleClick(function() {
+            $('#'+type).dblclick(function() {
                 //When clicked gives id name
                 alert("creating new "+$(this).attr('id'));
             });
-        i++;
+        i=i+1;
         });
     });
 });
