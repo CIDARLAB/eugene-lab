@@ -18,7 +18,7 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author Admin
  */
-public class DemoServlet extends HttpServlet {
+public class EugeneServlet extends HttpServlet {
 
     /**
      * Processes requests for both HTTP
@@ -36,12 +36,13 @@ public class DemoServlet extends HttpServlet {
         response.setContentType("application/json");
         PrintWriter out = response.getWriter();
         try {
-//            Remember the json object I sent to my servlet? 
-//            I'm grabbing the value associated with the key "command". 
-//            the value should be test
             String command = request.getParameter("command");
-            out.write(readImageFiles());
-//            out.println("THIS IS COMING FROM THE SERVER; the command was: " + command); //I'm printing a string to the server
+            System.out.println(command);
+            if (command.equals("imageList")) {
+                out.write(readImageFiles());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         } finally {
             out.close();
         }
@@ -66,7 +67,7 @@ public class DemoServlet extends HttpServlet {
             response.setContentType("text/html;charset=UTF-8");
             PrintWriter out = response.getWriter();
             try {
-                out.println(getImageFileLocations());
+                out.println(readImageFiles());
             } finally {
                 out.close();
             }
@@ -101,76 +102,24 @@ public class DemoServlet extends HttpServlet {
     public String getServletInfo() {
         return "Short description";
     }
-
-    //Returns a JSON string with the locations of images to be posted to the specticals drag and drop
-    public String getImageFileLocations() {
-        return "{\"imageList\":"
-                + "[{\"location\":\"assembly-scar.jpeg\"},"
-                + "{\"location\":\"blunt-restriction-site.jpeg\"},"
-                + "{\"location\":\"cds.jpeg\"},"
-                + "{\"location\":\"five-prime-overhang.jpeg\"},"
-                + "{\"location\":\"five-prime-sticky-restriction-site.jpeg\"},"
-                + "{\"location\":\"insulator.jpeg\"},"
-                + "{\"location\":\"operator.jpeg\"},"
-                + "{\"location\":\"origin-of-replication.jpeg\"},"
-                + "{\"location\":\"primer-binding-site.jpeg\"},"
-                + "{\"location\":\"promoter.jpeg\"},"
-                + "{\"location\":\"protease-site.jpeg\"},"
-                + "{\"location\":\"protein-stability-element.jpeg\"},"
-                + "{\"location\":\"restriction-enzyme-recognition-site.jpeg\"},"
-                + "{\"location\":\"ribonuclease-site.jpeg\"},"
-                + "{\"location\":\"ribosome-entry-site.jpeg\"},"
-                + "{\"location\":\"rna-stability-element.jpeg\"},"
-                + "{\"location\":\"signature.jpeg\"},"
-                + "{\"location\":\"terminator.jpeg\"},"
-                + "{\"location\":\"three-prime-overhang.jpeg\"},"
-                + "{\"location\":\"three-prime-sticky-restriction-site.jpeg\"},"
-                + "{\"location\":\"user-defined.jpeg\"}]}";
-
-
-        //I couldn't figure out how to access a file in NetBeans
-        //This is what I tried:
-
-        /*try {
-         Scanner scanner = new Scanner(new File("/WEB-INF/resources/image_index.csv/"));
-         scanner.useDelimiter(",");
-         String imageFileLocations = "{[";
-         while(scanner.hasNext()) {
-         String addition ="{\"location\":\"";
-         addition += scanner.next();
-         addition += "\"}";
-         imageFileLocations += addition;
-         }
-         imageFileLocations += "]}";
-         return imageFileLocations;
-         } catch (FileNotFoundException ex) {
-         return "Did Not Find File";
-         }*/
-    }
-
     // </editor-fold>
     private String readImageFiles() {
         //get path relative to servlet; ie the /web directory
-        String uploadFilePath = this.getServletContext().getRealPath("/") + "sbol_visual_jpeg\\";
+        String imagePath = this.getServletContext().getRealPath("/") + "images\\sbol_visual_jpeg\\";
         String toReturn = "[";
-        File[] filesInDirectory = new File(uploadFilePath).listFiles();
+        File[] filesInDirectory = new File(imagePath).listFiles();
         if (filesInDirectory != null) {
             for (File currentFile : filesInDirectory) {
                 String filePath = currentFile.getAbsolutePath();
                 String fileExtension = filePath.substring(filePath.lastIndexOf(".") + 1, filePath.length()).toLowerCase();
                 //grab only files that have jpeg extension
                 if ("jpeg".equals(fileExtension)) {
-                    //create a json object for each jpeg; notice that I'm just buiding a string 
-                    //the "\" characters are for escaping the quotation marks that appear in proper json syntax
-                    toReturn = toReturn +"{\"fileName\":\""+currentFile.getName()+"\"},";
+                    toReturn = toReturn + "{\"fileName\":\"" + currentFile.getName() + "\"},";
                 }
             }
         }
-        toReturn = toReturn.substring(0,toReturn.length()-1);
-        toReturn = toReturn +"]";
-        //I should have created a json array of json objects by now
-        //each object should have just one attribute, fileName
-        System.out.println(toReturn);
+        toReturn = toReturn.substring(0, toReturn.length() - 1);
+        toReturn = toReturn + "]";
         return toReturn;
     }
 }
