@@ -13,6 +13,12 @@
             ul.thumbnails li.span4:nth-child(3n + 4) {
                 margin-left : 0px;
             }
+            ul.device {
+                list-style-type: none;
+            }
+            ul.device li{
+                display: inline-block;
+            }
             .draggable { width: 90px; height: 90px; }
         </style>  
     </head>
@@ -49,26 +55,15 @@
                         <div class="tab-pane active" id="spectaclesEditorTab">
                             <div id="spectaclesEditorArea" style="height:500px">
                                 <h3>This is where are drag and drop interface will go</h3>
-                                <div id='dragDropDemo' class="droppable">
+                                <div id='dragDropDemo'>
 
-                                    <ul class="sortable"><li>item one</li></ul>
+                                    <ul class="device sortable"><li>item one</li></ul>
 
                                 </div>
                             </div>
                         </div>
                         <div class="tab-pane" id="textEditorTab"> 
                             <h3>this is where the text editor will go</h3>
-                            <ul>
-                                <li class="draggable">Drag me down</li>
-                            </ul>
-
-                            <ul class="sortable">
-                                <li class="ui-state-default">Item 1</li>
-                                <li class="ui-state-default">Item 2</li>
-                                <li class="ui-state-default">Item 3</li>
-                                <li class="ui-state-default">Item 4</li>
-                                <li class="ui-state-default">Item 5</li>
-                            </ul>
                         </div>
                     </div>
                 </div>

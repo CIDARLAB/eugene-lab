@@ -4,14 +4,8 @@
 $(document).ready(function() {
     $(function() {
         $(".sortable").sortable({
-            revert: true
+            revert: true,
         });
-        $(".draggable").draggable({
-            connectToSortable: ".sortable",
-            helper: "clone",
-            revert: "invalid"
-        });
-        $("ul, li").disableSelection();
     });
 
 
@@ -23,9 +17,9 @@ $(document).ready(function() {
         $('#iconArea').html("");
         $.each(response, function() {
             var type = this["fileName"].split("\.")[0];
-            $("#iconArea").append('<li class=" draggable" id="' + type + '"><div class="thumbnail"><img title="' + type.replace(/-/g, ' ') + '" class="img-rounded" style="width:40px;height:80px" src="images/sbol_visual_jpeg/' + this["fileName"] + '"></div></li>');
+            $("#iconArea").append('<div class="span5"><li class="draggable" title= "'+ type.replace(/-/g, ' ') + '" id="' + type + '"><div class="thumbnail"><img class="img-rounded" style="width:40px;height:80px" src="images/sbol_visual_jpeg/' + this["fileName"] + '"></div></li></div>');
             $('#' + type).dblclick(function() {
-//When clicked gives id name
+            //When clicked gives id name
                 alert("creating new " + $(this).attr('id'));
             });
             i = i + 1;
@@ -33,12 +27,8 @@ $(document).ready(function() {
         $('#iconArea .draggable').draggable({
             helper: "clone",
             connectToSortable: ".sortable",
-            revert: "invalid"
+            revert: "invalid"            
         });
-        $('.draggable').click(function() {
-            var appendTo = $(this).draggable("option", "appendTo");
-            alert(appendTo);
-        })
     });
 });
 
