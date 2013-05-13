@@ -1,5 +1,6 @@
 //I want my javascript to run only once the page is rendered, this helps the page load faster
 $(document).ready(function() {
+    
     //javascript to control the drag and drop elements
     $(function() {
         $("#draggable").draggable({snap: true});

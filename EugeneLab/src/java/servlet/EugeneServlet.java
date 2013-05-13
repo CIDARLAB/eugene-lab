@@ -37,7 +37,6 @@ public class EugeneServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
         try {
             String command = request.getParameter("command");
-            System.out.println(command);
             if (command.equals("imageList")) {
                 out.write(readImageFiles());
             }
