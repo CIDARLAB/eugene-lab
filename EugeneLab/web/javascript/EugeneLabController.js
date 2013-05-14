@@ -7,14 +7,14 @@ $(document).ready(function() {
 
 
     var command = {"command": "imageList"};
-    // Get the JSON object with the location of the images
-    // JSON has key imageList with a value as a array of JSON objects with a single key "location"
+
+    //render parts icons
     $.get("EugeneServlet", command, function(response) {
         var i = 0;
         $('#iconArea').html("");
         $.each(response, function() {
             var type = this["fileName"].split("\.")[0];
-            $("#iconArea").append('<div class="span5"><li class="draggable" title= "' + type.replace(/-/g, ' ') + '" id="' + type + '"><div class="thumbnail"><img class="img-rounded" style="width:40px;height:80px" src="images/sbol_visual_jpeg/' + this["fileName"] + '"></div></li></div>');
+            $("#iconArea").append('<div class="span5"><li class="draggable partIcon" title= "' + type.replace(/-/g, ' ') + '" id="' + type + '"><div class="thumbnail"><img class="img-rounded" style="width:40px;height:80px" src="images/sbol_visual_jpeg/' + this["fileName"] + '"></div></li></div>');
             $('#' + type).dblclick(function() {
                 //When clicked gives id name
                 alert("creating new " + $(this).attr('id'));
@@ -23,15 +23,13 @@ $(document).ready(function() {
         });
         $('#iconArea .draggable').draggable({
             helper: "clone",
-            connectToSortable: ".sortable",
+            connectToSortable: ".sortable, #trash",
             revert: "invalid"
         });
         $('#iconArea li').on("click", function() {
+            $(".selected").removeClass("selected");
             $(this).parent().addClass("selected");
             refreshPartsList($(this).attr("title"));
-        });
-        $('#iconArea li').on("mouseleave", function() {
-            $(this).parent().removeClass("selected");
         });
     });
 
@@ -43,17 +41,55 @@ $(document).ready(function() {
 
 
     //Event Handlers
+    $('#startButton').click(function() {
+        $('#newDeviceButton').trigger("click");
+    });
+
     $('#newDeviceButton').click(function() {
         if (deviceCount === 0) {
-            $('#spectaclesEditorArea').html("");
+            $('#spectaclesEditorArea button').remove();
+            $('#trash').droppable({
+                hoverClass: "droppable-hover",
+                drop: function(event, ui) {
+                    var element = ui.draggable.css('position', '');
+                    if (element.hasClass('blank')) {
+                        element.parent().remove();
+                    }
+                    if (!element.hasClass("partIcon")) {
+                        $(this).append(element);
+                        $(ui.draggable).fadeOut(500);
+                    }
+                }}
+            );
         }
-        $('#spectaclesEditorArea').append('<ul id="device' + deviceCount + '" class="device droppable sortable"><li class="blank" style="height:80px;width:80px;border:1px solid grey" title="Drag a part here to get started">New Device</li></ul>');
+        $('#spectaclesEditorArea').append('<ul id="device' + deviceCount + '" class="device droppable sortable"><li class="blank" style="vertical-align:bottom;height:80px;width:80px;border:1px solid grey" title="Drag a part here to get started">New Device</li></ul>');
         $("#device" + deviceCount).sortable({
             revert: true
         });
         $("#device" + deviceCount).droppable({
             drop: function() {
-                $(this).find("li.blank").remove();
+                $(this).droppable("destroy");
+                var firstItem = $(this).find("li.blank");
+                firstItem.html('<strong>' + $(this).attr("id") + '</strong>');
+                firstItem.addClass("notSortable");
+                $(this).sortable({
+                    revert: true,
+                    items: "li:not(.notSortable)",
+                    connectWith: "#trash",
+                    stop: function(event,ui) {
+                        var firstItem = $(ui.item).parent().find("li.blank");
+                        $(ui.item).parent().prepend(firstItem);
+                        ui.item.removeClass('partIcon');
+                    }
+                });
+                firstItem.attr("title", "Select to edit device properties");
+                $(this).prepend(firstItem);
+                firstItem.attr("style", 'height:40px;width:80px;background:#0081c2;vertical-align:top;padding:5px');
+                firstItem.addClass("rotatedText");
+                firstItem.click(function() {
+                    $('.selected').removeClass("selected");
+                    $(this).addClass("selected");
+                });
             }
         });
         deviceCount = deviceCount + 1;
@@ -68,7 +104,6 @@ $(document).ready(function() {
         command["parts"] = [];
         $('#spectaclesEditorArea ul').each(function() {
             var device = "Device " + $(this).attr("id") + "(";
-            //            command["devices"].push($(this).attr("id"));
             $(this).find("li").each(function() {
                 device = device + $(this).attr("title").split(' ').join("") + ",";
             });

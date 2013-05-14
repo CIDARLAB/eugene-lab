@@ -19,7 +19,14 @@
             .thumbnail{
                 background-color: white;
             }
-            .selected{opacity: 0.5}
+            .selected{opacity: 0.7}
+            .rotatedText{
+                -webkit-transform: rotate(-90deg); 
+                -moz-transform: rotate(-90deg); 
+                -ms-transform: rotate(-90deg); 
+                -o-transform: rotate(-90deg); 
+                transform: rotate(-90deg);
+            }
         </style>  
     </head>
     <body>
@@ -44,7 +51,7 @@
         <div class="row-fluid">
             <div class="span2 well">
                 <div id="partsList">parts list will appear here</div>
-                
+
             </div>
             <div class="span8">
                 <div class="tabbable">
@@ -57,7 +64,8 @@
                     <div id="dataTableContent" class="tab-content">
                         <div class="tab-pane active" id="spectaclesEditorTab">
                             <div id="spectaclesEditorArea" style="height:500px">
-                                <h3>Create a new device to get started</h3>
+                                <button id="startButton" class="btn btn-large btn-primary">Create a new Device to get started</button>
+                                <ul style="list-style:none" id="trash"><li style="height:100px;width:100px;border:black solid 1px">Trash</li></ul>'
                             </div>
                         </div>
                         <div class="tab-pane" id="textEditorTab"> 
