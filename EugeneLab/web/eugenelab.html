@@ -10,16 +10,16 @@
         <script src="jsLibraries/jquery-1.9.1.min.js"></script>
         <script src="jsLibraries/jquery-ui.min.js"></script>
         <style>
-            ul.thumbnails li.span4:nth-child(3n + 4) {
-                margin-left : 0px;
-            }
             ul.device {
                 list-style-type: none;
             }
             ul.device li{
                 display: inline-block;
             }
-            .draggable { width: 90px; height: 90px; }
+            .thumbnail{
+                background-color: white;
+            }
+            .selected{opacity: 0.5}
         </style>  
     </head>
     <body>
@@ -42,24 +42,22 @@
             <h1>EugeneLab<small> This is where the magic happens</small></h1>
         </div>
         <div class="row-fluid">
-            <div class="span2">
-                parts list will appear here
+            <div class="span2 well">
+                <div id="partsList">parts list will appear here</div>
+                
             </div>
             <div class="span8">
                 <div class="tabbable">
                     <ul id="dataTableHeader" class="nav nav-tabs">
                         <li class="active"><a href="#spectaclesEditorTab" data-toggle="tab">Graphical Editor</a></li>
                         <li><a href="#textEditorTab" data-toggle="tab">Text Editor</a></li>
+                        <li class="pull-right"><button style="width:150px" id="runButton" class="btn btn-success">Run</button></li>
+                        <li class="pull-right"><button style="width:150px" id="newDeviceButton" class="btn btn-primary">Create New Device</button></li>
                     </ul>
                     <div id="dataTableContent" class="tab-content">
                         <div class="tab-pane active" id="spectaclesEditorTab">
                             <div id="spectaclesEditorArea" style="height:500px">
-                                <h3>This is where are drag and drop interface will go</h3>
-                                <div id='dragDropDemo'>
-
-                                    <ul class="device sortable"><li>item one</li></ul>
-
-                                </div>
+                                <h3>Create a new device to get started</h3>
                             </div>
                         </div>
                         <div class="tab-pane" id="textEditorTab"> 
@@ -70,7 +68,7 @@
                 <hr/>
 
             </div>
-            <div class="span2">
+            <div class="span2 well">
                 <h3>Part Types</h3>
                 <hr/>
                 <ul id="iconArea" class="thumbnails" style="height:500px;overflow:scroll"></ul>

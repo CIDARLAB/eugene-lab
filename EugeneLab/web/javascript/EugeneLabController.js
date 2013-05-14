@@ -2,11 +2,8 @@
  * Also adds a unique id to each part, viewable when clicked
  */
 $(document).ready(function() {
-    $(function() {
-        $(".sortable").sortable({
-            revert: true,
-        });
-    });
+    var deviceCount = 0;
+
 
 
     var command = {"command": "imageList"};
@@ -17,9 +14,9 @@ $(document).ready(function() {
         $('#iconArea').html("");
         $.each(response, function() {
             var type = this["fileName"].split("\.")[0];
-            $("#iconArea").append('<div class="span5"><li class="draggable" title= "'+ type.replace(/-/g, ' ') + '" id="' + type + '"><div class="thumbnail"><img class="img-rounded" style="width:40px;height:80px" src="images/sbol_visual_jpeg/' + this["fileName"] + '"></div></li></div>');
+            $("#iconArea").append('<div class="span5"><li class="draggable" title= "' + type.replace(/-/g, ' ') + '" id="' + type + '"><div class="thumbnail"><img class="img-rounded" style="width:40px;height:80px" src="images/sbol_visual_jpeg/' + this["fileName"] + '"></div></li></div>');
             $('#' + type).dblclick(function() {
-            //When clicked gives id name
+                //When clicked gives id name
                 alert("creating new " + $(this).attr('id'));
             });
             i = i + 1;
@@ -27,8 +24,40 @@ $(document).ready(function() {
         $('#iconArea .draggable').draggable({
             helper: "clone",
             connectToSortable: ".sortable",
-            revert: "invalid"            
+            revert: "invalid"
         });
+        $('#iconArea li').on("click", function() {
+            $(this).parent().addClass("selected");
+            refreshPartsList($(this).attr("title"));
+        });
+        $('#iconArea li').on("mouseleave", function() {
+            $(this).parent().removeClass("selected");
+        });
+    });
+
+    //Functions
+    var refreshPartsList = function(s) {
+        //TODO render parts list
+        $('#partsList').html(s);
+    };
+
+
+    //Event Handlers
+    $('#newDeviceButton').click(function() {
+        if(deviceCount===0){
+            $('#spectaclesEditorArea').html("");
+        }
+        $('#spectaclesEditorArea').append('<ul id="device' + deviceCount + '" class="device droppable sortable"><li class="blank" style="height:80px;width:80px;border:1px solid grey" title="Drag a part here to get started">New Device</li></ul>');
+        $("#device"+deviceCount).sortable({
+            revert: true
+        });
+        $("#device"+deviceCount).droppable({
+            drop:function(){
+                $(this).find("li.blank").remove();
+            }
+        });
+        deviceCount = deviceCount + 1;
+
     });
 });
 
