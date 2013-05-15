@@ -4,6 +4,7 @@
  */
 package servlet;
 
+import eugene.EugeneExecutor;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -35,10 +36,13 @@ public class EugeneServlet extends HttpServlet {
         //I'm returning a JSON object and not a string
         response.setContentType("application/json");
         PrintWriter out = response.getWriter();
+                    String command = request.getParameter("command");
         try {
-            String command = request.getParameter("command");
             if (command.equals("imageList")) {
                 out.write(readImageFiles());
+            }
+            if(command.equals("run")) {
+                String[] devices = (String[]) EugeneExecutor.execute("eugeneString",1);
             }
         } catch (Exception e) {
             e.printStackTrace();

@@ -944,7 +944,7 @@ public class Interp {
 			throw new EugeneException(
 					"Cannot apply the XOR operator, because the element at the right side "
 							+ rightElement.getName()
-							+ " is not a Rule nor a Variable!");
+							+ " is not a Rule nor a Variable!");
 		}
 
 		return bLeft ^ bRight;
