@@ -29,38 +29,32 @@ import eugene.dom.loops.*;
 import eugene.dom.branches.*;
 import eugene.dom.rules.*;
 import eugene.dom.arrays.*;
-import eugene.dom.characterization.*;
 import eugene.dom.collection.*;
-import eugene.dom.components.*;
-import eugene.dom.components.types.*;
-import eugene.factory.DeviceFactory;
 import eugene.rules.*;
 import eugene.exception.*;
-import eugene.util.*;
 import eugene.output.ResultSet;
 import importer.RegistryImporter;
 import eugene.interpreter.*;
-import eugene.rules.parser.*;
-
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Stack;
 import java.util.Set;
 import java.util.Iterator;
-import java.util.Random;
-import java.io.File;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 // SBOL
-import eugene.data.sbol.*;
-import eugene.data.sbol.mapping.*;
 
 // for Genbank import
-import eugene.data.genbank.*;
+import eugene.data.genbank.GenbankImporter;
+import eugene.dom.components.Component;
+import eugene.dom.components.Device;
+import eugene.dom.components.DeviceInstance;
+import eugene.dom.components.Part;
+import eugene.dom.components.Property;
+import eugene.dom.components.RegistryPart;
+import eugene.dom.components.types.DeviceType;
+import eugene.dom.components.types.PartType;
 
 import org.antlr.runtime.*;
-import java.util.Stack;
 import java.util.List;
 import java.util.ArrayList;
 

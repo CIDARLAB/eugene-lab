@@ -50,7 +50,20 @@
         </div>
         <div class="row-fluid">
             <div class="span2 well">
-                <div id="partsList">parts list will appear here</div>
+                <h4>Parts List</h4>
+                <hr/>
+                <div style="height:250px;overflow:auto" id="partsListArea">parts list will appear here
+                    <hr/>
+                    <button class="btn" data-toggle="collapse" data-target="#uploadArea">Upload Parts</button>
+                    <div id="uploadArea" class="collapse out">
+                        <form id="file_upload" action="EugeneServlet" method="POST" enctype="multipart/form-data">
+                            <input id="file_1" type="file" name="file_1" multiple/>
+                            <br>
+                            <button id="uploadButton" data-toggle="collapse" data-target="#uploadArea">Upload</button>
+                        </form>
+                    </div>
+                </div>
+
 
             </div>
             <div class="span8">
