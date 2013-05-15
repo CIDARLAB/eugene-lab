@@ -3,11 +3,24 @@
  */
 $(document).ready(function() {
     var deviceCount = 0;
+    var command = {"command": "read"};
+    $.get("EugeneServlet", command, function(response) {
+        var toAppend = '<table class="table table-bordered table-hover" id="partsList"><thead><tr><th>Name</th><th>Type</th></tr></thead><tbody>';
+        $.each(response["result"], function() {
+            if (this["Type"].toLowerCase() !== "composite") {
+                toAppend = toAppend + '<tr><td>' + this["Name"] + '</td><td>' + this["Type"] + '</td></tr>';
+            }
+        });
+        toAppend = toAppend + "</tbody></table>";
+        $('#partsListArea').html(toAppend);
+        $("#partsList").dataTable({
+            "bPaginate": false,
+            "bScrollCollapse": true
+        });
+    });
 
 
-
-    var command = {"command": "imageList"};
-
+    command = {"command": "imageList"};
     //render parts icons
     $.get("EugeneServlet", command, function(response) {
         var i = 0;
@@ -32,6 +45,10 @@ $(document).ready(function() {
             refreshPartsList($(this).attr("title"));
         });
     });
+
+
+    //load parts list
+
 
     //Functions
     var refreshPartsList = function(s) {
@@ -62,7 +79,7 @@ $(document).ready(function() {
                 }}
             );
         }
-        $('#spectaclesEditorArea').append('<ul id="device' + deviceCount + '" class="device droppable sortable"><li class="blank" style="vertical-align:bottom;height:80px;width:80px;border:1px solid grey" title="Drag a part here to get started">New Device</li></ul>');
+        $('#spectaclesEditorArea').append('<ul id="device' + deviceCount + '" class="device droppable sortable"><li class="blank" style="vertical-align:bottom;height:80px;width:80px;border:1px solid grey" title="Drag a part here to get started">New Design</li></ul>');
         $("#device" + deviceCount).sortable({
             revert: true
         });
@@ -98,8 +115,9 @@ $(document).ready(function() {
     $('#runButton').click(function() {
         var command = {};
         command["command"] = "run";
-        command["devices"] = [];
+        command["devices"] = "";
         command["parts"] = [];
+        var devices = "";
         $('#spectaclesEditorArea ul').each(function() {
             if ($(this).find("li").length > 1) {
                 var device = "Device " + $(this).attr("id") + "(";
@@ -112,10 +130,16 @@ $(document).ready(function() {
                 });
                 device = device.substring(0, device.length - 1);
                 device = device + ")";
-                alert(device);
-                command["devices"].push(device);
+                devices = devices + device + "|";
             }
         });
+        devices = devices.substring(0, devices.length - 1);
+        command["devices"] = devices;
+        alert(command["devices"]);
+        window.location.replace("http://cidar.bu.edu/ravencad/ravencad.html");
+//        $.get("EugeneServlet", command, function(response) {
+//            alert(response);
+//        });
     });
 
 });

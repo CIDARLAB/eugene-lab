@@ -5,7 +5,9 @@
 package servlet;
 
 import eugene.EugeneExecutor;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -15,6 +17,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.antlr.runtime.RecognitionException;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
@@ -47,7 +50,12 @@ public class EugeneServlet extends HttpServlet {
                 out.write(readImageFiles());
             }
             if (command.equals("run")) {
-                String[] devices = (String[]) EugeneExecutor.execute("eugeneString", 1);
+                System.out.println("detected run command");
+                String devices = request.getParameter("devices");
+                System.out.println("devices: " + devices);
+                String toReturn = run(devices);
+                toReturn = "{\"response\":\"response\"}";
+                out.write(toReturn);
             }
             if (command.equals("read")) {
                 out.write(readFiles());
@@ -143,7 +151,7 @@ public class EugeneServlet extends HttpServlet {
         PrintWriter writer = response.getWriter();
         response.setContentType("text/plain");
         response.sendRedirect("eugenelab.html");
-        String uploadFilePath =  this.getServletContext().getRealPath("/") + "data";
+        String uploadFilePath = this.getServletContext().getRealPath("/") + "data";
         try {
             List<FileItem> items = uploadHandler.parseRequest(request);
             new File(uploadFilePath).mkdir();
@@ -181,23 +189,65 @@ public class EugeneServlet extends HttpServlet {
     }
 
     private String readFiles() {
+        String toReturn = "[";
+
         try {
-            String imagePath = this.getServletContext().getRealPath("/") + "data/";
-            String toReturn = "[";
+            String imagePath = this.getServletContext().getRealPath("/") + "data\\";
+
             File[] filesToRead = new File(imagePath).listFiles();
             if (filesToRead != null) {
-                for (File currentFile : filesToRead) {
+                for (int j = 0; j < filesToRead.length; j++) {
+                    File currentFile = filesToRead[j];
                     String filePath = currentFile.getAbsolutePath();
                     String fileExtension = filePath.substring(filePath.lastIndexOf(".") + 1, filePath.length()).toLowerCase();
                     if ("csv".equals(fileExtension)) {
-
+                        BufferedReader reader = new BufferedReader(new FileReader(currentFile.getAbsolutePath()));
+                        String line = reader.readLine();
+                        line = reader.readLine(); //skip first line
+                        while (line != null) {
+                            while (line.matches("^[\\s,]+")) {
+                                line = reader.readLine();
+                            }
+                            String[] tokens = line.split(",");
+                            int tokenCount = tokens.length; //keeps track of how many columns are filled by counting backwards
+                            for (int i = tokens.length - 1; i > -1; i--) {
+                                if (tokens[i].trim().matches("[\\s]*")) {
+                                    tokenCount--;
+                                } else {
+                                    break;
+                                }
+                            }
+                            String name = tokens[0].trim();
+                            String sequence = tokens[1].trim();
+                            String leftOverhang = tokens[2].trim();
+                            String rightOverhang = tokens[3].trim();
+                            String type = tokens[4].trim();
+                            toReturn = toReturn
+                                    + "{\"Name\":\"" + name
+                                    + "\",\"LO\":\"" + leftOverhang
+                                    + "\",\"RO\":\"" + rightOverhang
+                                    + "\",\"Type\":\"" + type + "\"},";
+                            line = reader.readLine();
+                        }
+                        reader.close();
                     }
                 }
+                toReturn = "{\"result\":" + toReturn.subSequence(0, toReturn.length() - 1) + "]}";
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return toReturn;
+    }
+
+    private String run(String devices) throws RecognitionException {
+        System.out.println("running");
+        System.out.println(devices);
+        String[] deviceArray = devices.split("\\|");
+        for (int i = 0; i < deviceArray.length; i++) {
+            System.out.println(deviceArray[i]);
+        }
+        String[] results = (String[]) EugeneExecutor.execute("eugeneString", 1);
         return null;
     }
 }
