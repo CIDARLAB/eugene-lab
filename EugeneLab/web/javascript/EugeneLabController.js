@@ -76,7 +76,7 @@ $(document).ready(function() {
                     revert: true,
                     items: "li:not(.notSortable)",
                     connectWith: "#trash",
-                    stop: function(event,ui) {
+                    stop: function(event, ui) {
                         var firstItem = $(ui.item).parent().find("li.blank");
                         $(ui.item).parent().prepend(firstItem);
                         ui.item.removeClass('partIcon');
@@ -96,20 +96,25 @@ $(document).ready(function() {
     });
 
     $('#runButton').click(function() {
-        $('li.blank').parent().remove();
-        $('li.blank').remove();
         var command = {};
         command["command"] = "run";
         command["devices"] = [];
         command["parts"] = [];
         $('#spectaclesEditorArea ul').each(function() {
-            var device = "Device " + $(this).attr("id") + "(";
-            $(this).find("li").each(function() {
-                device = device + $(this).attr("title").split(' ').join("") + ",";
-            });
-            device = device.substring(0, device.length - 1);
-            device = device + ")";
-            command["devices"].push(device);
+            if ($(this).find("li").length > 1) {
+                var device = "Device " + $(this).attr("id") + "(";
+                var count = 0;
+                $(this).find("li").each(function() {
+                    if (count > 0) {
+                        device = device + $(this).attr("title").split(' ').join("") + ",";
+                    }
+                    count = count + 1;
+                });
+                device = device.substring(0, device.length - 1);
+                device = device + ")";
+                alert(device);
+                command["devices"].push(device);
+            }
         });
     });
 
