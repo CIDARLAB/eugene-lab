@@ -4,8 +4,6 @@
 $(document).ready(function() {
     var deviceCount = 0;
 
-
-
     var command = {"command": "imageList"};
     // Get the JSON object with the location of the images
     // JSON has key imageList with a value as a array of JSON objects with a single key "location"
@@ -58,6 +56,13 @@ $(document).ready(function() {
         });
         deviceCount = deviceCount + 1;
 
+    });
+    
+    $('#runButton').click(function() {
+        var input = $('textarea#textEditor').val();
+        $.post("EugeneServlet", {"input":input}, function(response) {
+            $('textarea#console').append(response);
+        });
     });
 });
 

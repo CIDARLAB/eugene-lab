@@ -89,7 +89,15 @@ public class EugeneServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        //processRequest(request, response);
+        response.setContentType("text/html;charset=UTF-8");
+        PrintWriter out = response.getWriter();
+        try{
+            out.println(request.getParameter("input"));
+        } finally {
+            out.close();
+        }
+        
     }
 
     /**
@@ -104,7 +112,7 @@ public class EugeneServlet extends HttpServlet {
     // </editor-fold>
     private String readImageFiles() {
         //get path relative to servlet; ie the /web directory
-        String imagePath = this.getServletContext().getRealPath("/") + "images\\sbol_visual_jpeg\\";
+        String imagePath = this.getServletContext().getRealPath("/") + "images/sbol_visual_jpeg/";
         String toReturn = "[";
         File[] filesInDirectory = new File(imagePath).listFiles();
         if (filesInDirectory != null) {
