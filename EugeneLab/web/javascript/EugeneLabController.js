@@ -58,11 +58,18 @@ $(document).ready(function() {
 
     });
     
+    //Clicking run button sends current text to server
+    //May want to modify to send file or collection of files to server(if Eugene program spans multiple files)
     $('#runButton').click(function() {
         var input = $('textarea#textEditor').val();
         $.post("EugeneServlet", {"input":input}, function(response) {
             $('textarea#console').append(response);
         });
+    });
+    
+    //Removes default text when clicked
+    $('#textEditor').click(function(){
+        $('#textEditor').empty();
     });
 });
 

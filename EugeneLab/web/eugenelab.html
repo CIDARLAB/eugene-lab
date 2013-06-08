@@ -21,9 +21,17 @@
             }
             
             textarea{
-                height: 180em;
+                width: 48.5em; /* 80 Characters wide on my computer */
                 font-family: "Courier New", Courier, "Lucida Sans Typewriter", "Lucida Typewriter", monospace;
                 font-size: 12pt;
+            }
+            
+            #textEditor{
+                height: 30em;
+            }
+            
+            #console{
+                height: 8em;
             }
             .selected{opacity: 0.5}
         </style>  
@@ -69,7 +77,7 @@
                         <div class="tab-pane" id="textEditorTab"> 
                             <h3>this is where the text editor will go</h3>
                             <textarea id="textEditor">Enter Eugene Code Here</textarea>
-                            <textarea id="console">Output Goes Here</textarea>
+                            <textarea id="console" readonly>Output Goes Here</textarea>
                         </div>
                     </div>
                 </div>

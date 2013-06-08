@@ -4,15 +4,21 @@
  */
 package servlet;
 
+import eugene.EugeneExecutor;
+import eugene.dom.SavableElement;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.HashMap;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.antlr.runtime.RecognitionException;
 
 /**
  *
@@ -60,21 +66,9 @@ public class EugeneServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
-        //Getting image files if the request has command getImageList
-        if (request.getParameter("command").equals("getImageList")) {
-            response.setContentType("text/html;charset=UTF-8");
-            PrintWriter out = response.getWriter();
-            try {
-                out.println(readImageFiles());
-            } finally {
-                out.close();
-            }
-        } else {
-
-
-            processRequest(request, response);
-        }
+        
+        processRequest(request, response);
+        
     }
 
     /**
@@ -90,14 +84,31 @@ public class EugeneServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         //processRequest(request, response);
+       executeEugene(request, response);
+
+    }
+    
+    public void executeEugene(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException{
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
+        String input = request.getParameter("input");
+        Object results = new Object();
+        out.println("\nStarting Eugene");
+        out.println(input);
         try{
-            out.println(request.getParameter("input"));
+             try {
+                 results = EugeneExecutor.execute(input, 2);
+                 out.println("In Try Block");
+                 out.println(results);
+             } catch (Exception e) {
+                 out.println("In Catch Block");  
+                 e.printStackTrace();
+             }
         } finally {
+            out.println("Finished Eugene");
             out.close();
         }
-        
     }
 
     /**
