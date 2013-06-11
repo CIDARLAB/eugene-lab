@@ -93,16 +93,14 @@ public class EugeneServlet extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
         String input = request.getParameter("input");
-        Object results = new Object();
+        HashMap<String, SavableElement> results = new HashMap<String, SavableElement>();
         out.println("\nStarting Eugene");
-        out.println(input);
         try{
              try {
-                 results = EugeneExecutor.execute(input, 2);
-                 out.println("In Try Block");
+                 results = (HashMap<String, SavableElement>) EugeneExecutor.execute(input, 2);
                  out.println(results);
-             } catch (Exception e) {
-                 out.println("In Catch Block");  
+                 out.println("Eugene worked!");
+             } catch (RecognitionException e) { 
                  e.printStackTrace();
              }
         } finally {
