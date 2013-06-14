@@ -7,8 +7,7 @@
         <link rel="shortcut icon" href="images/shortcutIcon.ico">
         <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
         <link href="css/bootstrap-responsive.min.css" rel="stylesheet" media="screen">
-        <link href="css/themes/github.css" rel="stylesheet" type="text/css">
-
+        <link rel="stylesheet" href="css/codemirror.css">
         <script src="jsLibraries/jquery-1.9.1.min.js"></script>
         <script src="jsLibraries/jquery-ui.min.js"></script>
         <style>
@@ -84,15 +83,9 @@
                             </div>
                         </div>
                         <div class="tab-pane" id="textEditorTab"> 
-                            <h3>this is where the text editor will go</h3>
-                            <pre><code data-language="python">
-def openFile(path):
-file = open(path, "r")
-content = file.read()
-file.close()
-return content
-                                </code>
-                            </pre>
+                            <div style="border:black solid 1px">
+                                <textarea id="editorTextArea" style="width:90%;"></textarea>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -110,15 +103,11 @@ return content
         <script src="jsLibraries/jquery.dataTables.min.js"></script>
         <script src="jsLibraries/bootstrap.min.js"></script>
         <script src="javascript/EugeneLabController.js"></script>
-        <script src="jsLibraries/rainbow.min.js"></script>
-        <script src="jsLibraries/language/python.js"></script>
+        <script src="jsLibraries/codemirror.js"></script>
+        <script src="jsLibraries/eugene.js"></script>
         <script>
-            $(document).ready(function() {
-                function showHiddenParagraphs() {
-                    $("p.hidden").fadeIn(500);
-                }
-                setTimeout(showHiddenParagraphs, 1000);
-            });
+            var myCodeMirror = CodeMirror.fromTextArea($('#editorTextArea')[0]);
+
         </script>
         <footer>
             <div class="container" align="center">
