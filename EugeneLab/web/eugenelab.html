@@ -28,7 +28,21 @@
                 -ms-transform: rotate(-90deg); 
                 -o-transform: rotate(-90deg); 
                 transform: rotate(-90deg);
+            }           
+            textarea{
+                width: 48.5em; /* 80 Characters wide on my computer */
+                font-family: "Courier New", Courier, "Lucida Sans Typewriter", "Lucida Typewriter", monospace;
+                font-size: 12pt;
             }
+
+            #textEditor{
+                height: 30em;
+            }
+
+            #console{
+                height: 8em;
+            }
+            .selected{opacity: 0.5}
         </style>  
     </head>
     <body>
@@ -84,8 +98,8 @@
                             </div>
                         </div>
                         <div class="tab-pane active" id="textEditorTab"> 
-                            <div style="border:black solid 1px">
-                                <textarea id="editorTextArea" style="width:90%;">
+
+                            <textarea id="textEditor">
 include "MocloDemoParts.eug";
 /*
 DEVICES 
@@ -113,8 +127,8 @@ for(num i=0;i<allOperons.size;i++) {
 	print(allOperons.get(i);
 }
 }
-                            </textarea>
-                        </div>
+                        </textarea>
+                        <textarea id="console" readonly>Output Goes Here</textarea>
                     </div>
                 </div>
             </div>
@@ -136,7 +150,7 @@ for(num i=0;i<allOperons.size;i++) {
     <script src="jsLibraries/eugene.js"></script>
     <script>
 
-        var editor = CodeMirror.fromTextArea(document.getElementById("editorTextArea"), {
+        var editor = CodeMirror.fromTextArea(document.getElementById("textEditor"), {
             styleActiveLine: true,
             lineNumbers: true,
             lineWrapping: true,

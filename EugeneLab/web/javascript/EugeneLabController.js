@@ -20,8 +20,10 @@ $(document).ready(function() {
     });
 
 
-    command = {"command": "imageList"};
-    //render parts icons
+    var command = {"command": "imageList"};
+    // Get the JSON object with the location of the images
+    // JSON has key imageList with a value as a array of JSON objects with a single key "location"
+
     $.get("EugeneServlet", command, function(response) {
         var i = 0;
         $('#iconArea').html("");
@@ -113,34 +115,53 @@ $(document).ready(function() {
     });
 
     $('#runButton').click(function() {
-        var command = {};
-        command["command"] = "run";
-        command["devices"] = "";
-        command["parts"] = [];
-        var devices = "";
-        $('#spectaclesEditorArea ul').each(function() {
-            if ($(this).find("li").length > 1) {
-                var device = "Device " + $(this).attr("id") + "(";
-                var count = 0;
-                $(this).find("li").each(function() {
-                    if (count > 0) {
-                        device = device + $(this).attr("title").split(' ').join("") + ",";
-                    }
-                    count = count + 1;
+        var text = false; //is the text editor active?
+        if($('div#textEditorTab').hasClass("active")) {
+           text = true; 
+        }
+        if (!text) {
+            var command = {};
+            command["command"] = "run";
+            command["devices"] = "";
+            command["parts"] = [];
+            var devices = "";
+            $('#spectaclesEditorArea ul').each(function() {
+                if ($(this).find("li").length > 1) {
+                    var device = "Device " + $(this).attr("id") + "(";
+                    var count = 0;
+                    $(this).find("li").each(function() {
+                        if (count > 0) {
+                            device = device + $(this).attr("title").split(' ').join("") + ",";
+                        }
+                        count = count + 1;
+                    });
+                    device = device.substring(0, device.length - 1);
+                    device = device + ")";
+                    devices = devices + device + "|";
+                }
+            });
+            devices = devices.substring(0, devices.length - 1);
+            command["devices"] = devices;
+            alert(command["devices"]);
+            window.location.replace("http://cidar.bu.edu/ravencad/ravencad.html");
+            $.get("EugeneServlet", command, function(response) {
+                alert(response);
+            });
+        } else {
+            //Clicking run button sends current text to server
+            //May want to modify to send file or collection of files to server(if Eugene program spans multiple files)
+            $('#runButton').click(function() {
+                var input = $('textarea#textEditor').val();
+                $.get("EugeneServlet", {"command":"execute","input": input}, function(response) {
+                    alert(response["result"]);
+//                    $('textarea#console').append(response);
                 });
-                device = device.substring(0, device.length - 1);
-                device = device + ")";
-                devices = devices + device + "|";
-            }
-        });
-        devices = devices.substring(0, devices.length - 1);
-        command["devices"] = devices;
-        alert(command["devices"]);
-        window.location.replace("http://cidar.bu.edu/ravencad/ravencad.html");
-//        $.get("EugeneServlet", command, function(response) {
-//            alert(response);
-//        });
+            });
+        }
+
     });
+
+    ;
 
 });
 

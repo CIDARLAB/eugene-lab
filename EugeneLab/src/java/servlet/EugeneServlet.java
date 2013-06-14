@@ -5,6 +5,7 @@
 package servlet;
 
 import eugene.EugeneExecutor;
+import eugene.dom.SavableElement;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -12,6 +13,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -39,26 +41,29 @@ public class EugeneServlet extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
+    protected void processGetRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         //I'm returning a JSON object and not a string
         response.setContentType("application/json");
         PrintWriter out = response.getWriter();
         String command = request.getParameter("command");
+
         try {
             if (command.equals("imageList")) {
                 out.write(readImageFiles());
-            }
-            if (command.equals("run")) {
-                System.out.println("detected run command");
+            } else if (command.equals("run")) {
                 String devices = request.getParameter("devices");
-                System.out.println("devices: " + devices);
                 String toReturn = run(devices);
                 toReturn = "{\"response\":\"response\"}";
                 out.write(toReturn);
-            }
-            if (command.equals("read")) {
+            } else if (command.equals("read")) {
                 out.write(readFiles());
+            } else if (command.equals("execute")) {
+                String input = request.getParameter("input");
+                String result = executeEugene(input);
+                out.write("{\"result\":\"" + result + "\",\"status\":\"bad\"}");
+            } else if (command.equals("test")) {
+                out.write("{\"response\":\"test response\"}");
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -80,21 +85,7 @@ public class EugeneServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
-        //Getting image files if the request has command getImageList
-        if (request.getParameter("command").equals("getImageList")) {
-            response.setContentType("text/html;charset=UTF-8");
-            PrintWriter out = response.getWriter();
-            try {
-                out.println(readImageFiles());
-            } finally {
-                out.close();
-            }
-        } else {
-
-
-            processRequest(request, response);
-        }
+        processGetRequest(request, response);
     }
 
     /**
@@ -123,68 +114,57 @@ public class EugeneServlet extends HttpServlet {
     }
     // </editor-fold>
 
-    private String readImageFiles() {
-        //get path relative to servlet; ie the /web directory
-        String imagePath = this.getServletContext().getRealPath("/") + "images\\sbol_visual_jpeg\\";
-        String toReturn = "[";
-        File[] filesInDirectory = new File(imagePath).listFiles();
-        if (filesInDirectory != null) {
-            for (File currentFile : filesInDirectory) {
-                String filePath = currentFile.getAbsolutePath();
-                String fileExtension = filePath.substring(filePath.lastIndexOf(".") + 1, filePath.length()).toLowerCase();
-                //grab only files that have jpeg extension
-                if ("jpeg".equals(fileExtension)) {
-                    toReturn = toReturn + "{\"fileName\":\"" + currentFile.getName() + "\"},";
-                }
-            }
-        }
-        toReturn = toReturn.substring(0, toReturn.length() - 1);
-        toReturn = toReturn + "]";
-        return toReturn;
-    }
-
     protected void processPostRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        if (!ServletFileUpload.isMultipartContent(request)) {
-            throw new IllegalArgumentException("Request is not multipart, please 'multipart/form-data' enctype for your form.");
-        }
-        ServletFileUpload uploadHandler = new ServletFileUpload(new DiskFileItemFactory());
-        PrintWriter writer = response.getWriter();
-        response.setContentType("text/plain");
-        response.sendRedirect("eugenelab.html");
-        String uploadFilePath = this.getServletContext().getRealPath("/") + "data";
-        try {
-            List<FileItem> items = uploadHandler.parseRequest(request);
-            new File(uploadFilePath).mkdir();
-            ArrayList<File> toLoad = new ArrayList();
-            for (FileItem item : items) {
-                File file;
-                if (!item.isFormField()) {
-                    String fileName = item.getName();
-                    if (fileName.equals("")) {
-                        System.out.println("You forgot to choose a file.");
+        if (ServletFileUpload.isMultipartContent(request)) {
+            //process code for file upload
+            ServletFileUpload uploadHandler = new ServletFileUpload(new DiskFileItemFactory());
+            PrintWriter writer = response.getWriter();
+            response.setContentType("text/plain");
+            response.sendRedirect("eugenelab.html");
+            String uploadFilePath = this.getServletContext().getRealPath("/") + "data";
+            try {
+                List<FileItem> items = uploadHandler.parseRequest(request);
+                new File(uploadFilePath).mkdir();
+                ArrayList<File> toLoad = new ArrayList();
+                for (FileItem item : items) {
+                    File file;
+                    if (!item.isFormField()) {
+                        String fileName = item.getName();
+                        if (fileName.equals("")) {
+                            System.out.println("You forgot to choose a file.");
+                        }
+                        if (fileName.lastIndexOf("\\") >= 0) {
+                            file = new File(uploadFilePath + "\\" + fileName.substring(fileName.lastIndexOf("\\")));
+                        } else {
+                            file = new File(uploadFilePath + "\\" + fileName.substring(fileName.lastIndexOf("\\") + 1));
+                        }
+                        item.write(file);
+                        toLoad.add(file);
                     }
-                    if (fileName.lastIndexOf("\\") >= 0) {
-                        file = new File(uploadFilePath + "\\" + fileName.substring(fileName.lastIndexOf("\\")));
-                    } else {
-                        file = new File(uploadFilePath + "\\" + fileName.substring(fileName.lastIndexOf("\\") + 1));
-                    }
-                    item.write(file);
-                    toLoad.add(file);
+                    writer.write("{\"result\":\"good\",\"status\":\"good\"}");
                 }
-                writer.write("{\"result\":\"good\",\"status\":\"good\"}");
+            } catch (FileUploadException e) {
+                throw new RuntimeException(e);
+            } catch (Exception e) {
+                e.printStackTrace();
+                StringWriter stringWriter = new StringWriter();
+                PrintWriter printWriter = new PrintWriter(stringWriter);
+                e.printStackTrace(printWriter);
+                String exceptionAsString = stringWriter.toString().replaceAll("[\r\n\t]+", "<br/>");
+                writer.write("{\"result\":\"" + exceptionAsString + "\",\"status\":\"bad\"}");
+            } finally {
+                writer.close();
             }
-        } catch (FileUploadException e) {
-            throw new RuntimeException(e);
-        } catch (Exception e) {
-            e.printStackTrace();
-            StringWriter stringWriter = new StringWriter();
-            PrintWriter printWriter = new PrintWriter(stringWriter);
-            e.printStackTrace(printWriter);
-            String exceptionAsString = stringWriter.toString().replaceAll("[\r\n\t]+", "<br/>");
-            writer.write("{\"result\":\"" + exceptionAsString + "\",\"status\":\"bad\"}");
+        } else {
+            response.setContentType("application/json");
+            PrintWriter out = response.getWriter();
+            String command = request.getParameter("command");
+            if (command.equals("execute")) {
+                String input = request.getParameter("input");
+                String result = executeEugene(input);
+                out.write("{\"result\":\"" + result + "\",\"status\":\"bad\"}");
+            }
 
-        } finally {
-            writer.close();
         }
     }
 
@@ -249,5 +229,42 @@ public class EugeneServlet extends HttpServlet {
         }
         String[] results = (String[]) EugeneExecutor.execute("eugeneString", 1);
         return null;
+    }
+
+    private String readImageFiles() {
+        //get path relative to servlet; ie the /web directory
+        String imagePath = this.getServletContext().getRealPath("/") + "images\\sbol_visual_jpeg\\";
+        String toReturn = "[";
+        File[] filesInDirectory = new File(imagePath).listFiles();
+        if (filesInDirectory != null) {
+            for (File currentFile : filesInDirectory) {
+                String filePath = currentFile.getAbsolutePath();
+                String fileExtension = filePath.substring(filePath.lastIndexOf(".") + 1, filePath.length()).toLowerCase();
+                //grab only files that have jpeg extension
+                if ("jpeg".equals(fileExtension)) {
+                    toReturn = toReturn + "{\"fileName\":\"" + currentFile.getName() + "\"},";
+                }
+            }
+        }
+        toReturn = toReturn.substring(0, toReturn.length() - 1);
+        toReturn = toReturn + "]";
+        return toReturn;
+    }
+
+    public String executeEugene(String input) {
+        HashMap<String, SavableElement> results = new HashMap<String, SavableElement>();
+        String toReturn = "<br/>Starting Eugene";
+        try {
+            try {
+                results = (HashMap<String, SavableElement>) EugeneExecutor.execute(input, 2);
+                toReturn = toReturn + "<br/>" + results;
+                toReturn = toReturn + "<br/>Eugene worked!";
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } finally {
+            toReturn = toReturn + "<br/>Finished Eugene!";
+        }
+        return toReturn;
     }
 }
