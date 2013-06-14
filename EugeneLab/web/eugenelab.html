@@ -8,6 +8,7 @@
         <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
         <link href="css/bootstrap-responsive.min.css" rel="stylesheet" media="screen">
         <link rel="stylesheet" href="css/codemirror.css">
+        <link rel="stylesheet" href="css/blackboard.css">
         <script src="jsLibraries/jquery-1.9.1.min.js"></script>
         <script src="jsLibraries/jquery-ui.min.js"></script>
         <style>
@@ -70,50 +71,85 @@
             <div class="span8">
                 <div class="tabbable">
                     <ul id="dataTableHeader" class="nav nav-tabs">
-                        <li class="active"><a href="#spectaclesEditorTab" data-toggle="tab">Graphical Editor</a></li>
-                        <li><a href="#textEditorTab" data-toggle="tab">Text Editor</a></li>
+                        <li><a href="#spectaclesEditorTab" data-toggle="tab">Graphical Editor</a></li>
+                        <li class="active"><a href="#textEditorTab" data-toggle="tab">Text Editor</a></li>
                         <li class="pull-right"><button style="width:150px" id="runButton" class="btn btn-success">Run</button></li>
                         <li class="pull-right"><button style="width:150px" id="newDeviceButton" class="btn btn-primary">Create New Device</button></li>
                     </ul>
                     <div id="dataTableContent" class="tab-content">
-                        <div class="tab-pane active" id="spectaclesEditorTab">
+                        <div class="tab-pane" id="spectaclesEditorTab">
                             <div id="spectaclesEditorArea" style="height:500px">
                                 <button id="startButton" class="btn btn-large btn-primary">Create a new Device to get started</button>
                                 <ul id="trash" style="list-style:none;position:absolute;right:300px;bottom:100px"><li style="height:100px;width:100px;border:black solid 1px;background-color: #999999"><strong>Trash</strong></li></ul>'
                             </div>
                         </div>
-                        <div class="tab-pane" id="textEditorTab"> 
+                        <div class="tab-pane active" id="textEditorTab"> 
                             <div style="border:black solid 1px">
-                                <textarea id="editorTextArea" style="width:90%;"></textarea>
-                            </div>
+                                <textarea id="editorTextArea" style="width:90%;">
+include "MocloDemoParts.eug";
+/*
+DEVICES 
+*/
+Device URS1(Spacer, Promoter, RBS);
+Device URS2(Ribozyme, RBS, Leader);
+Device Operon(URS1, URS2, CodingSequence, Terminator, Spacer);
+
+/*
+RULES
+*/
+
+//length rules
+Rule URS1Rule (ON URS1:(Spacer.sequence.size()+Promoter.sequence.size()+RBS.sequence.size()) <=450);
+Rule URS2Rule (ON URS2:(Ribozyme.sequence.size()+RBS.sequence.size()+Leader.sequence.size()) <=450);
+
+//switch this on after first run
+Rule LeaderRule (ON URS2: NOT CONTAINS Leader);
+
+//generate all devices
+Device[] allOperons = product(Operon,strict);
+
+//print out device compositions
+for(num i=0;i<allOperons.size;i++) {
+	print(allOperons.get(i);
+}
+}
+                            </textarea>
                         </div>
                     </div>
                 </div>
-                <hr/>
-
             </div>
-            <div class="span2 well">
-                <h4>Part Types</h4>
-                <hr/>
-                <div id="partIconArea" style="height:500px;overflow:auto">
-                    <ul id="iconArea" class="thumbnails"></ul>
-                </div>
+            <hr/>
+
+        </div>
+        <div class="span2 well">
+            <h4>Part Types</h4>
+            <hr/>
+            <div id="partIconArea" style="height:500px;overflow:auto">
+                <ul id="iconArea" class="thumbnails"></ul>
             </div>
         </div>
-        <script src="jsLibraries/jquery.dataTables.min.js"></script>
-        <script src="jsLibraries/bootstrap.min.js"></script>
-        <script src="javascript/EugeneLabController.js"></script>
-        <script src="jsLibraries/codemirror.js"></script>
-        <script src="jsLibraries/eugene.js"></script>
-        <script>
-            var myCodeMirror = CodeMirror.fromTextArea($('#editorTextArea')[0]);
+    </div>
+    <script src="jsLibraries/jquery.dataTables.min.js"></script>
+    <script src="jsLibraries/bootstrap.min.js"></script>
+    <script src="javascript/EugeneLabController.js"></script>
+    <script src="jsLibraries/codemirror.js"></script>
+    <script src="jsLibraries/eugene.js"></script>
+    <script>
 
-        </script>
-        <footer>
-            <div class="container" align="center">
-                <p>Designed and built by <a href="contact.html">Jenhan Tao</a>, <a href="contact.html">Ernst Oberortner</a> and <a href="contact.html">Erik Lindgren</a></p>
-                <p>Code licensed under <a href="license.html">LICENSE</a></p>
-            </div>
-        </footer>
-    </body>
+        var editor = CodeMirror.fromTextArea(document.getElementById("editorTextArea"), {
+            styleActiveLine: true,
+            lineNumbers: true,
+            lineWrapping: true,
+            theme: "blackboard",
+            mode: "eugene"
+        });
+
+    </script>
+    <footer>
+        <div class="container" align="center">
+            <p>Designed and built by <a href="contact.html">Jenhan Tao</a>, <a href="contact.html">Ernst Oberortner</a> and <a href="contact.html">Erik Lindgren</a></p>
+            <p>Code licensed under <a href="license.html">LICENSE</a></p>
+        </div>
+    </footer>
+</body>
 </html>
