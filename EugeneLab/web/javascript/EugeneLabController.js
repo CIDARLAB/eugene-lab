@@ -58,6 +58,7 @@ $(document).ready(function() {
         $('#partsList').html(s);
     };
 
+    
 
     //Event Handlers
     $('#startButton').click(function() {
@@ -160,8 +161,19 @@ $(document).ready(function() {
         }
 
     });
-
-    ;
-
+    
+    // On file folder click changes the file explorer
+    $('.fileExplorerFolder').click(function() {
+        $(this).parent().css('display', 'none');
+        var s = '#' + $(this).attr('id') + 'Devices';
+        $(s).addClass('activeFileExplorer');
+        $(s).css('display', 'block');
+    });
+    
+    // Adds a project to the file explorer
+    $('#addNewProject').click(function() {
+        var response = prompt('New File Name?');
+        $('<li class="fileExplorerElement fileExplorerFolder" id="' + response + '">' + response + '</li>').insertBefore($(this));
+    });
 });
 
