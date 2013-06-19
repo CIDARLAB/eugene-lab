@@ -3,7 +3,7 @@ package org.clothocad.clotho.client;
 import org.clothocad.client.layers.communication.Channel;
 import org.clothocad.client.layers.communication.Router;
 import org.clothocad.dom.ClothoUser;
-import org.clothocad.dom.Datum;
+import org.clothocad.dom.ClothoObject;
 import org.clothocad.dom.Function;
 import org.json.JSONObject;
 
@@ -14,17 +14,17 @@ public class ClothoAPI {
 		this.router = new Router();
 	}
 	
-	public Datum get(String id) {
-		return (Datum)null;
+	public ClothoObject get(String id) {
+		return (ClothoObject)null;
 	}
 	
-	public boolean set(String id, Datum datum) {
+	public boolean set(String id, ClothoObject datum) {
 		return false;
 	}
 	
 	// create is an asynchronous call...
 	// i.e. we need a callback-handler which handles the server's response...
-	public boolean create(Datum datum) {
+	public boolean create(ClothoObject datum) {
 		
 		try {
 			router.sendMessage(Channel.create, datum.toJSON());						

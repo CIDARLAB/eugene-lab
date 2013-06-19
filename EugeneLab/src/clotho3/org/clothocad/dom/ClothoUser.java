@@ -60,7 +60,7 @@ import org.json.JSONObject;
  */
 
 public class ClothoUser 
-		extends Datum {
+		extends ClothoObject {
 	
 	private static final long serialVersionUID = 5084296205189240430L;
 	

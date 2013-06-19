@@ -9,7 +9,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.json.JSONObject;
 
 @XmlRootElement
-public abstract class Datum 
+public abstract class ClothoObject 
 	implements Serializable, ObjBase {
 	
 	private static final long serialVersionUID = -4383410157216396194L;
@@ -19,7 +19,7 @@ public abstract class Datum
 	private Date lastModified;
 	private Date lastAccessed;
 	
-	public Datum() {
+	public ClothoObject() {
 		// create a random UUID
 		this.uuid = UUID.randomUUID();
 		this.dateCreated = new Date();
@@ -44,5 +44,8 @@ public abstract class Datum
 	}
 	
     // every Datum must implement the toJSON method
-    public abstract JSONObject toJSON();
+    public JSONObject toJSON() {
+    	return new JSONObject();
+    }
+    	// can we do some retrospection here?
 }

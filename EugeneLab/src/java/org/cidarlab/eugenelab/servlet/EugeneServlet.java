@@ -22,6 +22,7 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.json.JSONObject;
 
 /**
  *
@@ -171,7 +172,11 @@ public class EugeneServlet extends HttpServlet {
                     item.write(file);
                     toLoad.add(file);
                 }
-                writer.write("{\"result\":\"good\",\"status\":\"good\"}");
+                
+                JSONObject json = new JSONObject();
+                json.put("result", "good");
+                json.put("status", "good");
+                writer.write(json.toString());
             }
         } catch (FileUploadException e) {
             throw new RuntimeException(e);

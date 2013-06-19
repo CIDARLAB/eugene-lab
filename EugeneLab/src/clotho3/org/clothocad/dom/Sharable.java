@@ -5,7 +5,7 @@ package org.clothocad.dom;
  * @author jcanderson
  */
 public abstract class Sharable 
-		extends Datum {
+		extends ClothoObject {
 	
 	private static final long serialVersionUID = 4685496726003406285L;
 	
