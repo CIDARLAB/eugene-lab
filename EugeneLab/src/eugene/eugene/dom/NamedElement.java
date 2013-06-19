@@ -24,6 +24,7 @@ package eugene.dom;
 
 import java.io.Serializable;
 
+import org.clothocad.dom.ClothoObject;
 import org.clothocad.dom.ObjBase;
 
 import eugene.exception.EugeneException;
@@ -34,7 +35,8 @@ import eugene.exception.InvalidEugeneAssignmentException;
  * @author Ernst Oberortner
  */
 public abstract class NamedElement 
-	implements Serializable, ObjBase {
+	extends ClothoObject
+	implements Serializable {
 
 	private static final long serialVersionUID = 1660684454032759291L;
 

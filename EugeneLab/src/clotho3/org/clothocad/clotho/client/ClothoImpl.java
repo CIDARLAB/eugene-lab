@@ -1,9 +1,13 @@
 package org.clothocad.clotho.client;
 
 
+import java.util.Set;
+
 import org.clothocad.client.layers.communication.Mind;
 import org.clothocad.dom.ClothoUser;
+import org.clothocad.dom.ClothoObject;
 import org.clothocad.dom.Function;
+import org.json.JSONObject;
 
 public class ClothoImpl 
 		implements Clotho {
@@ -43,4 +47,18 @@ public class ClothoImpl
 			}
 		}
 	}
+
+	@Override
+	public boolean create(ClothoObject datum) {
+		return false;
+	}
+
+	@Override
+	public boolean create(Set<ClothoObject> datum) {
+		
+		// wrap every datum into one big JSON object
+		
+		return false;
+	}
+
 }

@@ -26,6 +26,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.json.JSONObject;
+
 import eugene.constants.EugeneConstants;
 import eugene.dom.components.Part;
 import eugene.exception.EugeneException;
