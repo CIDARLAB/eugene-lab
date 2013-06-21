@@ -19,11 +19,19 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import org.antlr.runtime.RecognitionException;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 /**
  *
@@ -62,6 +70,9 @@ public class EugeneServlet extends HttpServlet {
                 String input = request.getParameter("input");
                 String result = executeEugene(input);
                 out.write("{\"result\":\"" + result + "\",\"status\":\"bad\"}");
+            } else if (command.equals("getFileList")) {
+                out.write(getFileNames(request.getParameter("currentFolder")));
+                //out.write("{\"response\":\"test response\"}");
             } else if (command.equals("test")) {
                 out.write("{\"response\":\"test response\"}");
             }
@@ -172,7 +183,7 @@ public class EugeneServlet extends HttpServlet {
         String toReturn = "[";
 
         try {
-            String imagePath = this.getServletContext().getRealPath("/") + "data\\";
+            String imagePath = this.getServletContext().getRealPath("/") + "resources/";
 
             File[] filesToRead = new File(imagePath).listFiles();
             if (filesToRead != null) {
@@ -233,7 +244,7 @@ public class EugeneServlet extends HttpServlet {
 
     private String readImageFiles() {
         //get path relative to servlet; ie the /web directory
-        String imagePath = this.getServletContext().getRealPath("/") + "images\\sbol_visual_jpeg\\";
+        String imagePath = this.getServletContext().getRealPath("/") + "images/sbol_visual_jpeg/";
         String toReturn = "[";
         File[] filesInDirectory = new File(imagePath).listFiles();
         if (filesInDirectory != null) {
@@ -265,6 +276,29 @@ public class EugeneServlet extends HttpServlet {
         } finally {
             toReturn = toReturn + "<br/>Finished Eugene!";
         }
+        return toReturn;
+    }
+    
+    // Returns a JSON Array with the name of a file/directory and if it is a file
+    // {"name": name, "isFile", isFile}
+    public String getFileNames(String currentFolderExtension) {
+        currentFolderExtension = this.getServletContext().getRealPath("/") + "data/testuser/" + currentFolderExtension + "/";
+        File currentFolder = new File(currentFolderExtension);
+        File[] fileNames = currentFolder.listFiles();
+        
+        String toReturn = "[";
+        
+        for(int i = 0; i < fileNames.length; i++) {
+            toReturn += "{\"name\":\"";
+            toReturn += fileNames[i].getName();
+            toReturn += "\",\"isFile\":";
+            toReturn += fileNames[i].isFile();
+            toReturn += "}";
+            if(i != fileNames.length - 1)
+                toReturn += ",";
+        }
+        toReturn += "]";
+        
         return toReturn;
     }
 }

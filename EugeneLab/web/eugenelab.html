@@ -9,6 +9,7 @@
         <link href="css/bootstrap-responsive.min.css" rel="stylesheet" media="screen">
         <link rel="stylesheet" href="css/codemirror.css">
         <link rel="stylesheet" href="css/blackboard.css">
+        <link rel="stylesheet" href="css/fileexplorer.css">
         <script src="jsLibraries/jquery-1.9.1.min.js"></script>
         <script src="jsLibraries/jquery-ui.min.js"></script>
         <style>
@@ -38,53 +39,12 @@
             #textEditor{
                 height: 30em;
             }
-            .fileExplorerList {
-                list-style-type: none;
-                display:none;
-            }
-
-            .activeFileExplorer{
-                display: block;
-            }
+            
 
             #console{
                 height: 8em;
             }
 
-            .firstFileExplorerElement{
-                -webkit-border-top-left-radius: 5px;
-                -webkit-border-top-right-radius: 5px;
-                -moz-border-radius-topleft: 5px;
-                -moz-border-radius-topright: 5px;
-                border-top-left-radius: 5px;
-                border-top-right-radius: 5px;
-            }
-
-            .lastFileExplorerElement{
-                border-bottom: 2px solid #000;
-                -webkit-border-bottom-right-radius: 5px;
-                -webkit-border-bottom-left-radius: 5px;
-                -moz-border-radius-bottomright: 5px;
-                -moz-border-radius-bottomleft: 5px;
-                border-bottom-right-radius: 5px;
-                border-bottom-left-radius: 5px;
-            }
-
-            .fileExplorerElement{
-                display: block;
-                border-top: 2px solid #000;
-                border-left: 2px solid #000;
-                border-right: 2px solid #000;
-                padding: 12.5px 20px;
-            }
-
-            .fileExplorerFolder{
-
-            }
-
-            .fileExplorerElement:hover{
-                background-color: #149bdf;
-            }
             .selected{opacity: 0.5}
         </style>  
     </head>
@@ -139,6 +99,11 @@
                                 <br>
                                 <input type="file" name="file" id="file" />
                             </form>
+                            <ul id="fileExplorerList">
+                                
+                            </ul>
+                            <li id="addNew" class="fileExplorerElement firstFileExplorerElement lastFileExplorerElement addNew">Add New</li>
+                            <!--
                             <ul id="fileExplorerRoot" class="fileExplorerList activeFileExplorer">
                                 <li class="fileExplorerElement firstFileExplorerElement fileExplorerFolder" id="project1"><p>Project 1</p></li>  
                                 <li class="fileExplorerElement fileExplorerFolder" id="project2">Project 2</li>
@@ -149,6 +114,7 @@
                                 <li id="project1Device1" class="fileExplorerElement firstFileExplorerElement fileExplorerFolder"><p>Device1</p></li>
                                 <li id="project1Device2" class="fileExplorerElement lastFileExplorerElement fileExplorerFolder"><p>Device2</p></li>
                             </ul>
+                            -->
                         </div>
                     </div>
                 </div>

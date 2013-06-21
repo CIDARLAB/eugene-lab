@@ -162,18 +162,48 @@ $(document).ready(function() {
 
     });
     
-    // On file folder click changes the file explorer
-    $('.fileExplorerFolder').click(function() {
-        $(this).parent().css('display', 'none');
-        var s = '#' + $(this).attr('id') + 'Devices';
-        $(s).addClass('activeFileExplorer');
-        $(s).css('display', 'block');
+    // <editor-fold defaultstate="collapsed" desc="File Explorer Functions">
+    var currentFolder = "root";
+    
+    getFileList(currentFolder);
+    
+    // Returns the structure of the file explorer given a current state
+    // Response is list of names and whether the output is a file or a folder {name: elementName, class: file/folder}
+    function getFileList(currentFolder) {
+        var command = {"command": "getFileList", "currentFolder": currentFolder};
+        $.get("EugeneServlet", command, function(response) {
+            buildFileList(response); 
+        });
+    }
+    
+    //Builds the file list from the server response
+    function buildFileList(response) {
+        for(var i = 0; i < response.length; i++) {
+            var name = response[i]["name"];
+            var id = "__" + name; //double underscore to prevent html id collisions
+            var isFile = response[i]["isFile"];
+            $('#fileExplorerList').append('<li id='+ id + ' class="fileExplorerElement">' + name + '</li>');
+            alert(i);
+            if(i === 0) {
+                $('#' + id).addClass('firstFileExplorerElement');
+            }
+            if (i === response.length - 1) {
+                $('#' + id).addClass('lastFileExplorerElement');
+            }
+            if(isFile) {
+                $('#' + id).addClass('fileExplorerFile');
+            } else {
+                $('#' + id).addClass('fileExplorerFolder');
+            }
+        }
+    }
+    
+    $(document).on('click','.fileExplorerFolder', function() {
+        currentFolder = currentFolder + '/' + this.id.substring(2); //to remove double underscore
+        $('#fileExplorerList').empty();
+        getFileList(currentFolder);
     });
     
-    // Adds a project to the file explorer
-    $('#addNewProject').click(function() {
-        var response = prompt('New File Name?');
-        $('<li class="fileExplorerElement fileExplorerFolder" id="' + response + '">' + response + '</li>').insertBefore($(this));
-    });
+    // </editor-fold>
 });
 
