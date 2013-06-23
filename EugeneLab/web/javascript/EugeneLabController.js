@@ -1,6 +1,8 @@
 /* Gets a list of images from the server and adds them to the imageList
  * Also adds a unique id to each part, viewable when clicked
  */
+
+
 $(document).ready(function() {
     var deviceCount = 0;
     var command = {"command": "read"};
@@ -163,45 +165,94 @@ $(document).ready(function() {
     });
     
     // <editor-fold defaultstate="collapsed" desc="File Explorer Functions">
-    var currentFolder = "root";
+    var currentFolder = 'root';
+    var currentState = 0; //state 0: root directory, state 1: within a project, state 2: within a device
+    var currentFile = null;
     
-    getFileList(currentFolder);
+    buildFileList(currentFolder);
     
-    // Returns the structure of the file explorer given a current state
-    // Response is list of names and whether the output is a file or a folder {name: elementName, class: file/folder}
-    function getFileList(currentFolder) {
-        var command = {"command": "getFileList", "currentFolder": currentFolder};
-        $.get("EugeneServlet", command, function(response) {
-            buildFileList(response); 
+    //Builds the file list from the server response
+    function buildFileList(currentFolder) {
+        var command = {'command': 'getFileList', 'currentFolder': currentFolder};
+        $('#fileExplorerList').empty();
+        $.get('EugeneServlet', command, function(response) {
+            for(var i = 0; i < response.length; i++) {
+                var name = response[i]['name'];
+                var id ='__' + name; //double underscore to prevent html id collisions
+                id = id.replace('.', '__DOT__'); //cannot have id with '.' character
+                var isFile = response[i]["isFile"];
+                $('#fileExplorerList').append('<li id='+ id + ' class="fileExplorerElement">' + name + '</li>');
+                if(i === 0) {
+                    $('#' + id).addClass('firstFileExplorerElement');
+                }
+                if (i === response.length - 1) {
+                    $('#' + id).addClass('lastFileExplorerElement');
+                }
+                if(isFile) {
+                    $('#' + id).addClass('fileExplorerFile');
+                } else {
+                    $('#' + id).addClass('fileExplorerFolder');
+                }
+            }
         });
     }
     
-    //Builds the file list from the server response
-    function buildFileList(response) {
-        for(var i = 0; i < response.length; i++) {
-            var name = response[i]["name"];
-            var id = "__" + name; //double underscore to prevent html id collisions
-            var isFile = response[i]["isFile"];
-            $('#fileExplorerList').append('<li id='+ id + ' class="fileExplorerElement">' + name + '</li>');
-            alert(i);
-            if(i === 0) {
-                $('#' + id).addClass('firstFileExplorerElement');
-            }
-            if (i === response.length - 1) {
-                $('#' + id).addClass('lastFileExplorerElement');
-            }
-            if(isFile) {
-                $('#' + id).addClass('fileExplorerFile');
-            } else {
-                $('#' + id).addClass('fileExplorerFolder');
-            }
-        }
-    }
-    
+    //Changes the file explorer when a folder is clicked
     $(document).on('click','.fileExplorerFolder', function() {
-        currentFolder = currentFolder + '/' + this.id.substring(2); //to remove double underscore
-        $('#fileExplorerList').empty();
-        getFileList(currentFolder);
+        currentState += 1;
+        currentFolder = currentFolder + '/' + this.id.substring(2); //need to remove double underscore and
+        buildFileList(currentFolder);
+    });
+    
+    //Code to load a file content from the server
+    $(document).on('click', '.fileExplorerFile', function() {
+        currentFile = this.id.substring(2).replace('__DOT__', '.');
+        var command = {'command':'getFileContent', 'fileName': currentFile, 'currentFolder':currentFolder};
+        $.get('EugeneServlet', command, function(response) {
+            editor.setValue(response['fileContent'].split('__BR__').join( '\n'));
+        });
+    });
+    
+    //Saves the open file when clicked
+    $('#fileSave').click(function() {
+        var fileContent = editor.getValue();
+        var command = {'command':'saveFileContent', 'fileName':currentFile, 'currentFolder':currentFolder, 'fileContent':fileContent};
+        $.post('EugeneServlet', command);
+    });
+    
+    $('#fileDelete').click(function() {
+       var command = {'command':'deleteFile', 'fileName':currentFile, 'currentFolder':currentFolder};
+       $.post('EugeneServlet', command, function() {
+           buildFileList(currentFolder);
+       });
+    });
+    
+    //Functionality of the back button
+    $('#fileExplorerBack').click(function() {
+        if(currentFolder !== 'root') {
+            currentState -= 1;
+            currentFolder = currentFolder.substring(0,currentFolder.lastIndexOf('/'));
+            buildFileList(currentFolder);
+        }
+    });
+    
+    //Adds new file or folder depending on current location
+    $('#addNew').click(function() {
+        var newFileName = prompt('New File Name?');
+        var isFile = false; //Only make a file when within a device, otherwise create a folder
+        
+        if(currentState === 2) { //If within a device then a file should be created
+            isFile = true;
+        }
+        var command = {'command':'addNewFile', 'currentFolder':currentFolder, 'newFileName':newFileName, 'isFile':isFile};
+        
+        $.get('EugeneServlet', command, function(response) {
+            buildFileList(currentFolder); //rebuild folder with current file list
+            alert(JSON.stringify(response));
+            if(response['fileCreateSucessful'] === false) {
+                alert("File Already Exists");
+            }
+        });
     });
     
     // </editor-fold>

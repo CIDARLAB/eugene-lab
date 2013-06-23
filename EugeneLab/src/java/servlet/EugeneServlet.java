@@ -7,8 +7,11 @@ package servlet;
 import eugene.EugeneExecutor;
 import eugene.dom.SavableElement;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -72,7 +75,15 @@ public class EugeneServlet extends HttpServlet {
                 out.write("{\"result\":\"" + result + "\",\"status\":\"bad\"}");
             } else if (command.equals("getFileList")) {
                 out.write(getFileNames(request.getParameter("currentFolder")));
-                //out.write("{\"response\":\"test response\"}");
+            } else if (command.equals("addNewFile")) {
+                String currentFolder = request.getParameter("currentFolder");
+                String newFileName = request.getParameter("newFileName");
+                boolean isFile = Boolean.parseBoolean(request.getParameter("isFile"));
+                out.write(addNewFile(currentFolder, newFileName, isFile));
+            } else if (command.equals("getFileContent")) {
+                String fileName = request.getParameter("fileName");
+                String currentFolder = request.getParameter("currentFolder");
+                out.write(loadFile(fileName, currentFolder));
             } else if (command.equals("test")) {
                 out.write("{\"response\":\"test response\"}");
             }
@@ -174,6 +185,15 @@ public class EugeneServlet extends HttpServlet {
                 String input = request.getParameter("input");
                 String result = executeEugene(input);
                 out.write("{\"result\":\"" + result + "\",\"status\":\"bad\"}");
+            } else if(command.equals("saveFileContent")) {
+                String fileName = request.getParameter("fileName");
+                String currentFolder = request.getParameter("currentFolder");
+                String fileContent = request.getParameter("fileContent");
+                saveFile(fileName, currentFolder, fileContent);
+            } else if(command.equals("deleteFile")) {
+                String fileName = request.getParameter("fileName");
+                String currentFolder = request.getParameter("currentFolder");
+                deleteFile(fileName, currentFolder);
             }
 
         }
@@ -241,6 +261,10 @@ public class EugeneServlet extends HttpServlet {
         String[] results = (String[]) EugeneExecutor.execute("eugeneString", 1);
         return null;
     }
+    
+    private String getCurrentUser() {
+        return "testuser";
+    }
 
     private String readImageFiles() {
         //get path relative to servlet; ie the /web directory
@@ -261,6 +285,8 @@ public class EugeneServlet extends HttpServlet {
         toReturn = toReturn + "]";
         return toReturn;
     }
+    
+    
 
     public String executeEugene(String input) {
         HashMap<String, SavableElement> results = new HashMap<String, SavableElement>();
@@ -281,8 +307,8 @@ public class EugeneServlet extends HttpServlet {
     
     // Returns a JSON Array with the name of a file/directory and if it is a file
     // {"name": name, "isFile", isFile}
-    public String getFileNames(String currentFolderExtension) {
-        currentFolderExtension = this.getServletContext().getRealPath("/") + "data/testuser/" + currentFolderExtension + "/";
+    private String getFileNames(String currentFolderExtension) {
+        currentFolderExtension = this.getServletContext().getRealPath("/") + "data/" + getCurrentUser() + "/" + currentFolderExtension + "/";
         File currentFolder = new File(currentFolderExtension);
         File[] fileNames = currentFolder.listFiles();
         
@@ -300,5 +326,54 @@ public class EugeneServlet extends HttpServlet {
         toReturn += "]";
         
         return toReturn;
+    }
+    
+    private String addNewFile(String currentFolderExtension, String newFileName, boolean isFile) {
+        currentFolderExtension = this.getServletContext().getRealPath("/") + "data/" + getCurrentUser() + "/" + currentFolderExtension + "/";
+        File newFile = new File(currentFolderExtension + newFileName + "/");
+        try {
+            if(isFile)
+                newFile.createNewFile();
+            else
+                newFile.mkdir();
+        } catch(Exception e) {
+            return "{\"fileCreateSucessful\":false}";
+        }
+        return "{\"fileCreateSucessful\":true}";
+    }
+    
+    private String loadFile(String fileName, String currentFolder) throws FileNotFoundException, IOException {
+        String currentFileExtension = getFileExtension(currentFolder + "/" + fileName, true);
+        File file = new File(currentFileExtension);
+        BufferedReader br = new BufferedReader(new FileReader(file.getAbsolutePath()));
+        String currentLine;
+        String toReturn = "";
+        while ((currentLine = br.readLine()) != null) {
+            toReturn += currentLine + "__BR__";
+        }
+        br.close();
+        return "{\"fileContent\":\"" + toReturn + "\"}";
+    }
+    
+    private void saveFile(String fileName, String currentFolder, String fileContent) throws IOException {
+        String currentFileExtension = getFileExtension(currentFolder + "/" + fileName, true);
+        File file = new File(currentFileExtension);
+        BufferedWriter bw = new BufferedWriter(new FileWriter(file.getAbsoluteFile()));
+        bw.write(fileContent);
+        bw.close();
+    }
+    
+    private void deleteFile(String fileName, String currentFolder) {
+        String currentFileExtension = getFileExtension(currentFolder + "/" + fileName, true);
+        File file = new File(currentFileExtension);
+        file = file.getAbsoluteFile();
+        file.delete();
+    }
+    
+    private String getFileExtension(String localExtension, boolean isFile) {
+        String extension = this.getServletContext().getRealPath("/") + "data/" + getCurrentUser() + "/" + localExtension;
+        if(!isFile)
+            extension += "/";
+        return extension;
     }
 }
