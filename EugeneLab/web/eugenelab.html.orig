@@ -1,0 +1,205 @@
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>EugeneLab</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <link rel="shortcut icon" href="images/shortcutIcon.ico">
+        <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
+        <link href="css/bootstrap-responsive.min.css" rel="stylesheet" media="screen">
+        <link rel="stylesheet" href="css/codemirror.css">
+<<<<<<< HEAD
+        <link rel="stylesheet" href="css/blackboard.css">
+        <link rel="stylesheet" href="css/fileexplorer.css">
+=======
+        <link rel="stylesheet" href="css/neat.css">
+>>>>>>> origin/master
+        <script src="jsLibraries/jquery-1.9.1.min.js"></script>
+        <script src="jsLibraries/jquery-ui.min.js"></script>
+        <style>
+            ul.device {
+                list-style-type: none;
+            }
+            ul.device li{
+                display: inline-block;
+            }
+            .thumbnail{
+                background-color: white;
+            }
+            .selected{opacity: 0.7}
+            .rotatedText{
+                -webkit-transform: rotate(-90deg); 
+                -moz-transform: rotate(-90deg); 
+                -ms-transform: rotate(-90deg); 
+                -o-transform: rotate(-90deg); 
+                transform: rotate(-90deg);
+            }           
+            textarea{
+                width: 48.5em; /* 80 Characters wide on my computer */
+                font-family: "Courier New", Courier, "Lucida Sans Typewriter", "Lucida Typewriter", monospace;
+                font-size: 12pt;
+            }
+
+            #textEditor{
+                height: 30em;
+            }
+            
+
+            #console{
+                height: 8em;
+            }
+
+            .selected{opacity: 0.5}
+        </style>  
+    </head>
+    <body>
+        <div class="navbar navbar-fixed-top">
+            <div class="navbar-inner"> <a class="brand" href="index.html">EugeneLab</a>
+                <ul class="nav">
+                    <li class="active"><a href="eugenelab.html">Design</a></li>
+                    <li><a href="documentation.html">How to</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+                <div id="loginArea"><form id="loginForm" class="navbar-form pull-right" action="AuthenticationServlet" method="POST">
+                        <input name="user" type="text" class="span2" placeholder="Login">
+                        <input name="password" type="password" class="span2" placeholder="Password">
+                        <input type="submit" value="Login" class="btn"/>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="page-header" style="margin-top:50px">
+            <h1>EugeneLab <small>IDE</small></h1>
+        </div>
+        <div class="row-fluid">
+            <div class="span2 well">
+                <div class="tabbable">
+                    <ul id="dataTableHeader" class="nav nav-tabs">
+                        <li ><a href="#partsTab" data-toggle="tab">Parts</a></li>
+                        <li class="active"><a  href="#filesTab" data-toggle="tab">Files</a></li>
+                    </ul>
+
+                    <div id="leftTabs" class="tab-content">
+                        <div class="tab-pane" id="partsTab">
+                            <h4>Parts List</h4>
+                            <hr/>
+                            <div style="height:500px;overflow:auto" id="partsListArea">
+                                <hr/>
+                                <button class="btn" data-toggle="collapse" data-target="#uploadArea">Add More Parts</button>
+                                <div id="uploadArea" class="collapse out">
+                                    <form id="file_upload" action="EugeneServlet" method="POST" enctype="multipart/form-data">
+                                        <input id="file_1" type="file" name="file_1" multiple/>
+                                        <br>
+                                        <button id="uploadButton" data-toggle="collapse" data-target="#uploadArea">Upload</button>
+                                    </form>
+                                </div>
+                            </div>
+                            <div id="partsList"></div>
+                            <hr/>
+                        </div>
+                        <div class="tab-pane active" id="filesTab">
+                            <form method="POST" action="EugeneServlet" enctype="multipart/form-data" >
+                                <input type="submit" value="Upload File" name="upload" id="uploadFileButton" class="btn btn-danger" style="width:150px" />
+                                <br>
+                                <input type="file" name="file" id="file" />
+                            </form>
+                            <p id="currentFileName"></p>
+                            <ul id="fileExplorerList">
+                            </ul>
+                            <ul>
+                                <li id="fileSave" class = "firstFileExplorerElement fileExplorerElement">Save</li>
+                                <li id="fileExplorerBack" class="fileExplorerElement">Back</li>
+                                <li id="addNew" class="fileExplorerElement lastFileExplorerElement">New Project</li>
+                                <!-- Delete Functionality still needs work
+                                <li id="fileDelete" class="fileExplorerElement lastFileExplorerElement">Delete</li>
+                                -->
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="span8">
+                <div class="tabbable">
+                    <ul id="dataTableHeader" class="nav nav-tabs">
+                        <li ><a href="#spectaclesEditorTab" data-toggle="tab">Graphical Editor</a></li>
+                        <li class="active"><a  href="#textEditorTab" data-toggle="tab">Text Editor</a></li>
+                        <li class="pull-right"><button style="width:150px" id="runButton" class="btn btn-success">Run</button></li>
+
+                    </ul>
+
+                    <div id="dataTableContent" class="tab-content">
+                        <div class="tab-pane" id="spectaclesEditorTab">
+                            <button style="width:150px" id="newDeviceButton" class="btn btn-primary">Create New Device</button>
+
+                            <div id="spectaclesEditorArea" style="height:500px">
+                                <ul id="trash" style="list-style:none;position:absolute;right:300px;bottom:100px"><li style="height:100px;width:100px;border:black solid 1px;background-color: #999999"><strong>Trash</strong></li></ul>'
+                            </div>
+                        </div>
+                        <div class="tab-pane active" id="textEditorTab"> 
+
+                            <textarea id="textEditor">
+include "MocloDemoParts.eug";
+/*
+DEVICES 
+*/
+Device URS1(Spacer, Promoter, RBS);
+Device URS2(Ribozyme, RBS, Leader);
+Device Operon(URS1, URS2, CodingSequence, Terminator, Spacer);
+
+/*
+RULES
+*/
+
+//length rules
+Rule URS1Rule (ON URS1:(Spacer.sequence.size()+Promoter.sequence.size()+RBS.sequence.size()) <=450);
+Rule URS2Rule (ON URS2:(Ribozyme.sequence.size()+RBS.sequence.size()+Leader.sequence.size()) <=450);
+
+//switch this on after first run
+Rule LeaderRule (ON URS2: NOT CONTAINS Leader);
+
+//generate all devices
+Device[] allOperons = product(Operon,strict);
+
+//print out device compositions
+for(num i=0;i<allOperons.size;i++) {
+	print(allOperons.get(i);
+}
+}
+                        </textarea>
+                        <textarea id="console" readonly>Output Goes Here</textarea>
+                    </div>
+                </div>
+            </div>
+            <hr/>
+
+        </div>
+        <div class="span2 well">
+            <h4>Part Types</h4>
+            <hr/>
+            <div id="partIconArea" style="height:500px;overflow:auto">
+                <ul id="iconArea" class="thumbnails"></ul>
+            </div>
+        </div>
+    </div>
+    <script src="jsLibraries/jquery.dataTables.min.js"></script>
+    <script src="jsLibraries/bootstrap.min.js"></script>
+    <script src="javascript/EugeneLabController.js"></script>
+    <script src="jsLibraries/codemirror.js"></script>
+    <script src="jsLibraries/eugene.js"></script>
+    <script>
+        var editor = CodeMirror.fromTextArea(document.getElementById("textEditor"), {
+            styleActiveLine: true,
+            lineNumbers: true,
+            lineWrapping: true,
+            theme: "neat",
+            mode: "eugene"
+        });
+    </script>
+    <footer>
+        <div class="container" align="center">
+            <p>Designed and built by <a href="contact.html">Jenhan Tao</a>, <a href="contact.html">Ernst Oberortner</a> and <a href="contact.html">Erik Lindgren</a></p>
+            <p>Code licensed under <a href="license.html">LICENSE</a></p>
+        </div>
+    </footer>
+</body>
+</html>
