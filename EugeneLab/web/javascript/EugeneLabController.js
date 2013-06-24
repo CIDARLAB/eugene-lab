@@ -168,6 +168,7 @@ $(document).ready(function() {
     var currentFolder = 'root';
     var currentState = 0; //state 0: root directory, state 1: within a project, state 2: within a device
     var currentFile = null;
+    var currentFileFolder = null;
     
     buildFileList(currentFolder);
     
@@ -197,9 +198,26 @@ $(document).ready(function() {
         });
     }
     
+    function setAddNewText(currentState) {
+        var addNew = $('#addNew');
+        switch(currentState) {
+            case 0:
+                addNew.html('New Project');
+            case 1: 
+                addNew.html('New Device');
+                break;
+            case 2: 
+                addNew.html('New File');
+                break;
+            default:
+                addNew.html('In Glitch State');
+        }
+    }
+    
     //Changes the file explorer when a folder is clicked
     $(document).on('click','.fileExplorerFolder', function() {
         currentState += 1;
+        setAddNewText(currentState);
         currentFolder = currentFolder + '/' + this.id.substring(2); //need to remove double underscore and
         buildFileList(currentFolder);
     });
@@ -207,6 +225,8 @@ $(document).ready(function() {
     //Code to load a file content from the server
     $(document).on('click', '.fileExplorerFile', function() {
         currentFile = this.id.substring(2).replace('__DOT__', '.');
+        $('#currentFileName').html(currentFile + ' open');
+        currentFileFolder = currentFolder;
         var command = {'command':'getFileContent', 'fileName': currentFile, 'currentFolder':currentFolder};
         $.get('EugeneServlet', command, function(response) {
             editor.setValue(response['fileContent'].split('__BR__').join( '\n'));
@@ -216,21 +236,15 @@ $(document).ready(function() {
     //Saves the open file when clicked
     $('#fileSave').click(function() {
         var fileContent = editor.getValue();
-        var command = {'command':'saveFileContent', 'fileName':currentFile, 'currentFolder':currentFolder, 'fileContent':fileContent};
+        var command = {'command':'saveFileContent', 'fileName':currentFile, 'currentFolder':currentFileFolder, 'fileContent':fileContent};
         $.post('EugeneServlet', command);
-    });
-    
-    $('#fileDelete').click(function() {
-       var command = {'command':'deleteFile', 'fileName':currentFile, 'currentFolder':currentFolder};
-       $.post('EugeneServlet', command, function() {
-           buildFileList(currentFolder);
-       });
     });
     
     //Functionality of the back button
     $('#fileExplorerBack').click(function() {
         if(currentFolder !== 'root') {
             currentState -= 1;
+            setAddNewText(currentState);
             currentFolder = currentFolder.substring(0,currentFolder.lastIndexOf('/'));
             buildFileList(currentFolder);
         }
@@ -248,12 +262,44 @@ $(document).ready(function() {
         
         $.get('EugeneServlet', command, function(response) {
             buildFileList(currentFolder); //rebuild folder with current file list
-            alert(JSON.stringify(response));
+            /* Bug here --- is never false
             if(response['fileCreateSucessful'] === false) {
                 alert("File Already Exists");
             }
+            */
         });
     });
+    
+    /* Delete Files --- still need some work
+   
+    $('#fileDelete').click(function() {
+       var command = {'command':'deleteFile', 'fileName':currentFile, 'currentFolder':currentFolder};
+       $.post('EugeneServlet', command, function() {
+           buildFileList(currentFolder);
+       });
+    });
+    
+    $('.fileExplorerFile').bind("contextmenu", function(event) {
+        event.preventDefault();
+        $('<div class="popupDelete" id="' + this.id + 'fileMenu">Delete</div>')
+            .appendTo("body")
+            .css({top: event.pageY - 2 + "px", left: event.pageX - 2 + "px"});
+    });
+    
+    $(document).bind("click", function(event) {
+        if(!$(event.target).is('.popupDelete'))
+            $("div.popupDelete").hide();
+    });
+    
+    $(document).on('click', '.popupDelete', function() {
+        var fileToDelete = this.id.replace('fileMenu', '').replace('__DOT__', '.').substring(2);
+        var command = {'command':'deleteFile', 'fileName':fileToDelete, 'currentFolder':currentFolder};
+       $.post('EugeneServlet', command, function() {
+           buildFileList(currentFolder);
+       });
+    });
+    
+    */
     
     // </editor-fold>
 });
