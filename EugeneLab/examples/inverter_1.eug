@@ -1,0 +1,33 @@
+include "./examples/design-space.h"
+
+/*** INVERTER DEVICES ***/
+
+Device Inverter01(Promoter, RBS, Repressor, Terminator);
+Device Inverter02(Promoter, RBS, Reporter, Terminator);
+Device Inverter = Inverter01 + Inverter02;
+
+// rules ...
+Rule r(
+	ON Inverter:
+	    Inverter[0].PromoterType EQUALS "Inducible"        	// - the first promoter should be inducible
+                AND
+	    Inverter[4].PromoterType EQUALS "Repressible"       // - the second promoter should be repressible
+                AND
+            Inverter[1] NOTEQUALS Inverter[5]               	// - different RBSs
+                AND
+            Inverter[2].Represses EQUALS Inverter[4].Name   	// - REPRESSES relationship
+                AND
+            Inverter[3] NOTEQUALS Inverter[7]	                // - different terminators
+); 
+	
+/*** PRODUCE ALL VALID INVERTER DEVICES ***/
+
+Device[] lstInverters = product(Inverter, strict);
+save(lstInverters);
+
+//println("*** done ***");
+//for(num i=0; i<lstInverters.size(); i++) {
+//     println(lstInverters[i]);
+//}
+
+
