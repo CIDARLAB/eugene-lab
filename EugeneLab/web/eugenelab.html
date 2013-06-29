@@ -4,13 +4,15 @@
     <head>
         <title>EugeneLab</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <link rel="shortcut icon" href="images/shortcutIcon.ico">
+        <link rel="shortcut icon" href="images/icon.ico">
         <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
         <link href="css/bootstrap-responsive.min.css" rel="stylesheet" media="screen">
         <link rel="stylesheet" href="css/codemirror.css">
         <link rel="stylesheet" href="css/neat.css">
         <script src="jsLibraries/jquery-1.9.1.min.js"></script>
         <script src="jsLibraries/jquery-ui.min.js"></script>
+        <link rel="stylesheet" href="css/fileexplorer.css">
+
         <style>
             ul.device {
                 list-style-type: none;
@@ -21,7 +23,7 @@
             .thumbnail{
                 background-color: white;
             }
-            .selected{opacity: 0.7}
+            .selected{opacity: 0.5}
             .rotatedText{
                 -webkit-transform: rotate(-90deg); 
                 -moz-transform: rotate(-90deg); 
@@ -29,63 +31,6 @@
                 -o-transform: rotate(-90deg); 
                 transform: rotate(-90deg);
             }           
-            textarea{
-                width: 48.5em; /* 80 Characters wide on my computer */
-                font-family: "Courier New", Courier, "Lucida Sans Typewriter", "Lucida Typewriter", monospace;
-                font-size: 12pt;
-            }
-
-            #textEditor{
-                height: 30em;
-            }
-            .fileExplorerList {
-                list-style-type: none;
-                display:none;
-            }
-
-            .activeFileExplorer{
-                display: block;
-            }
-
-            #console{
-                height: 8em;
-            }
-
-            .firstFileExplorerElement{
-                -webkit-border-top-left-radius: 5px;
-                -webkit-border-top-right-radius: 5px;
-                -moz-border-radius-topleft: 5px;
-                -moz-border-radius-topright: 5px;
-                border-top-left-radius: 5px;
-                border-top-right-radius: 5px;
-            }
-
-            .lastFileExplorerElement{
-                border-bottom: 2px solid #000;
-                -webkit-border-bottom-right-radius: 5px;
-                -webkit-border-bottom-left-radius: 5px;
-                -moz-border-radius-bottomright: 5px;
-                -moz-border-radius-bottomleft: 5px;
-                border-bottom-right-radius: 5px;
-                border-bottom-left-radius: 5px;
-            }
-
-            .fileExplorerElement{
-                display: block;
-                border-top: 2px solid #000;
-                border-left: 2px solid #000;
-                border-right: 2px solid #000;
-                padding: 12.5px 20px;
-            }
-
-            .fileExplorerFolder{
-
-            }
-
-            .fileExplorerElement:hover{
-                background-color: #149bdf;
-            }
-            .selected{opacity: 0.5}
         </style>  
     </head>
     <body>
@@ -110,7 +55,7 @@
         <div class="row-fluid">
             <div class="span2 well">
                 <div class="tabbable">
-                    <ul id="dataTableHeader" class="nav nav-tabs">
+                    <ul id="leftTabHeader" class="nav nav-tabs">
                         <li ><a href="#partsTab" data-toggle="tab">Parts</a></li>
                         <li class="active"><a  href="#filesTab" data-toggle="tab">Files</a></li>
                     </ul>
@@ -119,7 +64,7 @@
                         <div class="tab-pane" id="partsTab">
                             <h4>Parts List</h4>
                             <hr/>
-                            <div style="height:500px;overflow:auto" id="partsListArea">
+                            <div style="height:400px;overflow:auto" id="partsListArea">
                                 <hr/>
                                 <button class="btn" data-toggle="collapse" data-target="#uploadArea">Add More Parts</button>
                                 <div id="uploadArea" class="collapse out">
@@ -134,21 +79,25 @@
                             <hr/>
                         </div>
                         <div class="tab-pane active" id="filesTab">
-                            <form method="POST" action="EugeneServlet" enctype="multipart/form-data" >
-                                <input type="submit" value="Upload File" name="upload" id="uploadFileButton" class="btn btn-danger" style="width:150px" />
-                                <br>
-                                <input type="file" name="file" id="file" />
-                            </form>
-                            <ul id="fileExplorerRoot" class="fileExplorerList activeFileExplorer">
-                                <li class="fileExplorerElement firstFileExplorerElement fileExplorerFolder" id="project1"><p>Project 1</p></li>  
-                                <li class="fileExplorerElement fileExplorerFolder" id="project2">Project 2</li>
-                                <li class="fileExplorerElement fileExplorerFolder" id="project3">Project 3</li>
-                                <li id="addNewProject" class="fileExplorerElement lastFileExplorerElement">New Project</li>
-                            </ul>
-                            <ul id="project1Devices" class="fileExplorerList fileExplorerDeviceList">
-                                <li id="project1Device1" class="fileExplorerElement firstFileExplorerElement fileExplorerFolder"><p>Device1</p></li>
-                                <li id="project1Device2" class="fileExplorerElement lastFileExplorerElement fileExplorerFolder"><p>Device2</p></li>
-                            </ul>
+                            <div id="filesArea" style="height:400px">
+                                <form method="POST" action="EugeneServlet" enctype="multipart/form-data" >
+                                    <input type="submit" value="Upload File" name="upload" id="uploadFileButton" class="btn btn-danger" style="width:150px" />
+                                    <br>
+                                    <input type="file" name="file" id="file" />
+                                </form>
+                                <p id="currentFileName"></p>
+                                <ul id="fileExplorerList">
+                                </ul>
+                                <ul>
+                                    <li id="fileSave" class = "firstFileExplorerElement fileExplorerElement">Save</li>
+                                    <li id="fileExplorerBack" class="fileExplorerElement">Back</li>
+                                    <li id="addNew" class="fileExplorerElement lastFileExplorerElement">New Project</li>
+                                    <!-- Delete Functionality still needs work
+                                    <li id="fileDelete" class="fileExplorerElement lastFileExplorerElement">Delete</li>
+                                    -->
+                                </ul>
+                            </div>
+
                         </div>
                     </div>
                 </div>
@@ -159,7 +108,6 @@
                         <li ><a href="#spectaclesEditorTab" data-toggle="tab">Graphical Editor</a></li>
                         <li class="active"><a  href="#textEditorTab" data-toggle="tab">Text Editor</a></li>
                         <li class="pull-right"><button style="width:150px" id="runButton" class="btn btn-success">Run</button></li>
-
                     </ul>
 
                     <div id="dataTableContent" class="tab-content">
@@ -170,38 +118,36 @@
                                 <ul id="trash" style="list-style:none;position:absolute;right:300px;bottom:100px"><li style="height:100px;width:100px;border:black solid 1px;background-color: #999999"><strong>Trash</strong></li></ul>'
                             </div>
                         </div>
-                        <div class="tab-pane active" id="textEditorTab"> 
-
-                            <textarea id="textEditor">
-include "MocloDemoParts.eug";
-/*
-DEVICES 
-*/
-Device URS1(Spacer, Promoter, RBS);
-Device URS2(Ribozyme, RBS, Leader);
-Device Operon(URS1, URS2, CodingSequence, Terminator, Spacer);
-
-/*
-RULES
-*/
-
-//length rules
-Rule URS1Rule (ON URS1:(Spacer.sequence.size()+Promoter.sequence.size()+RBS.sequence.size()) <=450);
-Rule URS2Rule (ON URS2:(Ribozyme.sequence.size()+RBS.sequence.size()+Leader.sequence.size()) <=450);
-
-//switch this on after first run
-Rule LeaderRule (ON URS2: NOT CONTAINS Leader);
-
-//generate all devices
-Device[] allOperons = product(Operon,strict);
-
-//print out device compositions
-for(num i=0;i<allOperons.size;i++) {
-	print(allOperons.get(i);
-}
-}
-                        </textarea>
-                        <textarea id="console" readonly>Output Goes Here</textarea>
+                        <div class="tab-pane active" id="textEditorTab">
+                            <div class="accordion" id="accordion2">
+                                <div class="accordion-group">
+                                    <div class="accordion-heading">
+                                        <a class="accordion-toggle" data-toggle="collapse" data-target="#editorArea" href="#editorArea">
+                                            Editor
+                                        </a>
+                                    </div>
+                                    <div id="editorArea" class="accordion-body collapse in">
+                                        <div class="accordion-inner">
+                                            <textarea id="textEditor">
+                                        </textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="accordion-group">
+                                <div class="accordion-heading">
+                                    <h5>
+                                        <a class="accordion-toggle" data-toggle="collapse" data-target="#outputArea" href="#outputArea">
+                                            Output 
+                                        </a>
+                                    </h5>
+                                </div>
+                                <div id="outputArea" class="accordion-body collapse">
+                                    <div class="accordion-inner">
+                                        <textarea id="console" readonly style="width:95%">Output Goes Here</textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -220,9 +166,11 @@ for(num i=0;i<allOperons.size;i++) {
     <script src="jsLibraries/bootstrap.min.js"></script>
     <script src="javascript/EugeneLabController.js"></script>
     <script src="jsLibraries/codemirror.js"></script>
+    <script src="jsLibraries/active-line.js"></script>
+
     <script src="jsLibraries/eugene.js"></script>
     <script>
-
+        $('#textEditor').val('include "MocloDemoParts.eug";');
         var editor = CodeMirror.fromTextArea(document.getElementById("textEditor"), {
             styleActiveLine: true,
             lineNumbers: true,
@@ -230,7 +178,6 @@ for(num i=0;i<allOperons.size;i++) {
             theme: "neat",
             mode: "eugene"
         });
-
     </script>
     <footer>
         <div class="container" align="center">

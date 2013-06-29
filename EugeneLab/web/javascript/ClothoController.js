@@ -1,4 +1,4 @@
- var connection = new WebSocket('some_url');
+ var connection = new WebSocket('ws://cidar.bu.edu/clotho/websocket');
 connection.send('{"channel": "query", "data": {"schema":"Part"}}');
 
 connection.onmessage = function(e) {
