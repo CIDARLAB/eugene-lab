@@ -2,7 +2,7 @@ package org.clothocad.communication.protocol;
 
 import java.net.InetAddress;
 
-import org.clothocad.client.layers.communication.Channel;
+import org.clothocad.client.communication.Channel;
 import org.clothocad.dom.ClothoObject;
 import org.json.JSONObject;
 

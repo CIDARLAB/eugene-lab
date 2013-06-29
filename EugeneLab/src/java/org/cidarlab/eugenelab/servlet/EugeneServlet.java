@@ -114,7 +114,8 @@ public class EugeneServlet extends HttpServlet {
     }
     // </editor-fold>
 
-    protected void processPostRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void processPostRequest(HttpServletRequest request, HttpServletResponse response) 
+            throws ServletException, IOException {
         if (ServletFileUpload.isMultipartContent(request)) {
             //process code for file upload
             ServletFileUpload uploadHandler = new ServletFileUpload(new DiskFileItemFactory());
@@ -164,7 +165,6 @@ public class EugeneServlet extends HttpServlet {
                 String result = executeEugene(input);
                 out.write("{\"result\":\"" + result + "\",\"status\":\"bad\"}");
             }
-
         }
     }
 
