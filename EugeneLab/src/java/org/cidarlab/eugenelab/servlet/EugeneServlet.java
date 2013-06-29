@@ -18,23 +18,20 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import org.antlr.runtime.RecognitionException;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  *
@@ -73,8 +70,8 @@ public class EugeneServlet extends HttpServlet {
                 String input = request.getParameter("input");
                 String result = executeEugene(input);
                 out.write("{\"result\":\"" + result + "\",\"status\":\"bad\"}");
-            } else if (command.equals("getFileList")) {
-                out.write(getFileNames(request.getParameter("currentFolder")));
+            } else if (command.equals("getFileTree")) {
+                out.write(getFileTree());
             } else if (command.equals("addNewFile")) {
                 String currentFolder = request.getParameter("currentFolder");
                 String newFileName = request.getParameter("newFileName");
@@ -86,6 +83,10 @@ public class EugeneServlet extends HttpServlet {
                 out.write(loadFile(fileName, currentFolder));
             } else if (command.equals("test")) {
                 out.write("{\"response\":\"test response\"}");
+            } else if (command.equals("deleteFile")) {
+                String fileName = request.getParameter("fileName");
+                String currentFolder = request.getParameter("currentFolder");
+                deleteFile(fileName, currentFolder);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -185,15 +186,11 @@ public class EugeneServlet extends HttpServlet {
                 String input = request.getParameter("input");
                 String result = executeEugene(input);
                 out.write("{\"result\":\"" + result + "\",\"status\":\"bad\"}");
-            } else if(command.equals("saveFileContent")) {
+            } else if (command.equals("saveFileContent")) {
                 String fileName = request.getParameter("fileName");
                 String currentFolder = request.getParameter("currentFolder");
                 String fileContent = request.getParameter("fileContent");
                 saveFile(fileName, currentFolder, fileContent);
-            } else if(command.equals("deleteFile")) {
-                String fileName = request.getParameter("fileName");
-                String currentFolder = request.getParameter("currentFolder");
-                deleteFile(fileName, currentFolder);
             }
 
         }
@@ -261,7 +258,7 @@ public class EugeneServlet extends HttpServlet {
         String[] results = (String[]) EugeneExecutor.execute("eugeneString", 1);
         return null;
     }
-    
+
     private String getCurrentUser() {
         return "testuser";
     }
@@ -285,8 +282,6 @@ public class EugeneServlet extends HttpServlet {
         toReturn = toReturn + "]";
         return toReturn;
     }
-    
-    
 
     public String executeEugene(String input) {
         HashMap<String, SavableElement> results = new HashMap<String, SavableElement>();
@@ -304,44 +299,54 @@ public class EugeneServlet extends HttpServlet {
         }
         return toReturn;
     }
-    
+
     // Returns a JSON Array with the name of a file/directory and if it is a file
     // {"name": name, "isFile", isFile}
-    private String getFileNames(String currentFolderExtension) {
-        currentFolderExtension = this.getServletContext().getRealPath("/") + "data/" + getCurrentUser() + "/" + currentFolderExtension + "/";
-        File currentFolder = new File(currentFolderExtension);
-        File[] fileNames = currentFolder.listFiles();
-        
-        String toReturn = "[";
-        
-        for(int i = 0; i < fileNames.length; i++) {
-            toReturn += "{\"name\":\"";
-            toReturn += fileNames[i].getName();
-            toReturn += "\",\"isFile\":";
-            toReturn += fileNames[i].isFile();
-            toReturn += "}";
-            if(i != fileNames.length - 1)
-                toReturn += ",";
+    private String getFileTree() {
+        String currentFolderExtension = this.getServletContext().getRealPath("/") + "data/" + getCurrentUser() + "/";
+        File rootFolder = new File(currentFolderExtension);
+        ArrayList<File> queue = new ArrayList();
+        queue.add(rootFolder);
+        JSONArray rootArray = new JSONArray();
+        JSONArray currentArray = rootArray;
+        while (!queue.isEmpty()) {
+            try {
+                File currentFile = queue.get(0);
+                queue.remove(0);
+                JSONObject toPut = new JSONObject();
+                toPut.put("title", currentFile.getName());
+                currentArray.put(toPut);
+                if (currentFile.isDirectory()) {
+                    toPut.put("children", new JSONArray());
+                    toPut.put("isFolder", true);
+                    currentArray = toPut.getJSONArray("children");
+                    File[] subFiles = currentFile.listFiles();
+                    for (int i = 0; i < subFiles.length; i++) {
+                        queue.add(subFiles[i]);
+                    }
+                }
+            } catch (JSONException ex) {
+                ex.printStackTrace();
+            }
         }
-        toReturn += "]";
-        
-        return toReturn;
+        return rootArray.toString();
     }
-    
+
     private String addNewFile(String currentFolderExtension, String newFileName, boolean isFile) {
         currentFolderExtension = this.getServletContext().getRealPath("/") + "data/" + getCurrentUser() + "/" + currentFolderExtension + "/";
         File newFile = new File(currentFolderExtension + newFileName + "/");
         try {
-            if(isFile)
+            if (isFile) {
                 newFile.createNewFile();
-            else
+            } else {
                 newFile.mkdir();
-        } catch(Exception e) {
+            }
+        } catch (Exception e) {
             return "{\"fileCreateSucessful\":false}";
         }
         return "{\"fileCreateSucessful\":true}";
     }
-    
+
     private String loadFile(String fileName, String currentFolder) throws FileNotFoundException, IOException {
         String currentFileExtension = getFileExtension(currentFolder + "/" + fileName, true);
         File file = new File(currentFileExtension);
@@ -354,7 +359,7 @@ public class EugeneServlet extends HttpServlet {
         br.close();
         return "{\"fileContent\":\"" + toReturn + "\"}";
     }
-    
+
     private void saveFile(String fileName, String currentFolder, String fileContent) throws IOException {
         String currentFileExtension = getFileExtension(currentFolder + "/" + fileName, true);
         File file = new File(currentFileExtension);
@@ -362,18 +367,19 @@ public class EugeneServlet extends HttpServlet {
         bw.write(fileContent);
         bw.close();
     }
-    
+
     private void deleteFile(String fileName, String currentFolder) {
         String currentFileExtension = getFileExtension(currentFolder + "/" + fileName, true);
         File file = new File(currentFileExtension);
         file = file.getAbsoluteFile();
         file.delete();
     }
-    
+
     private String getFileExtension(String localExtension, boolean isFile) {
         String extension = this.getServletContext().getRealPath("/") + "data/" + getCurrentUser() + "/" + localExtension;
-        if(!isFile)
+        if (!isFile) {
             extension += "/";
+        }
         return extension;
     }
 }
