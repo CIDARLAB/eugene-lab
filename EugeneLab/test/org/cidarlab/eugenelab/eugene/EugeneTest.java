@@ -31,8 +31,6 @@ public class EugeneTest {
 
     public void testInverters()
             throws Exception {
-        //new Eugene("./examples/inverter_1.eug");
-        
         //Clotho clotho = ClothoFactory.getAPI("ws://localhost:8080/websocket");
         
         Clotho clotho = ClothoFactory.getAPI("ws://cidar.bu.edu/clotho/websocket");
@@ -51,7 +49,7 @@ public class EugeneTest {
                     JSONObject deviceJSON = this.toJSON(objDevice);
                     
                     // now, we store it in the Clotho DB...
-                    clotho.create(deviceJSON);
+                    //clotho.create(deviceJSON);
 
                     System.out.println("Device: " + deviceJSON);
                 }
@@ -66,6 +64,12 @@ public class EugeneTest {
 
     private JSONObject toJSON(Device objDevice) 
             throws Exception {
+        String NEWLINE = System.getProperty("line.separator");
+        StringBuilder sbPigeon = new StringBuilder();
+        StringBuilder sbPigeonArcs = new StringBuilder();
+        
+        sbPigeonArcs.append("# Arcs").append(NEWLINE);
+        
         JSONObject deviceJSON = new JSONObject();
         deviceJSON.put("name", objDevice.getName());
         deviceJSON.put("Schema", objDevice.getClass().getCanonicalName());
@@ -85,11 +89,22 @@ public class EugeneTest {
                 Part objPart = (Part)component;
                 List<JSONObject> lstPropertyValuesJSON = new ArrayList<JSONObject>();
                 componentJSON.put("pigeon", objPart.get("Pigeon"));
+                sbPigeon.append(objPart.get("Pigeon")).append(NEWLINE);
+                
+                if(null != objPart.get("Represses")) {
+                    sbPigeonArcs.append(objPart.getName())
+                            .append(" rep ")
+                            .append(objPart.get("Represses"))
+                            .append(NEWLINE);
+                }
             } 
             lstComponentsJSON.add(componentJSON);
         }
         deviceJSON.put("components", lstComponentsJSON);
         
+        String sPigeon = sbPigeon.toString() + sbPigeonArcs.toString();
+        deviceJSON.put("Pigeon", sPigeon);
+
         return deviceJSON;
     }
 }

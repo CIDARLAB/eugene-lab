@@ -6,6 +6,10 @@ package org.cidarlab.eugenelab.servlet;
 
 import eugene.EugeneExecutor;
 import eugene.dom.SavableElement;
+import eugene.dom.components.Component;
+import eugene.dom.components.Device;
+import eugene.dom.components.Part;
+import eugene.dom.components.types.PartType;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -15,6 +19,7 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -24,6 +29,9 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.clothocad.client.Clotho;
+import org.clothocad.client.ClothoFactory;
+import org.json.JSONObject;
 
 /**
  *
@@ -31,6 +39,15 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
  */
 public class EugeneServlet extends HttpServlet {
 
+    /* here is our Clotho instance */    
+    private Clotho clotho;
+    
+    @Override
+    public void init(ServletConfig config) 
+            throws ServletException {
+        this.clotho = ClothoFactory.getAPI("ws://cidar.bu.edu/clotho/websocket");
+    }
+    
     /**
      * Processes requests for both HTTP
      * <code>GET</code> and
@@ -43,6 +60,7 @@ public class EugeneServlet extends HttpServlet {
      */
     protected void processGetRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
         //I'm returning a JSON object and not a string
         response.setContentType("application/json");
         PrintWriter out = response.getWriter();
@@ -60,8 +78,7 @@ public class EugeneServlet extends HttpServlet {
                 out.write(readFiles());
             } else if (command.equals("execute")) {
                 String input = request.getParameter("input");
-                String result = executeEugene(input);
-                out.write("{\"result\":\"" + result + "\",\"status\":\"bad\"}");
+                out.write(executeEugene(input).toString());
             } else if (command.equals("test")) {
                 out.write("{\"response\":\"test response\"}");
             }
@@ -162,8 +179,8 @@ public class EugeneServlet extends HttpServlet {
             String command = request.getParameter("command");
             if (command.equals("execute")) {
                 String input = request.getParameter("input");
-                String result = executeEugene(input);
-                out.write("{\"result\":\"" + result + "\",\"status\":\"bad\"}");
+                JSONObject resultsJSON = executeEugene(input);
+                out.write(resultsJSON.toString());
             }
         }
     }
@@ -251,20 +268,90 @@ public class EugeneServlet extends HttpServlet {
         return toReturn;
     }
 
-    public String executeEugene(String input) {
+    public JSONObject executeEugene(String input) {
         HashMap<String, SavableElement> results = new HashMap<String, SavableElement>();
-        String toReturn = "<br/>Starting Eugene";
+        
+        JSONObject returnJSON = new JSONObject();        
         try {
-            try {
-                results = (HashMap<String, SavableElement>) EugeneExecutor.execute(input, 2);
-                toReturn = toReturn + "<br/>" + results;
-                toReturn = toReturn + "<br/>Eugene worked!";
-            } catch (Exception e) {
-                e.printStackTrace();
+            results = (HashMap<String, SavableElement>) EugeneExecutor.execute(input, 2);
+
+            if (null != results && !results.isEmpty()) {
+                List<JSONObject> lstDeviceJSON = new ArrayList<JSONObject>();
+                for (String s : results.keySet()) {
+                    SavableElement objElement = results.get(s);
+                    if (objElement instanceof Device) {
+
+                        Device objDevice = (Device) objElement;
+
+                        lstDeviceJSON.add(this.toJSON(objDevice));
+
+                        // now, we store it in the Clotho DB...
+                        
+                        
+                        /** clotho.create(deviceJSON); **/
+                        /* THIS DOES NOT WORK !!! */
+                    }
+                }
+
+                returnJSON.put("results", lstDeviceJSON);
             }
-        } finally {
-            toReturn = toReturn + "<br/>Finished Eugene!";
+            
+            returnJSON.put("status", "good");
+            
+        } catch (Exception e) {
+            try {
+                returnJSON.put("status", "bad");
+                returnJSON.put("erroe", e.getMessage());
+            } catch(Exception e1) {}
         }
-        return toReturn;
+        
+        return returnJSON;
     }
+    
+    private JSONObject toJSON(Device objDevice) 
+            throws Exception {
+        String NEWLINE = System.getProperty("line.separator");
+        StringBuilder sbPigeon = new StringBuilder();
+        StringBuilder sbPigeonArcs = new StringBuilder();
+        
+        sbPigeonArcs.append("# Arcs").append(NEWLINE);
+        
+        JSONObject deviceJSON = new JSONObject();
+        deviceJSON.put("name", objDevice.getName());
+        deviceJSON.put("Schema", objDevice.getClass().getCanonicalName());
+
+        List<Component> lstComponents = objDevice.getAllComponents();
+        List<JSONObject> lstComponentsJSON = new ArrayList<JSONObject>();
+        
+        for(Component component : lstComponents) {
+            JSONObject componentJSON = new JSONObject();
+            componentJSON.put("name", component.getName());
+            componentJSON.put("Schema", component.getClass().getCanonicalName());
+            if(component instanceof Device) {
+                componentJSON = this.toJSON((Device)component);
+            } else if(component instanceof PartType) {
+                //componentJSON.put("name", lstComponents)
+            } else if(component instanceof Part) {
+                Part objPart = (Part)component;
+                List<JSONObject> lstPropertyValuesJSON = new ArrayList<JSONObject>();
+                componentJSON.put("pigeon", objPart.get("Pigeon"));
+                sbPigeon.append(objPart.get("Pigeon")).append(NEWLINE);
+                
+                if(null != objPart.get("Represses")) {
+                    sbPigeonArcs.append(objPart.getName())
+                            .append(" rep ")
+                            .append(objPart.get("Represses"))
+                            .append(NEWLINE);
+                }
+            } 
+            lstComponentsJSON.add(componentJSON);
+        }
+        deviceJSON.put("components", lstComponentsJSON);
+        
+        String sPigeon = sbPigeon.toString() + sbPigeonArcs.toString();
+        deviceJSON.put("Pigeon", sPigeon);
+
+        return deviceJSON;
+    }
+
 }
