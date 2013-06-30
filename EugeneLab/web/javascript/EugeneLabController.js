@@ -61,68 +61,7 @@ $(document).ready(function() {
 //                alert("You activated " + node.data.title);
             },
             persist: true,
-            children: children,
-            dnd: {
-                autoExpandMS: 1000,
-                preventVoidMoves: true, // Prevent dropping nodes 'before self', etc.
-                onDragStart: function(node) {
-                    /** This function MUST be defined to enable dragging for the tree.
-                     *  Return false to cancel dragging of node.
-                     */
-                    logMsg("tree.onDragStart(%o)", node);
-                    if (node.data.isFolder)
-                        return false;
-                    return true;
-                },
-                onDragStop: function(node) {
-                    logMsg("tree.onDragStop(%o)", node);
-                },
-                onDragEnter: function(node, sourceNode) {
-                    /** sourceNode may be null for non-dynatree droppables.
-                     *  Return false to disallow dropping on node. In this case
-                     *  onDragOver and onDragLeave are not called.
-                     *  Return 'over', 'before, or 'after' to force a hitMode.
-                     *  Any other return value will calc the hitMode from the cursor position.
-                     */
-                    logMsg("tree.onDragEnter(%o, %o)", node, sourceNode);
-                    return true;
-                },
-                onDragOver: function(node, sourceNode, hitMode) {
-                    /** Return false to disallow dropping this node.
-                     *
-                     */
-                    logMsg("tree.onDragOver(%o, %o, %o)", node, sourceNode, hitMode);
-                },
-                onDrop: function(node, sourceNode, hitMode, ui, draggable) {
-                    /**This function MUST be defined to enable dropping of items on the tree.
-                     * sourceNode may be null, if it is a non-Dynatree droppable.
-                     */
-                    logMsg("tree.onDrop(%o, %o)", node, sourceNode);
-                    var copynode;
-                    if (sourceNode) {
-                        copynode = sourceNode;
-                    } else {
-                        copynode = {title: "This node was dropped here (" + ui.helper + ")."};
-                    }
-                    if (hitMode == "over") {
-                        // Append as child node
-                        node.addChild(copynode);
-                        // expand the drop target
-                        node.expand(true);
-                    } else if (hitMode == "before") {
-                        // Add before this, i.e. as child of current parent
-                        node.parent.addChild(copynode, node);
-                    } else if (hitMode == "after") {
-                        // Add after this, i.e. as child of current parent
-                        node.parent.addChild(copynode, node.getNextSibling());
-                    }
-                },
-                onDragLeave: function(node, sourceNode) {
-                    /** Always called if onDragEnter was called.
-                     */
-                    logMsg("tree.onDragLeave(%o, %o)", node, sourceNode);
-                }
-            }
+            children: children
         });
     });
 
