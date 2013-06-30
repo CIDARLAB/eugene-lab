@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.cidarlab.eugenelab.servlet;
 
 import eugene.EugeneExecutor;
@@ -49,11 +45,14 @@ public class EugeneServlet extends HttpServlet {
     /* here is our Clotho instance */
     private Clotho clotho;
 
-//    @Override
-//    public void init(ServletConfig config) 
-//            throws ServletException {
-//        this.clotho = ClothoFactory.getAPI("ws://cidar.bu.edu/clotho/websocket");
-//    }
+    @Override
+    public void init() 
+            throws ServletException {
+    
+        super.init();
+        this.clotho = ClothoFactory.getAPI("ws://cidar.bu.edu/clotho/websocket");
+    }
+    
     /**
      * Processes requests for both HTTP
      * <code>GET</code> and
@@ -155,6 +154,9 @@ public class EugeneServlet extends HttpServlet {
 
     protected void processPostRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        
+        System.out.println("[EugeneServlet.processPostRequest] "+request.getQueryString());
+
         if (ServletFileUpload.isMultipartContent(request)) {
             //process code for file upload
             ServletFileUpload uploadHandler = new ServletFileUpload(new DiskFileItemFactory());

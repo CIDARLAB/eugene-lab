@@ -134,6 +134,7 @@ $(document).ready(function() {
         if ($('div#textEditorTab').hasClass("active")) {
             text = true;
         }
+
         if (!text) {
             var command = {};
             command["command"] = "run";
@@ -167,9 +168,10 @@ $(document).ready(function() {
             //May want to modify to send file or collection of files to server(if Eugene program spans multiple files)
             $('#runButton').click(function() {
                 var input = $('textarea#textEditor').val();
+                
                 $.get("EugeneServlet", {"command": "execute", "input": input}, function(response) {
                     alert(response["result"]);
-//                    $('textarea#console').append(response);
+                    $('textarea#console').append(response);
                 });
             });
         }
