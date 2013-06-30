@@ -50,8 +50,8 @@ public class EugeneServlet extends HttpServlet {
     private Clotho clotho;
 
 //    @Override
-//    public void init(ServletConfig config) 
-//            throws ServletException {
+//    public void init() throws ServletException {
+//        super.init();
 //        this.clotho = ClothoFactory.getAPI("ws://cidar.bu.edu/clotho/websocket");
 //    }
     /**
@@ -85,7 +85,8 @@ public class EugeneServlet extends HttpServlet {
             } else if (command.equals("execute")) {
                 String input = request.getParameter("input");
                 JSONObject result = executeEugene(input);
-                out.write("{\"result\":\"" + result.toString() + "\",\"status\":\"bad\"}");
+                String resultString = result.toString();
+                out.write(resultString);
             } else if (command.equals("getFileTree")) {
                 out.write(getFileTree());
             } else if (command.equals("addNewFile")) {
@@ -107,6 +108,7 @@ public class EugeneServlet extends HttpServlet {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
+            out.flush();
             out.close();
         }
     }
