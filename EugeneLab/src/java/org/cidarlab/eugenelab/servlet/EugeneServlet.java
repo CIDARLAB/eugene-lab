@@ -84,7 +84,7 @@ public class EugeneServlet extends HttpServlet {
             } else if (command.equals("execute")) {
                 String input = request.getParameter("input");
                 JSONObject result = executeEugene(input);
-                out.write("{\"result\":\"" + result.toString() + "\",\"status\":\"bad\"}");
+                out.write(result.toString());
             } else if (command.equals("getFileTree")) {
                 out.write(getFileTree());
             } else if (command.equals("addNewFile")) {
