@@ -1,0 +1,38 @@
+
+Property name(txt);
+Property sequence(txt);
+Property represses(txt);
+Property repressedBy(txt);
+
+PartType Gene(name, sequence, represses);
+PartType Promoter(name, sequence, repressedBy);
+PartType Reporter(name, sequence);
+
+/** CI -> pCI **/
+Promoter pCI(.name("pCI"), .sequence("atatatatatat"), .repressedBy("CI"));
+Gene CI(.name("CI"), .sequence("atctacttac"), .represses("pCI"));
+
+/** LacI -> pLacI **/
+Promoter pLacI(.name("pLacI"), .sequence("atatatatatat"), .repressedBy("LacI"));
+Gene LacI(.name("LacI"), .sequence("cagtccgttacttag"), .represses("pLacI"));
+
+/** TetR -> pTetR **/
+Promoter pTetR(.name("pTetR"), .sequence("atatatatatat"), .repressedBy("TetR"));
+Gene TetR(.name("TetR"), .sequence("ctcacctcttaggac"), .represses("pTetR"));
+
+Reporter GFP(.name("GFP"), .sequence("actactacgtactacctag"), .repressedBy("TetR"));
+
+/** DEVICES **/
+RepressilatorDevice = Promoter + Gene + Promoter + Gene + Promoter + Gene;
+ReporterDevice = Promoter + Reporter;
+
+Repressilator = RepressilatorDevice + ReporterDevice;
+
+/** RULES **/
+//Rule ortho(Gene ORTHO Promoter);
+
+
+/** PRODUCE ALL POSSIBLE REPRESSILATORS **/
+product(Repressilator);
+
+println("*** DONE ***");

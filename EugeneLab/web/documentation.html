@@ -3,11 +3,11 @@
     <head>
         <title>EugeneLab</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <link rel="shortcut icon" href="images/shortcutIcon.ico">
+        <link rel="shortcut icon" href="images/icon.ico">
         <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
         <link href="css/bootstrap-responsive.min.css" rel="stylesheet" media="screen">
     </head>
-    <body data-spy="scroll" data-target="#sidebar">
+    <body>
         <div class="navbar navbar-fixed-top">
             <div class="navbar-inner">
                 <a class="brand" href="index.html">EugeneLab</a>
@@ -30,37 +30,1419 @@
             <h1>EugeneLab <small>Learn how our algorithms and tools can help you today</small></h1>
         </div>
         <div class="container">
-            <div class="row-fluid">
-                <div class="span2">
-                    <div id="sidebar">
-                        <ul  class=" well nav nav-list affix">
-                            <li class="active"><a href="#overview">Overview</a></li>
-                            <li><a href="#video">Demo</a></li>
-                            <li><a href="#help">Help</a></li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="span10">
-                    <div class="well" id="overview">
-                        <h3>EugeneLab Overview</h3>
-                        <hr/>
-                        <p>two paragraph description of what EugeneLab is</p>
-                    </div>
-                    <div id="video" class="well">
-                        <h3>Demonstration Video</h3>
-                        <hr/>
-                        <div align="center">    
-                            <iframe width="640" height="480" src="http://www.youtube.com/embed/TeIG-r5-jLU" frameborder="0"></iframe>
-                        </div>
-                    </div>
-                    <div class="well" id="help">
-                        <h3>Help</h3>
-                        <hr/>
-                        <p>FAQ and contact information</p>
-                    </div>
-                </div>
-            </div>
-
+            <P STYLE="margin-bottom: 0in"><BR>
+            </P>
+            <UL>
+                <LI><P STYLE="margin-bottom: 0in; line-height: 100%"><FONT COLOR="#0000ff"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=4 STYLE="font-size: 16pt"><B>Downloading
+                            Eugene</B></FONT></FONT></FONT></P>
+            </UL>
+            <P STYLE="margin-bottom: 0in; line-height: 100%"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3><SPAN STYLE="font-weight: normal">Eugene
+                    can be downloaded <A HREF="http://sourceforge.net/projects/eugene/">here</A>.
+                    After having downloaded Eugene, there are no additional installations
+                    required. </SPAN></FONT></FONT>
+            </P>
+            <P STYLE="margin-bottom: 0in; line-height: 100%"><BR>
+            </P>
+            <UL>
+                <LI><P STYLE="margin-bottom: 0in; line-height: 100%"><FONT COLOR="#0000ff"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=4 STYLE="font-size: 16pt"><B>Running
+                            Eugene</B></FONT></FONT></FONT></P>
+            </UL>
+            <P STYLE="margin-bottom: 0in; line-height: 100%"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3><SPAN STYLE="font-weight: normal">For
+                    running Eugene, a Java Runtime Environment (JRE) is needed, which can
+                    be downloaded <A HREF="http://www.oracle.com/technetwork/java/javase/downloads/index.html">here</A>.</SPAN></FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3>The
+                eugene.jar file is the executable. In the command-line type the
+                following:</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3>java -jar
+                /path/to/eugene.jar &lt;file&gt; </FONT></FONT>
+            </P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3>Eugene
+                reads the specified file and executes it. Errors and all outputs are
+                written to the console.</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; line-height: 100%"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3><B>Example:</B></FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>java -jar
+                eugene.jar Example.eug</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; line-height: 100%"><BR>
+            </P>
+            <UL>
+                <LI><P STYLE="margin-bottom: 0in; line-height: 100%"><FONT COLOR="#0000ff"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=4 STYLE="font-size: 16pt"><B>Eugene's
+                            Basic Syntax</B></FONT></FONT></FONT></P>
+                    <UL>
+                        <LI><P STYLE="margin-bottom: 0in; line-height: 100%"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=4><B>Comments
+                                </B></FONT></FONT>
+                            </P>
+                    </UL>
+            </UL>
+            <P STYLE="margin-bottom: 0in; font-style: normal; font-weight: normal; line-height: 100%">
+                <FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3>Eugene
+                supports line and block comments.</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; line-height: 100%"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3><B>Examples:
+                </B></FONT></FONT>
+            </P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>// This is a
+                line comment. </FONT></FONT>
+            </P>
+            <P><FONT FACE="American Typewriter, monospace"><FONT SIZE=3>/* <br/>This<br/>
+                is a <br/>block comment. */</FONT></FONT></P>
+            <UL>
+                <UL>
+                    <LI><P STYLE="margin-bottom: 0in; line-height: 100%"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=4><B>Declaration
+                                of Primitives/Variables</B></FONT></FONT></P>
+                </UL>
+            </UL>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3>Eugene
+                supports three types of variables -- boolean, txt, and num. A
+                variable of type boolean can have one of the two values: true or
+                false. A txt variable is a string of characters, and a num variable
+                can store a number. Multiple declarations of the same type can be
+                made on one line by separating assignments by commas. </FONT></FONT>
+            </P>
+            <P STYLE="margin-bottom: 0in; line-height: 100%"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3><B>Examples:
+                </B></FONT></FONT>
+            </P>
+            <P><FONT FACE="American Typewriter, monospace"><FONT SIZE=3>boolean
+                b;</FONT></FONT><br/> <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>txt
+                txt1,txt2, txt3;</FONT></FONT><br/> <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>num
+                num1,num2, num3;</FONT></FONT> 
+            </P>
+            <P STYLE="margin-bottom: 0in; line-height: 100%"><BR>
+            </P>
+            <UL>
+                <UL>
+                    <LI><P STYLE="margin-bottom: 0in; line-height: 100%"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=4><B>Declaration
+                                of Arrays</B></FONT></FONT></P>
+                </UL>
+            </UL>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3>Eugene
+                supports txt[] arrays, which is a list of txt values, and num[]
+                arrays, which is a list of num values. The txt or num values of an
+                array can be accessed by specifying an index between squared
+                brackets. The first element of an array is indexed with zero (0).</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; line-height: 100%"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3><B>Examples:</B></FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>txt[]
+                arrayTxt1, arrayTxt2;</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>num[]
+                arrayNum;</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; line-height: 100%"><BR>
+            </P>
+            <UL>
+                <UL>
+                    <LI><P STYLE="margin-bottom: 0in; line-height: 100%"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=4><B>Expressions
+                                and Assignments</B></FONT></FONT></P>
+                </UL>
+            </UL>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3>Eugene
+                supports the following types of operations: The + operator can be
+                used to add numbers, concatenate txt variables or values, and to
+                concatenate arrays. The –, *, and – operators can be only be used
+                to subtract, multiply, and divide num variables or values
+                respectively.</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3>The =
+                assignment operator sets the value of the destination to the source,
+                as long as types match. In the previous examples, the sources were
+                primitive values, references to primitive values, references to
+                property values of parts, and references to property values of
+                devices. The destinations were all references to primitives; however,
+                references to part property values can be set like this, as well. A
+                property can be set to a property even if the property names are not
+                the same, as long as types match. The properties of devices cannot be
+                set. Parts and devices cannot be set to references to other parts and
+                devices. Assignments of values to variables can be written at the
+                declaration of a variable or an array, as well as everywhere in the
+                entire Eugene script. If the variable or array at the left side of
+                the assignment is not declared, the variable will get assigned the
+                value and type of the right side of the assignment. </FONT></FONT>
+            </P>
+            <P STYLE="margin-bottom: 0in; line-height: 100%"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3><B>Examples:</B></FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>// the
+                myTxtArray is not declared and will get assigned the type txt[]</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>myTxtArray =
+                [&quot;A&quot;, &quot;list&quot;, &quot;of&quot;, &quot;strings&quot;];
+                </FONT></FONT>
+            </P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>num[]
+                arrayNum2 = [1, 2.0, 3.00, 4, 2.5 + 2.5]; </FONT></FONT>
+            </P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>num two =
+                numLst2[1]; // two holds 2.0 </FONT></FONT>
+            </P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>num four =
+                two + 2; // four holds 4.0</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>num2 =
+                (((44.4 + 6.7) * 2) - 1.45) / 5;</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>arrayTxt3 =
+                myTxtArray + [&quot;with&quot;, &quot;more&quot;, &quot;strings&quot;];
+                </FONT></FONT>
+            </P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>arrayNum3 =
+                arryNum2 + [6, 7.0, 8]; </FONT></FONT>
+            </P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>txt txt3 =
+                &quot;This&quot;, txt4 = &quot;is&quot;, txt5 = &quot;a&quot;, txt6 =
+                &quot;shortcut&quot;;</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>rbs2.Sequence
+                = &quot;ATCG&quot;; </FONT></FONT>
+            </P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>rbs1.Sequence
+                = rbs2.Sequence; // rbs1.Sequence holds &quot;ATCG&quot;</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; line-height: 100%"><BR>
+            </P>
+            <UL>
+                <UL>
+                    <LI><P STYLE="margin-bottom: 0in; line-height: 100%"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=4><B>IO
+                                Statements</B></FONT></FONT></P>
+                        <UL>
+                            <LI><P STYLE="margin-bottom: 0in; line-height: 100%"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3><B>print()</B></FONT></FONT></P>
+                        </UL>
+                </UL>
+            </UL>
+            <P STYLE="margin-bottom: 0in; line-height: 100%"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3><B>The
+                    print() function writes information to the console output and can
+                    take multiple comma-separated arguments. Its arguments can either be
+                    variables, expressions, or synthetic biological components.</B></FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; line-height: 100%"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3><B>Examples:</B></FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>print(“Hello
+                World!”);</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>print(“Hello
+                “, world, “!”);</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>print(“Device
+                d: “, d);</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; line-height: 100%"><BR>
+            </P>
+            <UL>
+                <LI><P STYLE="margin-bottom: 0in; line-height: 100%"><FONT COLOR="#0000ff"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=4 STYLE="font-size: 16pt"><B>Control-Flow
+                            Structures</B></FONT></FONT></FONT></P>
+            </UL>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT COLOR="#000000"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3>Eugene
+                scripts are generally executed in a top-down manner. Control-flow
+                statements break up the flow of execution and allow blocks of code to
+                be executed conditionally or as long as a condition is fulfilled.
+                Conditions are value comparisons of primitives, biological properties
+                and components, as well as evaluations of rules. For value
+                comparisons, Eugene offers the following relational operators: </FONT></FONT></FONT>
+            </P>
+            <UL>
+                <LI><P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                        <FONT COLOR="#000000"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3>==
+                        ... equal to </FONT></FONT></FONT>
+                    </P>
+                <LI><P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                        <FONT COLOR="#000000"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3>!=
+                        ... not equal to </FONT></FONT></FONT>
+                    </P>
+                <LI><P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                        <FONT COLOR="#000000"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3>&gt;
+                        … greater than</FONT></FONT></FONT></P>
+                <LI><P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                        <FONT COLOR="#000000"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3>&gt;=
+                        ... greater or equal to </FONT></FONT></FONT>
+                    </P>
+                <LI><P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                        <FONT COLOR="#000000"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3>&lt;=
+                        ... less or equal than</FONT></FONT></FONT></P>
+                <LI><P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                        <FONT COLOR="#000000"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3>&lt;
+                        … less than </FONT></FONT></FONT>
+                    </P>
+            </UL>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT COLOR="#000000"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3>In
+                Eugene, only values of the same type can be compared. If the values
+                are arrays, then only the == and != operators are supported, where
+                each element in one list is compared to the element at the
+                corresponding position in the other list.</FONT></FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT COLOR="#000000"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3>Conditions
+                can be </FONT></FONT></FONT>
+            </P>
+            <UL>
+                <LI><P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                        <FONT COLOR="#000000"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3>combined
+                        by using the AND, OR, or XOR logical operators,</FONT></FONT></FONT></P>
+                <LI><P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                        <FONT COLOR="#000000"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3>negated
+                        by using the NOT operator, and</FONT></FONT></FONT></P>
+                <LI><P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                        <FONT COLOR="#000000"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3>grouped
+                        by using parenthesis. </FONT></FONT></FONT>
+                    </P>
+            </UL>
+            <P STYLE="margin-bottom: 0in; line-height: 100%"><BR>
+            </P>
+            <UL>
+                <UL>
+                    <LI><P STYLE="margin-bottom: 0in; line-height: 100%"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=4><B>IF-ELSE
+                                Statements</B></FONT></FONT></P>
+                </UL>
+            </UL>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3>Eugene
+                offers conditional branches (i.e., IF-ELSE statements) to manage the
+                execution of specific actions under certain conditions. IF-ELSE
+                statements evaluate the specified condition, where the evaluation
+                result is a boolean value – true or false. If the condition results
+                in true, then the branch specified under the IF condition gets
+                executed. If the condition results in false, then the ELSE branch is
+                executed. </FONT></FONT>
+            </P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3>Examples:</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>num x = 4; </FONT></FONT>
+            </P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>if
+                (p1.RelativeStrength &gt; x AND NOT(p1.Sequence == &quot;ATCG&quot;))
+                { </FONT></FONT>
+            </P>
+            <P STYLE="margin-left: 0.14in; margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>p1.Sequence
+                = &quot;TCGA&quot;; </FONT></FONT>
+            </P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>} else { </FONT></FONT>
+            </P>
+            <P STYLE="margin-left: 0.14in; margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>p1.Sequence
+                = &quot;CGAT&quot;; </FONT></FONT>
+            </P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>} </FONT></FONT>
+            </P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>if (on(d1,
+                d2, d3) (r1 AND r2) OR (NOT(r2 OR r3))) { </FONT></FONT>
+            </P>
+            <P STYLE="margin-left: 0.14in; margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>RBS
+                rbs3(&quot;GATC&quot;); </FONT></FONT>
+            </P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>} else { </FONT></FONT>
+            </P>
+            <P STYLE="margin-left: 0.13in; margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>RBS
+                rbs3(&quot;ATCG&quot;); </FONT></FONT>
+            </P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>}</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3><I>Note:</I>
+                It is planned to integrate ELSEIF branches in the near future.</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; line-height: 100%"><BR>
+            </P>
+            <UL>
+                <UL>
+                    <LI><P STYLE="margin-bottom: 0in; line-height: 100%"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=4><B>Loops</B></FONT></FONT></P>
+                </UL>
+            </UL>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3>To
+                iterate over a set of synthetic biological components or to repeat an
+                execution multiple times. Equivalent to Java, Eugene offers three
+                variations of loops – FOR, WHILE, and DO-WHILE. Loops may be nested
+                too.</FONT></FONT></P>
+            <UL>
+                <UL>
+                    <UL>
+                        <LI><P STYLE="margin-bottom: 0in; line-height: 100%"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=4><B>FOR
+                                    Loops</B></FONT></FONT></P>
+                    </UL>
+                </UL>
+            </UL>
+            <P STYLE="margin-bottom: 0in; font-style: normal; font-weight: normal; line-height: 100%">
+                <FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3>FOR loops
+                take three arguments which are separated by a semicolon – the
+                <FONT COLOR="#000000">initialization, condition, and</FONT></FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-style: normal; font-weight: normal">
+                <FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3><FONT COLOR="#000000">incrementation
+                arguments. F</FONT>irst, the initialization arguments is executed,
+                followed by an evaluation of the condition argument. If the FOR loop
+                condition evaluates to true, the body of the loop gets executed.
+                After the body's execution, the third argument of the FOR loop, i.e.
+                the incrementation argument, is executed, and the loop condition is
+                evaluated again. The FOR loop terminates if the evaluation of the
+                loop conditions evaluates to false.</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; line-height: 100%"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3><B>Examples:</B></FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>// print the
+                numbers from 1 to 10</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal"><FONT FACE="American Typewriter, monospace">for(num
+                i=1; i&lt;=10; i++) { </FONT>
+            </P>
+            <P STYLE="margin-left: 0.14in; margin-bottom: 0in; font-weight: normal">
+                <FONT FACE="American Typewriter, monospace">print(“i: “, i); </FONT>
+            </P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>}</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>// now,
+                let's print the values of the arrayNum2 array</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>// in
+                reverse order</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>for(num
+                X=arrayNum2.size()-1; X&gt;=0; X--) {</FONT></FONT></P>
+            <P STYLE="margin-left: 0.19in; margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>print(“arrayNum[“,X,”]:
+                ”,arrayNum2[X]);</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>}</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; line-height: 100%"><BR>
+            </P>
+            <UL>
+                <UL>
+                    <UL>
+                        <LI><P STYLE="margin-bottom: 0in; line-height: 100%"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=4><B>WHILE
+                                    Loops</B></FONT></FONT></P>
+                    </UL>
+                </UL>
+            </UL>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3>WHILE
+                loops evaluate a specified conditional expression, and while the
+                evaluation returns true, the specified statements in the loop body
+                will be executed.</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; line-height: 100%"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3><B>Examples:</B></FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>// print the
+                numbers from 1 to 10 using a WHILE loop</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>num i=1;</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>while(i&lt;=10)
+                {</FONT></FONT></P>
+            <P STYLE="margin-left: 0.18in; margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>print(“i:
+                ”,i);</FONT></FONT></P>
+            <P STYLE="margin-left: 0.18in; margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>i++;</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>}</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>// now,
+                let's print the values of the arrayNum2 array</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>// in
+                reverse order by using a WHILE loop</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>num
+                X=arrayNum2.size()-1;</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>while(X&gt;=0)
+                {</FONT></FONT></P>
+            <P STYLE="margin-left: 0.18in; margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>print(“arrayNum[“,X,”]:
+                ”,arrayNum2[X]);</FONT></FONT></P>
+            <P STYLE="margin-left: 0.18in; margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>X--;</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>}</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; line-height: 100%"><BR>
+            </P>
+            <UL>
+                <UL>
+                    <UL>
+                        <LI><P STYLE="margin-bottom: 0in; line-height: 100%"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=4><B>DO-WHILE
+                                    Loops</B></FONT></FONT></P>
+                    </UL>
+                </UL>
+            </UL>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT COLOR="#000000"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3>Different
+                to the WHILE loop, the DO-WHILE loops evaluates the specified
+                condition after the execution of the loop's body instead of before
+                the execution of the loop body. Therefore, the statements within the
+                DO block are always executed at least once.</FONT></FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT COLOR="#000000"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3>Examples:</FONT></FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>// print the
+                numbers from 1 to 10 using a DO-WHILE loop</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>num i=1;</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>do {</FONT></FONT></P>
+            <P STYLE="margin-left: 0.18in; margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>print(“i:
+                ”, i);</FONT></FONT></P>
+            <P STYLE="margin-left: 0.18in; margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>i++;</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>}
+                while(i&lt;=10);</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>// now,
+                let's print the values of the arrayNum2 array</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3><FONT FACE="American Typewriter, monospace">//
+                in reverse order by using a DO-WHILE loop</FONT> </FONT></FONT>
+            </P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>num
+                X=arrayNum2.size()-1;</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>do {</FONT></FONT></P>
+            <P STYLE="margin-left: 0.18in; margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>print(“arrayNum[“,X,”]:
+                ”,arrayNum2[X]);</FONT></FONT></P>
+            <P STYLE="margin-left: 0.18in; margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>X--;</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>}
+                while(X&gt;=0);</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; line-height: 100%"><BR>
+            </P>
+            <UL>
+                <LI><P STYLE="margin-bottom: 0in; line-height: 100%"><FONT COLOR="#0000ff"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=4 STYLE="font-size: 16pt"><B>Function
+                            Prototyping</B></FONT></FONT></FONT></P>
+            </UL>
+            <P STYLE="margin-bottom: 0in; line-height: 100%"><BR>
+            </P>
+            <UL>
+                <UL>
+                    <LI><P STYLE="margin-bottom: 0in; line-height: 100%"><FONT COLOR="#000000"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=4><B>Declaring
+                                Functions</B></FONT></FONT></FONT></P>
+                </UL>
+            </UL>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT COLOR="#000000"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3>Equivalently
+                to the C programming language, Eugene provides facilities to declare
+                function prototypes. A function is a named block of Eugene statements
+                that performs a certain task and can return some value to its
+                invoker. </FONT></FONT></FONT>
+            </P>
+            <P STYLE="margin-bottom: 0in; line-height: 100%"><BR>
+            </P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT COLOR="#000000"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3>Examples:</FONT></FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT COLOR="#000000"><FONT FACE="American Typewriter, monospace"><FONT SIZE=3>//
+                in the following we declare a function prototype which</FONT></FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT COLOR="#000000"><FONT FACE="American Typewriter, monospace"><FONT SIZE=3>//
+                gets as parameter a num[] array and prints its values</FONT></FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT COLOR="#000000"><FONT FACE="American Typewriter, monospace"><FONT SIZE=3>//
+                in reverse order by using Eugene's print() function</FONT></FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT COLOR="#000000"><FONT FACE="American Typewriter, monospace"><FONT SIZE=3>function
+                reversePrint(num[] arrayNum) {</FONT></FONT></FONT></P>
+            <P STYLE="margin-left: 0.18in; margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT COLOR="#000000"><FONT FACE="American Typewriter, monospace"><FONT SIZE=3>if(arrayNum.size()-1&gt;=0)
+                {</FONT></FONT></FONT></P>
+            <P STYLE="margin-left: 0.39in; margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT COLOR="#000000"><FONT FACE="American Typewriter, monospace"><FONT SIZE=3>for(num
+                i=arrayNum.size()-1;i&gt;=0;i++) {</FONT></FONT></FONT></P>
+            <P STYLE="margin-left: 0.6in; margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT COLOR="#000000"><FONT FACE="American Typewriter, monospace"><FONT SIZE=3>print(“arrayNum[“,i,”]:
+                ”,arrayName[i]);</FONT></FONT></FONT></P>
+            <P STYLE="margin-left: 0.39in; margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT COLOR="#000000"><FONT FACE="American Typewriter, monospace"><FONT SIZE=3>}</FONT></FONT></FONT></P>
+            <P STYLE="margin-left: 0.18in; margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT COLOR="#000000"><FONT FACE="American Typewriter, monospace"><FONT SIZE=3>}</FONT></FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT COLOR="#000000"><FONT FACE="American Typewriter, monospace"><FONT SIZE=3>}</FONT></FONT></FONT></P>
+            <UL>
+                <UL>
+                    <LI><P STYLE="margin-bottom: 0in; line-height: 100%"><FONT COLOR="#000000"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=4><B>Calling
+                                a Function</B></FONT></FONT></FONT></P>
+                </UL>
+            </UL>
+            <P STYLE="margin-bottom: 0in; font-style: normal; font-weight: normal; line-height: 100%">
+                <FONT COLOR="#000000"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3>In
+                order to execute a function prototype, the function must be called.
+                In Eugene, a function can be executed (called) multiple times, from
+                various places during a single execution of a Eugene script. </FONT></FONT></FONT>
+            </P>
+            <P STYLE="margin-bottom: 0in; line-height: 100%"><FONT COLOR="#000000"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3><I><B>Note:
+                    </B></I><SPAN STYLE="font-weight: normal">Currently, Eugene does not
+                    support recursive function calls.</SPAN></FONT></FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-style: normal; font-weight: normal; line-height: 100%">
+                <FONT COLOR="#000000"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3>Examples:</FONT></FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-style: normal; font-weight: normal; line-height: 100%">
+                <FONT COLOR="#000000"><FONT FACE="American Typewriter, monospace"><FONT SIZE=3>//
+                call the reversePrint() function to print the values </FONT></FONT></FONT>
+            </P>
+            <P STYLE="margin-bottom: 0in; font-style: normal; font-weight: normal; line-height: 100%">
+                <FONT COLOR="#000000"><FONT FACE="American Typewriter, monospace"><FONT SIZE=3>//
+                of the arrayNum2 array in reverse order</FONT></FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-style: normal; font-weight: normal; line-height: 100%">
+                <FONT COLOR="#000000"><FONT FACE="American Typewriter, monospace"><FONT SIZE=3>reversePrint(arrayNum2);</FONT></FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; line-height: 100%"><BR>
+            </P>
+            <UL>
+                <LI><P STYLE="margin-bottom: 0in; line-height: 100%"><FONT COLOR="#0000ff"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=4 STYLE="font-size: 16pt"><B>Synthetic
+                            Biology-specific Features</B></FONT></FONT></FONT></P>
+                    <UL>
+                        <LI><P STYLE="margin-bottom: 0in; line-height: 100%"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=4><B>Import
+                                    and Export of Synthetic Biological Data</B></FONT></FONT></P>
+                            <UL>
+                                <LI><P STYLE="margin-bottom: 0in; line-height: 100%"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=4><B>include
+                                            Statement</B></FONT></FONT></P>
+                            </UL>
+                    </UL>
+            </UL>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3>Eugene
+                allows to include Eugene scripts into a Eugene script, regardless
+                where in the code. Therefore, the include statement can be used,
+                where the path of the included Eugene scripts must be specified if
+                they are located in a different folder. The include statement can
+                take multiple Eugene scripts that must be specified in a
+                comma-separated list.</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; line-height: 100%"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3><B>Examples:</B></FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>include
+                PropertyDefinition.h;</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>include
+                PartTypeDefinitions.h, MyFunctions.h;</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>include
+                ./path/to/MyDevices.eug;</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; line-height: 100%"><BR>
+            </P>
+            <UL>
+                <UL>
+                    <LI><P STYLE="margin-bottom: 0in; line-height: 100%"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=4><B>Declarations
+                                of Synthetic Biological Properties</B></FONT></FONT></P>
+                </UL>
+            </UL>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3>Properties
+                are significant labels for primitives to be associated with Parts and
+                Part Types. Property definitions must specify a primitive type.</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; line-height: 100%"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3><B>Examples:</B></FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>Property
+                Sequence(txt); </FONT></FONT>
+            </P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>Property
+                RelativeStrength(num); </FONT></FONT>
+            </P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>Property
+                Letters(txt[]); </FONT></FONT>
+            </P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>Property
+                Numbers(num[]); </FONT></FONT>
+            </P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>Property
+                Bool(boolean);</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; line-height: 100%"><BR>
+            </P>
+            <UL>
+                <UL>
+                    <LI><P STYLE="margin-bottom: 0in; line-height: 100%"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=4><B>Declarations
+                                of Synthetic Biological Components</B></FONT></FONT></P>
+                </UL>
+            </UL>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3>Eugene
+                provides various types of components of different levels of
+                abstraction, i.e., Device, Part Type, and Part. Devices and Parts
+                have one pre-defined attribute, i.e. sequence, and various
+                pre-defined operations, such as toSequence() or size().</FONT></FONT></P>
+            <UL>
+                <UL>
+                    <UL>
+                        <LI><P STYLE="margin-bottom: 0in; line-height: 100%"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3><B>Part
+                                    Type</B></FONT></FONT></P>
+                    </UL>
+                </UL>
+            </UL>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3>Part
+                Types represent types of standard biological parts, such as
+                promoters, ribosome binding sites, or terminators. Part Types do not
+                construct any parts, but rather specify the structure and properties
+                of part that can be constructed. All properties referenced by a Part
+                Type definition must be defined before the Part Type's definition.</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; line-height: 100%"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3><B>Examples:</B></FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>Part
+                Promoter(Sequence, RelativeStrength, Letters, Numbers, Bool); </FONT></FONT>
+            </P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>Part
+                RBS(Sequence);</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>Part
+                Gene(Sequence);</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>Part
+                Terminator(Sequence);</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; line-height: 100%"><BR>
+            </P>
+            <UL>
+                <UL>
+                    <UL>
+                        <LI><P STYLE="margin-bottom: 0in; line-height: 100%"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3><B>Device</B></FONT></FONT></P>
+                    </UL>
+                </UL>
+            </UL>
+            <P ALIGN=LEFT STYLE="margin-bottom: 0in; font-weight: normal"><FONT COLOR="#000000"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3>Devices
+                represent a composite of standard biological parts and/or other
+                devices. In a device declaration, the same part and/or device can be
+                used more than once. Eugene allows synthetic biologist to specify
+                abstract, instantiated, and hybrid synthetic devices. Abstract
+                devices are only assembled of part types, such as promoters, ribosome
+                binding sites, or terminators. Hybrid devices are devices that are
+                assembled of other devices, part types, and parts.</FONT></FONT></FONT></P>
+            <P ALIGN=LEFT STYLE="margin-bottom: 0in; line-height: 100%"><FONT COLOR="#000000"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3><B>Examples:</B></FONT></FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal"><FONT FACE="American Typewriter, monospace">Device
+                emptyDevice() ; </FONT>
+            </P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal"><FONT FACE="American Typewriter, monospace">Device
+                abstractDevice (Promoter, RBS, Gene, Terminator) ; </FONT>
+            </P>
+            <P ALIGN=LEFT STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT COLOR="#000000"><FONT FACE="American Typewriter, monospace"><FONT SIZE=3>Device
+                hybridDevice (abstractDevice, pBad, CI, BBa_B0010, pCI, Reporter,
+                Terminator) ; </FONT></FONT></FONT>
+            </P>
+            <P ALIGN=LEFT STYLE="margin-bottom: 0in; line-height: 100%"><BR>
+            </P>
+            <UL>
+                <UL>
+                    <LI><P STYLE="margin-bottom: 0in; line-height: 100%"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=4><B>Instantiation
+                                of Part Types and Abstract Devices</B></FONT></FONT></P>
+                        <UL>
+                            <LI><P STYLE="margin-bottom: 0in; line-height: 100%"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3><B>Parts</B></FONT></FONT></P>
+                        </UL>
+                </UL>
+            </UL>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3>Part
+                instantiations define instances of predefined Parts Types and assign
+                concrete values to the Part Type's properties. Eugene provides two
+                possibilities to set the property values of Parts. First, a
+                comma-separated list of values can be specified, by specifying the
+                property values in the same order as specified in the Part Type
+                declaration. Second, the name of the properties can be specified to
+                which the given value should by assigned to.</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; line-height: 100%"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3><B>Examples:</B></FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal"><FONT FACE="American Typewriter, monospace"><FONT SIZE=3>txt
+                seq = &quot;ATCG&quot;; </FONT></FONT>
+            </P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal"><FONT FACE="American Typewriter, monospace"><FONT SIZE=3>Promoter
+                p1(seq, 100, [&quot;A&quot;, &quot;B&quot;, &quot;C&quot;], [1, 2,
+                3], true); </FONT></FONT>
+            </P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal"><FONT FACE="American Typewriter, monospace"><FONT SIZE=3>Promoter
+                p2(.RelativeStrength(20), .Sequence(&quot;GCTA&quot;)); </FONT></FONT>
+            </P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal"><FONT FACE="American Typewriter, monospace"><FONT SIZE=3>RBS
+                rbs1(&quot;CGAT&quot;); </FONT></FONT>
+            </P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>RBS rbs2();</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>Gene
+                RFP(&quot;GTCCTATA&quot;);</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>Terminator
+                t1();</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; line-height: 100%"><BR>
+            </P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3>The
+                property values of a part can be accessed using the 'dot' operator by
+                first specifying the part name, followed by a dot ('.'), and the
+                desired name of the property.</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; line-height: 100%"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3><B>Examples:</B></FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>txt p1Seq =
+                p1.Sequence; // p1Seq holds &quot;ATCG&quot;</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; line-height: 100%"><BR>
+            </P>
+            <UL>
+                <UL>
+                    <UL>
+                        <LI><P STYLE="margin-bottom: 0in; line-height: 100%"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3><B>Devices</B></FONT></FONT></P>
+                    </UL>
+                </UL>
+            </UL>
+            <P ALIGN=LEFT STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT COLOR="#000000"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3>In
+                Eugene, only abstract devices can be instantiated. Instantiated
+                devices consists of parts, such as pLac or lacI. Each part must be an
+                instance of the corresponding part type in the abstract device.</FONT></FONT></FONT></P>
+            <P ALIGN=LEFT STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT COLOR="#000000"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3>Examples:</FONT></FONT></FONT></P>
+            <P ALIGN=LEFT STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT COLOR="#000000"><FONT FACE="American Typewriter, monospace">Device
+                concreteDevice(p2, rbs1, RFP, t1);</FONT></FONT></P>
+            <P ALIGN=LEFT STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT COLOR="#000000"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3>Property
+                values of devices can be accessed with the dot operator; however, the
+                value is the union of the property values of its members returned as
+                a list. If the property is a txt or num, a txt[] or a num[] is
+                returned. If the property is a txt[] or a num[], a txt[] or a num[]
+                is also returned that consists of the lists appended together.
+                Individual members can be accessed by using square brackets and
+                specifying an index. The first member is indexed at zero. Square
+                brackets can be stacked in the case of devices within devices. </FONT></FONT></FONT>
+            </P>
+            <P ALIGN=LEFT STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT COLOR="#000000"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3>Examples:</FONT></FONT></FONT></P>
+            <P ALIGN=LEFT STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT COLOR="#000000"><FONT FACE="American Typewriter, monospace"><FONT SIZE=3>txt[]
+                d1Seq = d1.Sequence; //d1Seq holds [&quot;ATCG&quot;, &quot;ATCG&quot;,
+                &quot;CGAT&quot;] </FONT></FONT></FONT>
+            </P>
+            <P ALIGN=LEFT STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT COLOR="#000000"><FONT FACE="American Typewriter, monospace"><FONT SIZE=3>txt
+                rbs1Seq = d2[1][2].Sequence; // rbs1Seq holds &quot;CGAT&quot; </FONT></FONT></FONT>
+            </P>
+            <P ALIGN=LEFT STYLE="margin-bottom: 0in; line-height: 100%"><BR>
+            </P>
+            <UL>
+                <UL>
+                    <LI><P STYLE="margin-bottom: 0in; line-height: 100%"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=4><B>Arrays
+                                of Synthetic Biological Components</B></FONT></FONT></P>
+                </UL>
+            </UL>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3>Eugene
+                offers facilities to declare arrays of Devices, Device Instances,
+                Part Types, Part Instances and Properties. Every array of synthetic
+                biological components can only contain elements of the corresponding
+                biological component, for example, a Device[] array can only consist
+                devices. Similar to num[] and txt[] arrays, the elements of arrays of
+                synthetic biological components can be accessed by using squared
+                brackets, where the index is zero-based. Arrays may access the built
+                in functions get and size.</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3>Examples:</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>Property[]
+                arrayProperties = [Property1, Property2, … , PropertyN];</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace">PartType[] arrayPartTypes
+                = [PartType1, PartType2, … , PartTypeN];</FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace">Promoter[] arrayPromoters
+                = [Promoter1, Promoter2, … , PromoterN];</FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>Device[]
+                arrayDevices = [Device1, Device2, Device3, … , DeviceN];</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; line-height: 100%"><BR>
+            </P>
+            <UL>
+                <LI><P STYLE="margin-bottom: 0in; line-height: 100%"><FONT COLOR="#0000ff"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=4 STYLE="font-size: 16pt"><B>Rules
+                            on the Composition of Synthetic Biological Components</B></FONT></FONT></FONT></P>
+            </UL>
+            <P STYLE="margin-bottom: 0in; line-height: 100%"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3>In
+                Eugene, a Rule consists of two operands – one left operand and one
+                right operand – and an operator. Both operands can be either
+                variables, properties, or biological components (i.e., Devices, Part
+                Types, and Parts). Rules can optionally be defined on a device – <FONT FACE="American Typewriter, monospace"><SPAN STYLE="font-weight: normal">ON
+                    &lt;device&gt;:</SPAN></FONT><SPAN STYLE="font-weight: normal">. If
+                    no device is defined for a rule, then the rule will be evaluated on
+                    every defined device in the Eugene script. Eugene allows the
+                    composition of rules that are made up from several rules using the
+                    logical operators </SPAN><FONT FACE="American Typewriter, monospace"><SPAN STYLE="font-weight: normal">AND</SPAN></FONT><SPAN STYLE="font-weight: normal">,
+                </SPAN><FONT FACE="American Typewriter, monospace"><SPAN STYLE="font-weight: normal">OR</SPAN></FONT><SPAN STYLE="font-weight: normal">,
+                    or </SPAN><FONT FACE="American Typewriter, monospace"><SPAN STYLE="font-weight: normal">XOR</SPAN></FONT><SPAN STYLE="font-weight: normal">.
+                    It is also possible to negate rules by using the </SPAN><FONT FACE="American Typewriter, monospace"><SPAN STYLE="font-weight: normal">NOT</SPAN></FONT>
+                <SPAN STYLE="font-weight: normal">operator.</SPAN></FONT></FONT></P>
+            <UL>
+                <UL>
+                    <LI><P STYLE="margin-bottom: 0in; line-height: 100%"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=4><B>Eugene's
+                                Rule Set</B></FONT></FONT></P>
+                </UL>
+            </UL>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3>Eugene
+                offers various rules in order to constrain the composition of
+                devices, part types, and parts. In the following table we present
+                Eugene's rule operators, their semantics, and examples.</FONT></FONT></P>
+            <TABLE WIDTH=100% BORDER=1 CELLPADDING=4 CELLSPACING=4 STYLE="page-break-inside: avoid">
+                <COL WIDTH=68*>
+                <COL WIDTH=96*>
+                <COL WIDTH=92*>
+                <TR VALIGN=TOP>
+                    <TD WIDTH=26%>
+                        <P ALIGN=CENTER><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3><B>RULE
+                                OPERATOR</B></FONT></FONT></P>
+                    </TD>
+                    <TD WIDTH=38%>
+                        <P ALIGN=CENTER><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3><B>SEMANTICS</B></FONT></FONT></P>
+                    </TD>
+                    <TD WIDTH=36%>
+                        <P ALIGN=CENTER><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3><B>EXAMPLES</B></FONT></FONT></P>
+                    </TD>
+                </TR>
+                <TR VALIGN=TOP>
+                    <TD WIDTH=26%>
+                        <P ALIGN=CENTER STYLE="font-weight: normal"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3>&lt;left&gt;
+                            <B>CONTAINS</B> &lt;right&gt;</FONT></FONT></P>
+                    </TD>
+                    <TD WIDTH=38%>
+                        <P><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3>The
+                            &lt;left&gt; operand must contain the &lt;right&gt; operand. Both
+                            operands must be different.</FONT></FONT></P>
+                    </TD>
+                    <TD WIDTH=36%>
+                        <P><FONT COLOR="#000000"><FONT FACE="AmericanTypewriter, monospace"><FONT SIZE=3>
+                            abstractDevice CONSTAINS Promoter<br/>
+                            concreteDevice CONTAINS RFP</FONT></FONT></FONT> 
+                        </P>
+                    </TD>
+                </TR>
+                <TR VALIGN=TOP>
+                    <TD WIDTH=26%>
+                        <P ALIGN=CENTER STYLE="font-weight: normal"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3>&lt;left&gt;
+                            <B>AFTER</B> &lt;right&gt;</FONT></FONT></P>
+                    </TD>
+                    <TD WIDTH=38%>
+                        <P><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3>All
+                            elements of the &lt;left&gt; operand must precede all elements of
+                            the &lt;right&gt; operand in a device. Both operands must be
+                            different. </FONT></FONT>
+                        </P>
+                    </TD>
+                    <TD WIDTH=36%>
+                        <P><FONT COLOR="#000000"><FONT FACE="AmericanTypewriter, monospace"><FONT SIZE=3>Terminator
+                            AFTER Promoter<br/>Reporter
+                            AFTER pCI</FONT></FONT></FONT> 
+                        </P>
+                    </TD>
+                </TR>
+                <TR VALIGN=TOP>
+                    <TD WIDTH=26%>
+                        <P ALIGN=CENTER STYLE="font-weight: normal"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3>&lt;left&gt;
+                            <B>BEFORE</B> &lt;right&gt;</FONT></FONT></P>
+                    </TD>
+                    <TD WIDTH=38%>
+                        <P><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3>All
+                            element of the &lt;right&gt; operand must precede all elements of
+                            the &lt;left&gt; operand in a device. Both operands must be
+                            different. </FONT></FONT>
+                        </P>
+                    </TD>
+                    <TD WIDTH=36%>
+                        <P><FONT COLOR="#000000"><FONT FACE="AmericanTypewriter, monospace"><FONT SIZE=3>Promoter
+                            BEFORE Terminator<br/>pCI BEFORE Reporter</FONT></FONT></FONT> 
+                        </P>
+                    </TD>
+                </TR>
+                <TR VALIGN=TOP>
+                    <TD WIDTH=26%>
+                        <P ALIGN=CENTER STYLE="font-weight: normal"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3>&lt;left&gt;
+                            <B>STARTSWITH</B> &lt;right&gt;</FONT></FONT></P>
+                    </TD>
+                    <TD WIDTH=38%>
+                        <P><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3>The
+                            first component of the &lt;left&gt; operand must be equal to the
+                            &lt;right&gt; operand. The &lt;left&gt; operand can only be
+                            devices.</FONT></FONT></P>
+                    </TD>
+                    <TD WIDTH=36%>
+                        <P><FONT COLOR="#000000"><FONT FACE="AmericanTypewriter, monospace"><FONT SIZE=3>abstractDevice
+                            STARTSWITH Promoter<br/>hybridDevice STARTSWITH abstractDevice</FONT></FONT></FONT>
+                        </P>
+                    </TD>
+                </TR>
+                <TR VALIGN=TOP>
+                    <TD WIDTH=26%>
+                        <P ALIGN=CENTER STYLE="font-weight: normal"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3>&lt;left&gt;
+                            <B>ENDSWITH</B> &lt;right&gt;</FONT></FONT></P>
+                    </TD>
+                    <TD WIDTH=38%>
+                        <P><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3>The
+                            last component of the &lt;left&gt; operand must be equal to the
+                            &lt;right&gt; operand. The &lt;left&gt; operand can only be
+                            devices.</FONT></FONT></P>
+                    </TD>
+                    <TD WIDTH=36%>
+                        <P><FONT COLOR="#000000"><FONT FACE="AmericanTypewriter, monospace"><FONT SIZE=3>abstractDevice
+                            ENDSWITH Terminator<br/>rbs1.Sequence ENDSWITH &quot;ATCATG&quot;</FONT></FONT></FONT>
+                        </P>
+                    </TD>
+                </TR>
+                <TR VALIGN=TOP>
+                    <TD WIDTH=26%>
+                        <P ALIGN=CENTER STYLE="font-weight: normal"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3>&lt;left&gt;
+                            <B>WITH</B> &lt;right&gt;</FONT></FONT></P>
+                    </TD>
+                    <TD WIDTH=38%>
+                        <P><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3>Both
+                            &lt;left&gt; and &lt;right&gt; operands must be present in a
+                            device.</FONT></FONT></P>
+                    </TD>
+                    <TD WIDTH=36%>
+                        <P><FONT COLOR="#000000"><FONT FACE="AmericanTypewriter, monospace"><FONT SIZE=3>Promoter
+                            WITH Terminator<br/>abstractDevice WITH pBad</FONT></FONT></FONT> 
+                        </P>
+                    </TD>
+                </TR>
+                <TR VALIGN=TOP>
+                    <TD WIDTH=26%>
+                        <P ALIGN=CENTER STYLE="font-weight: normal"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3>&lt;left&gt;
+                            <B>THEN</B> &lt;right&gt;</FONT></FONT></P>
+                    </TD>
+                    <TD WIDTH=38%>
+                        <P><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3>If
+                            a device contains the &lt;left&gt; operand, then it must also
+                            contain the &lt;right&gt; operand. </FONT></FONT>
+                        </P>
+                    </TD>
+                    <TD WIDTH=36%>
+                        <P><FONT COLOR="#000000"><FONT FACE="AmericanTypewriter, monospace"><FONT SIZE=3>Promoter
+                            THEN Terminator<br/>pCI THEN CI</FONT></FONT></FONT> 
+                        </P>
+                    </TD>
+                </TR>
+                <TR VALIGN=TOP>
+                    <TD WIDTH=26%>
+                        <P ALIGN=CENTER STYLE="font-weight: normal"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3>&lt;left&gt;
+                            <B>NEXTTO</B> &lt;right&gt;</FONT></FONT></P>
+                    </TD>
+                    <TD WIDTH=38%>
+                        <P STYLE="font-weight: normal"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3>The
+                            &lt;left&gt; operand must be immediately to the left or to the
+                            right of the &lt;right&gt; operand.</FONT></FONT></P>
+                    </TD>
+                    <TD WIDTH=36%>
+                        <P><FONT COLOR="#000000"><FONT FACE="AmericanTypewriter, monospace"><FONT SIZE=3>Promoter
+                            NEXTTO RBS<br/>Terminator NEXTTO Reporter</FONT></FONT></FONT> 
+                        </P>
+                    </TD>
+                </TR>
+                <TR VALIGN=TOP>
+                    <TD WIDTH=26%>
+                        <P ALIGN=CENTER STYLE="font-weight: normal"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3>&lt;left&gt;
+                            <B>MORETHAN</B> N</FONT></FONT></P>
+                    </TD>
+                    <TD WIDTH=38%>
+                        <P><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3>The
+                            &lt;left&gt; operand must appear more than N times. </FONT></FONT>
+                        </P>
+                    </TD>
+                    <TD WIDTH=36%>
+                        <P><FONT COLOR="#000000"><FONT FACE="AmericanTypewriter, monospace"><FONT SIZE=3>Promoter
+                            MORETHAN 1<br/>pCI MORETHAN 1</FONT></FONT></FONT> 
+                        </P>
+                    </TD>
+                </TR>
+                <TR VALIGN=TOP>
+                    <TD WIDTH=26%>
+                        <P ALIGN=CENTER STYLE="font-weight: normal"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3>&lt;left&gt;
+                            <B>==, !=, &gt;, &gt;=, =&lt;, &lt;</B> &lt;right&gt;</FONT></FONT></P>
+                    </TD>
+                    <TD WIDTH=38%>
+                        <P><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3>Relational
+                            rules compare the values of the &lt;left&gt; operand with the value of the &lt;right&gt;
+                            operand. </FONT></FONT>
+                        </P>
+                    </TD>
+                    <TD WIDTH=36%>
+                        <P><FONT COLOR="#000000"><FONT FACE="AmericanTypewriter, monospace"><FONT SIZE=3>Promoter.Sequence
+                            != Terminator.Sequence<br/>pCI.Strength &gt; 6.5</FONT></FONT></FONT> 
+                        </P>
+                    </TD>
+                </TR>
+            </TABLE>
+            <P STYLE="margin-bottom: 0in; line-height: 100%"><BR>
+            </P>
+            <UL>
+                <UL>
+                    <LI><P STYLE="margin-bottom: 0in; line-height: 100%"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=4><B>Declaration
+                                of Rules</B></FONT></FONT></P>
+                </UL>
+            </UL>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3>Each rule
+                declaration starts with the 'Rule' keyword, followed by the rules’s
+                name. The rule is defined within rounded parentheses. </FONT></FONT>
+            </P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3>Examples:</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in"><FONT FACE="American Typewriter, monospace">Rule
+                simpleRule (abstractDevice STARTSWITH Promoter) ; </FONT>
+            </P>
+            <P STYLE="margin-bottom: 0in"><FONT FACE="American Typewriter, monospace">Rule
+                onDeviceRule (ON concreteDevice: p2.RelativeStrength&gt;=20) ; </FONT>
+            </P>
+            <P STYLE="margin-bottom: 0in"><FONT FACE="American Typewriter, monospace">Rule
+                compositeRule (simpleRule AND onDeviceRule) ;</FONT> 
+            </P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>Rule
+                notRule(ON abstractDevice: NOT Promoter MORETHAN 3); </FONT></FONT>
+            </P>
+            <P STYLE="margin-bottom: 0in; line-height: 100%"><BR>
+            </P>
+            <UL>
+                <UL>
+                    <LI><P STYLE="margin-bottom: 0in; line-height: 100%"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=4><B>Evaluation
+                                of Rules</B></FONT></FONT></P>
+                </UL>
+            </UL>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3>Eugene
+                provides two functions for evaluating rules: Note() and Assert(). The
+                main difference between those functions is the continuing execution
+                of the Eugene script. Whenever a rule violation is noted, an
+                exception is only reported and the execution of the Eugene script
+                continues. Whenever a rule violation is asserted, an exception is
+                thrown and the execution of the Eugene script stops. Both function
+                can note or assert rules individually or on specific devices. If no
+                rules are passed to the Note() or Assert() functions, then all
+                declared rules will be noted or asserted respectively. Also, both
+                functions can take a comma-separated list of rules.</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3>Examples:</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-style: normal; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>// Note
+                three rules, i.e. simpleRule, onDeviceRule, notRule</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-style: normal; font-weight: normal">
+                <FONT FACE="American Typewriter, monospace">Note(simpleRule,
+                onDeviceRule, <FONT SIZE=3>notRule</FONT>);</FONT></P>
+            <P STYLE="margin-bottom: 0in; font-style: normal; font-weight: normal">
+                <FONT FACE="American Typewriter, monospace">// Assert on the
+                concreteDevice device, if the compositeRule is fulfilled</FONT></P>
+            <P STYLE="margin-bottom: 0in; font-style: normal; font-weight: normal">
+                <FONT FACE="American Typewriter, monospace">Assert(ON concreteDevice:
+                compositeRule);</FONT></P>
+            <P STYLE="margin-bottom: 0in; font-style: normal; font-weight: normal">
+                <FONT FACE="American Typewriter, monospace">// Note all rules</FONT></P>
+            <P STYLE="margin-bottom: 0in; font-style: normal; font-weight: normal">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>Note();</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in"><BR>
+            </P>
+            <UL>
+                <LI><P STYLE="margin-bottom: 0in; line-height: 100%"><FONT COLOR="#0000ff"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=4 STYLE="font-size: 16pt"><B>Pre-defined
+                            Functions </B></FONT></FONT></FONT>
+                    </P>
+                    <UL>
+                        <LI><P STYLE="margin-bottom: 0in; line-height: 100%"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=4><B>on
+                                    Synthetic Biological Components</B></FONT></FONT></P>
+                            <UL>
+                                <LI><P STYLE="margin-bottom: 0in; line-height: 100%"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3><B>add(element)</B></FONT></FONT></P>
+                            </UL>
+                    </UL>
+            </UL>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3>The add()
+                function appends the specified element to the list of a component's
+                elements.</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; line-height: 100%"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3><B>Examples:</B></FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>// add the
+                Strength Property to the Promoter Part Type</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>Property
+                Strength(num);</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>Promoter.add(Strength);</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>// add the
+                Promoter Part Type to the hybridDevice </FONT></FONT>
+            </P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>hybridDevice.add(Promoter);</FONT></FONT></P>
+            <UL>
+                <UL>
+                    <UL>
+                        <LI><P STYLE="margin-bottom: 0in; line-height: 100%"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3><B>get(idx)</B></FONT></FONT></P>
+                    </UL>
+                </UL>
+            </UL>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT COLOR="#000000"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3>The
+                get() function has one parameter that specifies the position of the
+                element which should be returned. The indexing of the elements starts
+                with the index 0.</FONT></FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; line-height: 100%"><FONT COLOR="#000000"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3><B>Examples:</B></FONT></FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT COLOR="#000000"><FONT FACE="American Typewriter, monospace"><FONT SIZE=3>//
+                get the first element of the abstractDevice, i.e., Promoter</FONT></FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT COLOR="#000000"><FONT FACE="American Typewriter, monospace"><FONT SIZE=3>abstractDevice.get(0);</FONT></FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT COLOR="#000000"><FONT FACE="American Typewriter, monospace"><FONT SIZE=3>//
+                get the i-th element (i.e., the 4th) of the arrayDevices</FONT></FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT COLOR="#000000"><FONT FACE="American Typewriter, monospace"><FONT SIZE=3>num
+                i = 3;</FONT></FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT COLOR="#000000"><FONT FACE="American Typewriter, monospace"><FONT SIZE=3>arrayDevices.get(i);</FONT></FONT></FONT></P>
+            <UL>
+                <UL>
+                    <UL>
+                        <LI><P STYLE="margin-bottom: 0in; line-height: 100%"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3><B>remove(idx)</B></FONT></FONT></P>
+                    </UL>
+                </UL>
+            </UL>
+            <P STYLE="margin-bottom: 0in; line-height: 100%"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3><B>The
+                    remove() function takes on parameter which specifies to index of the
+                    element that should be deleted from the list of elements.</B></FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; line-height: 100%"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3><B>Examples:</B></FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>// delete
+                the first element of the abstractDevice (i.e. the Promoter)</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>abstractDevice.remove(0);</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>// delete
+                the second Property of the Promoter Part Type (i.e.,
+                RelativeStrength)</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>Promoter.remove(1);</FONT></FONT></P>
+            <UL>
+                <UL>
+                    <UL>
+                        <LI><P STYLE="margin-bottom: 0in; line-height: 100%"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3><B>size()</B></FONT></FONT></P>
+                    </UL>
+                </UL>
+            </UL>
+            <P STYLE="margin-bottom: 0in; line-height: 100%"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3><B>The
+                    size() function returns the size of the component. The returned value
+                    can be assigned or compared to a variable.</B></FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; line-height: 100%"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3><B>Examples:</B></FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>// the
+                following statement returns 4</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>abstractDevice.size();</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>// assign
+                the size of the arrayDevices array to the nSize variable</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>num nSize =
+                arrayDevices.size();</FONT></FONT></P>
+            <UL>
+                <UL>
+                    <UL>
+                        <LI><P STYLE="margin-bottom: 0in; line-height: 100%"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3><B>toSequence()</B></FONT></FONT></P>
+                    </UL>
+                </UL>
+            </UL>
+            <P STYLE="margin-bottom: 0in; line-height: 100%"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3><B>The
+                    toSequence() function returns a txt value that represents the DNA
+                    sequence of the biological component. If the toSequence() function is
+                    utilized on a device instance, the function returns the DNA sequence
+                    of the assembled Device. For abstract and hybrid devices, the
+                    toSequence() function inserts placeholders for the Part Types.</B></FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; line-height: 100%"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3><B>Example:</B></FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>// print the
+                sequence of the concreteDevice to the console</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>print(“DNA
+                sequence of the concreteDevice: ”, concreteDevice.toSequence());</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>// assign
+                the sequence of the hybridDevice to the sequence txt variable</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>txt sequence
+                = hybridDevice.toSequence();</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; line-height: 100%"><BR>
+            </P>
+            <UL>
+                <UL>
+                    <LI><P STYLE="margin-bottom: 0in; line-height: 100%"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=4><B>to
+                                explore the Design Space</B></FONT></FONT></P>
+                </UL>
+            </UL>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3>In
+                Eugene, the design space contains all specified and imported
+                synthetic biological components, i.e., devices, part types, and
+                parts. Eugene offers various functions in order to explore the
+                content of the current design space.</FONT></FONT></P>
+            <UL>
+                <UL>
+                    <UL>
+                        <LI><P STYLE="margin-bottom: 0in; line-height: 100%"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3><B>getAllPartTypes()</B></FONT></FONT></P>
+                    </UL>
+                </UL>
+            </UL>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3>The
+                getAllPartTypes() function returns an array of part types (i.e.,
+                Part[]) that consists of all currently declared part types. </FONT></FONT>
+            </P>
+            <P STYLE="margin-bottom: 0in; line-height: 100%"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3><B>Examples:</B></FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>// get all
+                defined part types and print their names</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>Part[]
+                arrayPartTypes = getAllPartTypes();</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>for(num I=0;
+                i&lt;arrayPartTypes.size(); i++) {</FONT></FONT></P>
+            <P STYLE="margin-left: 0.2in; margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>print(“part
+                type: ”, arrayPartTypes[i]);</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>}</FONT></FONT></P>
+            <UL>
+                <UL>
+                    <UL>
+                        <LI><P STYLE="margin-bottom: 0in; line-height: 100%"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3><B>getAllDevices()</B></FONT></FONT></P>
+                    </UL>
+                </UL>
+            </UL>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3>The
+                <B>getAllDevices</B>() function returns an array of devices (i.e.,
+                Device[]) that consists of all currently declared devices. </FONT></FONT>
+            </P>
+            <P STYLE="margin-bottom: 0in; line-height: 100%"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3><B>Examples:</B></FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; line-height: 100%"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3><B>Examples:</B></FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>// get all
+                defined devices and print their content</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>Device[]
+                arrayDevices = getAllDevices();</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>for(num I=0;
+                i&lt;arrayDevices .size(); i++) {</FONT></FONT></P>
+            <P STYLE="margin-left: 0.2in; margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>print(“device:
+                ”, arrayDevices[i]);</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>}</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <BR>
+            </P>
+            <UL>
+                <UL>
+                    <LI><P STYLE="margin-bottom: 0in; line-height: 100%"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=4><B>to
+                                generate Rule-compliant Devices automatically</B></FONT></FONT></P>
+                </UL>
+            </UL>
+            <P STYLE="font-weight: normal"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3>To
+                automatically generate synthetic biological devices that comply with
+                a given set of rules, two built-in functions have been added to
+                Eugene – permute and product. Both functions return a list of
+                generated devices. Both functions can take up to three arguments: a
+                device, if the device generation process should include the existing
+                rules or not, and a number of desired variations. Only the first
+                argument – the input device – is required, whereas the second and
+                third arguments are optional. For the second parameter, which
+                specifies the level of rule enforcement, two options can be
+                specified: strict or flexible. The strict option only generates
+                devices that obey the specified rules, while the flexible option,
+                which is default, generates every possible device and just labels
+                devices that violate the rules. The third parameter is a non-negative
+                integer number and limits the number of variations generated. If
+                product or permute is called with a number smaller than the total
+                number of possible variations, it will generate a random subset of
+                the that size.  If the number of possible variations is greater than
+                1000, an error will be thrown, and the user will be called to reduce
+                the number of possible variations through the application of rules to
+                the generated devices.  </FONT></FONT>
+            </P>
+            <UL>
+                <UL>
+                    <UL>
+                        <LI><P STYLE="margin-bottom: 0in; line-height: 100%"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3><B>product()</B></FONT></FONT></P>
+                    </UL>
+                </UL>
+            </UL>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3>The
+                product() function generates all possible devices from the
+                information stored in the design space that comply with the specified
+                rules and order. Given a device composed of n components, and a
+                design space with m elements of the device's components, the
+                product() function generate m^n variations of that device. Rules can
+                be used to prune the set of generated devices.</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; line-height: 100%"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3><B>Examples:</B></FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>// generate
+                5 possible rule compliant device instances of the abstractDevice</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>product(abstractDevice,
+                strict, 5);</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>// generate
+                all devices that adhere to the hybridDevice's structure</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>product(hybridDevice);</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <BR>
+            </P>
+            <UL>
+                <UL>
+                    <UL>
+                        <LI><P STYLE="margin-bottom: 0in; line-height: 100%"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3><B>permute()</B></FONT></FONT></P>
+                    </UL>
+                </UL>
+            </UL>
+            <P STYLE="margin-bottom: 0in; line-height: 100%"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3><SPAN STYLE="font-weight: normal">The
+                    permute function automates the specification of many devices that
+                    share the same structure. It generates a device for every permutation
+                    of the parts in the design space. Hence, given a device composed of n
+                    parts, the permute function will generate n! permutations of the
+                    parts. If a component of the given device is a device, even ones with
+                    only one part, it is not changed and appears in every variation.</SPAN><B>
+                </B></FONT></FONT>
+            </P>
+            <P STYLE="margin-bottom: 0in; line-height: 100%"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3><B>Examples:</B></FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>// generate
+                all permutations of the abstractDevice that satisfy all defined rules</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>permute(abstractDevice,
+                strict);</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>// generate
+                all permutations of the hybridDevice and label the devices which do
+                not satisfy the rules</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT FACE="American Typewriter, monospace"><FONT SIZE=3>permute(hybridDevice,
+                flexible);</FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; line-height: 100%"><BR>
+            </P>
+            <UL>
+                <LI><P STYLE="margin-bottom: 0in; line-height: 100%"><FONT COLOR="#0000ff"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=4 STYLE="font-size: 16pt"><B>Additional
+                            information </B></FONT></FONT></FONT>
+                    </P>
+            </UL>
+            <P STYLE="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+                <FONT COLOR="#000000"><FONT FACE="Arial Rounded MT Bold, sans-serif"><FONT SIZE=3>Additional
+                information will be posted here.</FONT></FONT></FONT></P>
+            <P STYLE="margin-bottom: 0in; line-height: 100%"><BR>
+            </P>
         </div>
         <!--scripts placed at the end to enhance page loading speed--> 
         <script type="text/javascript" src="jsLibraries/jquery-1.9.1.min.js"></script> 

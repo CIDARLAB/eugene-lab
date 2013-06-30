@@ -1,6 +1,8 @@
 /* Gets a list of images from the server and adds them to the imageList
  * Also adds a unique id to each part, viewable when clicked
  */
+
+
 $(document).ready(function() {
     var deviceCount = 0;
     var command = {"command": "read"};
@@ -49,7 +51,19 @@ $(document).ready(function() {
     });
 
 
-    //load parts list
+    //load files list
+    $.get("EugeneServlet", {"command": "getFileTree"}, function(data) {
+        var children = data;
+        $("#filesArea").dynatree({
+            onActivate: function(node) {
+                // A DynaTreeNode object is passed to the activation handler
+                // Note: we also get this event, if persistence is on, and the page is reloaded.
+//                alert("You activated " + node.data.title);
+            },
+            persist: true,
+            children: children
+        });
+    });
 
 
     //Functions
@@ -58,7 +72,7 @@ $(document).ready(function() {
         $('#partsList').html(s);
     };
 
-    
+
 
     //Event Handlers
     $('#startButton').click(function() {
@@ -117,8 +131,8 @@ $(document).ready(function() {
 
     $('#runButton').click(function() {
         var text = false; //is the text editor active?
-        if($('div#textEditorTab').hasClass("active")) {
-           text = true; 
+        if ($('div#textEditorTab').hasClass("active")) {
+            text = true;
         }
         if (!text) {
             var command = {};
@@ -153,7 +167,7 @@ $(document).ready(function() {
             //May want to modify to send file or collection of files to server(if Eugene program spans multiple files)
             $('#runButton').click(function() {
                 var input = $('textarea#textEditor').val();
-                $.get("EugeneServlet", {"command":"execute","input": input}, function(response) {
+                $.get("EugeneServlet", {"command": "execute", "input": input}, function(response) {
                     alert(response["result"]);
 //                    $('textarea#console').append(response);
                 });
@@ -161,19 +175,7 @@ $(document).ready(function() {
         }
 
     });
-    
-    // On file folder click changes the file explorer
-    $('.fileExplorerFolder').click(function() {
-        $(this).parent().css('display', 'none');
-        var s = '#' + $(this).attr('id') + 'Devices';
-        $(s).addClass('activeFileExplorer');
-        $(s).css('display', 'block');
-    });
-    
-    // Adds a project to the file explorer
-    $('#addNewProject').click(function() {
-        var response = prompt('New File Name?');
-        $('<li class="fileExplorerElement fileExplorerFolder" id="' + response + '">' + response + '</li>').insertBefore($(this));
-    });
+
+
 });
 
