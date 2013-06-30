@@ -46,15 +46,14 @@ import org.json.JSONObject;
  */
 public class EugeneServlet extends HttpServlet {
 
-    /* here is our Clotho instance */    
+    /* here is our Clotho instance */
     private Clotho clotho;
-    
-    @Override
-    public void init(ServletConfig config) 
-            throws ServletException {
-        this.clotho = ClothoFactory.getAPI("ws://cidar.bu.edu/clotho/websocket");
-    }
-    
+
+//    @Override
+//    public void init(ServletConfig config) 
+//            throws ServletException {
+//        this.clotho = ClothoFactory.getAPI("ws://cidar.bu.edu/clotho/websocket");
+//    }
     /**
      * Processes requests for both HTTP
      * <code>GET</code> and
@@ -154,7 +153,7 @@ public class EugeneServlet extends HttpServlet {
     }
     // </editor-fold>
 
-    protected void processPostRequest(HttpServletRequest request, HttpServletResponse response) 
+    protected void processPostRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         if (ServletFileUpload.isMultipartContent(request)) {
             //process code for file upload
@@ -210,7 +209,7 @@ public class EugeneServlet extends HttpServlet {
                 String currentFolder = request.getParameter("currentFolder");
                 String fileContent = request.getParameter("fileContent");
                 saveFile(fileName, currentFolder, fileContent);
-                            }
+            }
         }
     }
 
@@ -303,8 +302,8 @@ public class EugeneServlet extends HttpServlet {
 
     public JSONObject executeEugene(String input) {
         HashMap<String, SavableElement> results = new HashMap<String, SavableElement>();
-        
-        JSONObject returnJSON = new JSONObject();        
+
+        JSONObject returnJSON = new JSONObject();
         try {
             results = (HashMap<String, SavableElement>) EugeneExecutor.execute(input, 2);
 
@@ -319,25 +318,28 @@ public class EugeneServlet extends HttpServlet {
                         lstDeviceJSON.add(this.toJSON(objDevice));
 
                         // now, we store it in the Clotho DB...
-                        
-                        
-                        /** clotho.create(deviceJSON); **/
+
+
+                        /**
+                         * clotho.create(deviceJSON); *
+                         */
                         /* THIS DOES NOT WORK !!! */
                     }
                 }
 
                 returnJSON.put("results", lstDeviceJSON);
             }
-            
+
             returnJSON.put("status", "good");
-            
+
         } catch (Exception e) {
             try {
                 returnJSON.put("status", "bad");
                 returnJSON.put("erroe", e.getMessage());
-            } catch(Exception e1) {}
+            } catch (Exception e1) {
+            }
         }
-        
+
         return returnJSON;
     }
 
@@ -347,28 +349,56 @@ public class EugeneServlet extends HttpServlet {
         String currentFolderExtension = this.getServletContext().getRealPath("/") + "data/" + getCurrentUser() + "/";
         File rootFolder = new File(currentFolderExtension);
         ArrayList<File> queue = new ArrayList();
-        queue.add(rootFolder);
+        ArrayList<JSONArray> folders = new ArrayList();
+        ArrayList<Integer> folderSizes = new ArrayList();
+        File[] rootFiles = rootFolder.listFiles();
+        for (int i = 0; i < rootFiles.length; i++) {
+            queue.add(rootFiles[i]);
+        }
         JSONArray rootArray = new JSONArray();
         JSONArray currentArray = rootArray;
+        boolean switchFolder = false;
+        int currentFolderSize = rootFolder.listFiles().length;
+        int counter = 1;
         while (!queue.isEmpty()) {
             try {
                 File currentFile = queue.get(0);
                 queue.remove(0);
+//                System.out.println(switchFolder + " " + counter + " | " + currentFolderSize + " " + currentFile.getName());
+
+                if (!switchFolder) {
+                    switchFolder = false;
+                }
                 JSONObject toPut = new JSONObject();
                 toPut.put("title", currentFile.getName());
                 currentArray.put(toPut);
                 if (currentFile.isDirectory()) {
+                    switchFolder = true;
                     toPut.put("children", new JSONArray());
                     toPut.put("isFolder", true);
-                    currentArray = toPut.getJSONArray("children");
+                    if (currentFile.listFiles().length > 0) {
+                        folderSizes.add(currentFile.listFiles().length);
+                        folders.add(toPut.getJSONArray("children"));
+                    }
                     File[] subFiles = currentFile.listFiles();
                     for (int i = 0; i < subFiles.length; i++) {
                         queue.add(subFiles[i]);
                     }
                 }
+                if (switchFolder && counter == currentFolderSize) {
+//                    System.out.println("switching");
+//                    System.out.println(folderSizes);
+                    currentArray = folders.get(0);
+                    currentFolderSize = folderSizes.get(0);
+                    folderSizes.remove(0);
+                    folders.remove(0);
+                    counter = 0;
+                    switchFolder = false;
+                }
             } catch (JSONException ex) {
                 ex.printStackTrace();
             }
+            counter++;
         }
         return rootArray.toString();
     }
@@ -423,51 +453,50 @@ public class EugeneServlet extends HttpServlet {
         }
         return extension;
     }
-    
-    private JSONObject toJSON(Device objDevice) 
+
+    private JSONObject toJSON(Device objDevice)
             throws Exception {
         String NEWLINE = System.getProperty("line.separator");
         StringBuilder sbPigeon = new StringBuilder();
         StringBuilder sbPigeonArcs = new StringBuilder();
-        
+
         sbPigeonArcs.append("# Arcs").append(NEWLINE);
-        
+
         JSONObject deviceJSON = new JSONObject();
         deviceJSON.put("name", objDevice.getName());
         deviceJSON.put("Schema", objDevice.getClass().getCanonicalName());
 
         List<Component> lstComponents = objDevice.getAllComponents();
         List<JSONObject> lstComponentsJSON = new ArrayList<JSONObject>();
-        
-        for(Component component : lstComponents) {
+
+        for (Component component : lstComponents) {
             JSONObject componentJSON = new JSONObject();
             componentJSON.put("name", component.getName());
             componentJSON.put("Schema", component.getClass().getCanonicalName());
-            if(component instanceof Device) {
-                componentJSON = this.toJSON((Device)component);
-            } else if(component instanceof PartType) {
+            if (component instanceof Device) {
+                componentJSON = this.toJSON((Device) component);
+            } else if (component instanceof PartType) {
                 //componentJSON.put("name", lstComponents)
-            } else if(component instanceof Part) {
-                Part objPart = (Part)component;
+            } else if (component instanceof Part) {
+                Part objPart = (Part) component;
                 List<JSONObject> lstPropertyValuesJSON = new ArrayList<JSONObject>();
                 componentJSON.put("pigeon", objPart.get("Pigeon"));
                 sbPigeon.append(objPart.get("Pigeon")).append(NEWLINE);
-                
-                if(null != objPart.get("Represses")) {
+
+                if (null != objPart.get("Represses")) {
                     sbPigeonArcs.append(objPart.getName())
                             .append(" rep ")
                             .append(objPart.get("Represses"))
                             .append(NEWLINE);
                 }
-            } 
+            }
             lstComponentsJSON.add(componentJSON);
         }
         deviceJSON.put("components", lstComponentsJSON);
-        
+
         String sPigeon = sbPigeon.toString() + sbPigeonArcs.toString();
         deviceJSON.put("Pigeon", sPigeon);
 
         return deviceJSON;
     }
-
 }
