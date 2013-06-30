@@ -79,35 +79,47 @@
                             <hr/>
                         </div>
                         <div class="tab-pane active" id="filesTab">
-                            <div id="filesArea" style="height:400px">
-                                <form method="POST" action="EugeneServlet" enctype="multipart/form-data" >
-                                    <input type="submit" value="Upload File" name="upload" id="uploadFileButton" class="btn btn-danger" style="width:150px" />
-                                    <br>
-                                    <input type="file" name="file" id="file" />
-                                </form>
-                                <p id="currentFileName"></p>
-                                <ul id="fileExplorerList">
-                                </ul>
-                                <ul>
-                                    <li id="fileSave" class = "firstFileExplorerElement fileExplorerElement">Save</li>
-                                    <li id="fileExplorerBack" class="fileExplorerElement">Back</li>
-                                    <li id="addNew" class="fileExplorerElement lastFileExplorerElement">New Project</li>
-                                    <!-- Delete Functionality still needs work
-                                    <li id="fileDelete" class="fileExplorerElement lastFileExplorerElement">Delete</li>
-                                    -->
-                                </ul>
+                            <div class ="row-fluid">
+                                <div id="filesArea" style="height:400px">
+                                </div>
                             </div>
-
+                            <br/>
+                            <div class="row-fluid">
+                                <div class="btn-group btn-group-vertical">
+                                    <button id="loadButton" class="btn btn-primary" style="width:100%">Load File</button>
+                                    <a href="#newFileModal" role="button" class="btn btn-success" data-toggle="modal">New File</a>
+                                    <button id="deleteButton" class="btn-danger" style="width:100%">Delete File</button>
+                                </div>
+                            </div>
+                            <div id="newFileModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="newFileModalLabel" aria-hidden="true">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                                    <h4 id="newFileModalLabel">New File</h4>
+                                </div>
+                                <div class="modal-body">
+                                    <form method="POST" action="EugeneServlet" enctype="multipart/form-data" target="hiddenIFrame">
+                                        <p>You can either upload an existing file.</p>
+                                        <input type="file" name="file" id="file" />
+                                        <p>Or....</p>
+                                    </form>
+                                    <p>Create a new file</p>
+                                    <input placeholder="New File Name"/>
+                                </div>
+                                <div class="modal-footer">
+                                    <button class="btn" data-dismiss="modal" aria-hidden="true">Create New File</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="span8">
                 <div class="tabbable">
-                    <ul id="dataTableHeader" class="nav nav-tabs">
+                    <ul id="dataTableHeader" class="nav nav-tabs nav-pills">
                         <li ><a href="#spectaclesEditorTab" data-toggle="tab">Graphical Editor</a></li>
                         <li class="active"><a  href="#textEditorTab" data-toggle="tab">Text Editor</a></li>
-                        <li class="pull-right"><button style="width:150px" id="runButton" class="btn btn-success">Run</button></li>
+                        <li class="pull-right"><button style="width:150px" id="saveButton" class="btn btn-success">Save</button></li>
+                        <li class="pull-right"><button style="width:150px" id="runButton" class="btn btn-danger">Run</button></li>
                     </ul>
 
                     <div id="dataTableContent" class="tab-content">
@@ -122,70 +134,73 @@
                             <div class="accordion" id="accordion2">
                                 <div class="accordion-group">
                                     <div class="accordion-heading">
-                                        <a class="accordion-toggle" data-toggle="collapse" data-target="#editorArea" href="#editorArea">
+                                        <h5><a class="accordion-toggle" data-toggle="collapse" data-target="#editorArea" href="#editorArea">
                                             Editor
                                         </a>
+                                        </h5>
                                     </div>
                                     <div id="editorArea" class="accordion-body collapse in">
                                         <div class="accordion-inner">
                                             <textarea id="textEditor">
-                                        </textarea>
+                                            </textarea>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="accordion-group">
-                                <div class="accordion-heading">
-                                    <h5>
-                                        <a class="accordion-toggle" data-toggle="collapse" data-target="#outputArea" href="#outputArea">
-                                            Output 
-                                        </a>
-                                    </h5>
-                                </div>
-                                <div id="outputArea" class="accordion-body collapse">
-                                    <div class="accordion-inner">
-                                        <textarea id="console" readonly style="width:95%">Output Goes Here</textarea>
+                                <div class="accordion-group">
+                                    <div class="accordion-heading">
+                                        <h5>
+                                            <a class="accordion-toggle" data-toggle="collapse" data-target="#outputArea" href="#outputArea">
+                                                Output 
+                                            </a>
+                                        </h5>
+                                    </div>
+                                    <div id="outputArea" class="accordion-body collapse">
+                                        <div class="accordion-inner">
+                                            <textarea id="console" readonly style="width:95%">Output Goes Here</textarea>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <hr/>
+                <hr/>
 
-        </div>
-        <div class="span2 well">
-            <h4>Part Types</h4>
-            <hr/>
-            <div id="partIconArea" style="height:500px;overflow:auto">
-                <ul id="iconArea" class="thumbnails"></ul>
+            </div>
+            <div class="span2 well">
+                <h4>Part Types</h4>
+                <hr/>
+                <div id="partIconArea" style="height:500px;overflow:auto">
+                    <ul id="iconArea" class="thumbnails"></ul>
+                </div>
             </div>
         </div>
-    </div>
-    <script src="jsLibraries/jquery.dataTables.min.js"></script>
-    <script src="jsLibraries/bootstrap.min.js"></script>
-    <script src="javascript/EugeneLabController.js"></script>
-    <script src="jsLibraries/codemirror.js"></script>
-    <script src="jsLibraries/active-line.js"></script>
-    <script src="jsLibraries/jquery.dynatree.min.js"></script>
+        <iframe id="hiddenIFrame" class="hidden">
+        </iframe>
+        <script src="jsLibraries/jquery.dataTables.min.js"></script>
+        <script src="jsLibraries/bootstrap.min.js"></script>
+        <script src="javascript/EugeneLabController.js"></script>
+        <script src="jsLibraries/codemirror.js"></script>
+        <script src="jsLibraries/active-line.js"></script>
+        <script src="jsLibraries/jquery.dynatree.min.js"></script>
         <script src="jsLibraries/jquery.cookie.js"></script>
 
-    <script src="jsLibraries/eugene.js"></script>
-    <script>
-        $('#textEditor').val('include "MocloDemoParts.eug";');
-        var editor = CodeMirror.fromTextArea(document.getElementById("textEditor"), {
-            styleActiveLine: true,
-            lineNumbers: true,
-            lineWrapping: true,
-            theme: "neat",
-            mode: "eugene"
-        });
-    </script>
-    <footer>
-        <div class="container" align="center">
-            <p>Designed and built by <a href="contact.html">Jenhan Tao</a>, <a href="contact.html">Ernst Oberortner</a> and <a href="contact.html">Erik Lindgren</a></p>
-            <p>Code licensed under <a href="license.html">LICENSE</a></p>
-        </div>
-    </footer>
-</body>
+        <script src="jsLibraries/eugene.js"></script>
+        <script>
+            $('#textEditor').val('include "MocloDemoParts.eug";');
+            var editor = CodeMirror.fromTextArea(document.getElementById("textEditor"), {
+                styleActiveLine: true,
+                lineNumbers: true,
+                lineWrapping: true,
+                theme: "neat",
+                mode: "eugene"
+            });
+        </script>
+        <footer>
+            <div class="container" align="center">
+                <p>Designed and built by <a href="contact.html">Jenhan Tao</a>, <a href="contact.html">Ernst Oberortner</a> and <a href="contact.html">Erik Lindgren</a></p>
+                <p>Code licensed under <a href="license.html">LICENSE</a></p>
+            </div>
+        </footer>
+    </body>
 </html>
