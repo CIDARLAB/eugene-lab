@@ -52,7 +52,7 @@ public class DataPusher {
             
             JSONObject dataJSON = new JSONObject();
             dataJSON.put("data", lstParts);
-            //System.out.println(dataJSON);
+            System.out.println(dataJSON);
             
             this.clotho.create(dataJSON);
         } catch(Exception e) {

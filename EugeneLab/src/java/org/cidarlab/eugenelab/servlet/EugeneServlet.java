@@ -30,6 +30,7 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.cidarlab.weyekin.WeyekinPoster;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.clothocad.client.Clotho;
@@ -238,7 +239,11 @@ public class EugeneServlet extends HttpServlet {
                 String currentFolder = request.getParameter("currentFolder");
                 String fileContent = request.getParameter("fileContent");
                 saveFile(fileName, currentFolder, fileContent);
-            }
+            } else if("pigeon".equals(command)) {
+                String sPigeon = request.getParameter("pigeon");
+                WeyekinPoster.setPigeonText(sPigeon);
+                WeyekinPoster.postMyBird();
+           }
             out.flush();
             out.close();            
         }
@@ -367,11 +372,15 @@ public class EugeneServlet extends HttpServlet {
                     if (objElement instanceof Device) {
 
                         Device objDevice = (Device) objElement;
-                        lstDeviceJSON.add(
-                                this.toJSON(objDevice));
+                        
+                        JSONObject deviceJSON = this.toJSON(objDevice);
 
                         // now, we could store it in the Clotho DB...
-
+                        WeyekinPoster.setPigeonText(
+                                deviceJSON.get("Pigeon").toString());
+                        deviceJSON.put("pigeon-uri", WeyekinPoster.postMyBird());
+                        lstDeviceJSON.add(deviceJSON);
+                        
                         /**
                          * clotho.create(deviceJSON); *
                          */
@@ -385,10 +394,13 @@ public class EugeneServlet extends HttpServlet {
             returnJSON.put("status", "good");
 
         } catch (Exception e) {
+            e.printStackTrace();
             try {
+                returnJSON.put("results", "");
                 returnJSON.put("status", "bad");
                 returnJSON.put("error", e.getMessage());
             } catch (Exception e1) {
+                
             }
         }
 
@@ -582,7 +594,7 @@ public class EugeneServlet extends HttpServlet {
                             .append(" rep ")
                             .append(objPart.get("Represses"))
                             .append(NEWLINE);
-                }
+               }
             }
             lstComponentsJSON.add(componentJSON);
         }

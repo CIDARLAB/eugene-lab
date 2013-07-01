@@ -172,9 +172,13 @@ $(document).ready(function() {
                 $.post("EugeneServlet", {"command": "execute", "input": input}, function(response) {
                     $('#runButton').removeAttr("disabled");
 
-                    $.each(response["results"], function() {
-                        alert(this["Pigeon"]);
-                    });
+                    if("good" == response["status"]) {
+                        $.each(response["results"], function() {
+                            window.open(this["pigeon-uri"]);
+                        });
+                    } else {
+                        console.log(response["error"]);                        
+                    }
                 });
         }
 
