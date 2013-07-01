@@ -5,21 +5,24 @@
 
 $(document).ready(function() {
     var deviceCount = 0;
-//    var command = {"command": "read"};
-//    $.get("EugeneServlet", command, function(response) {
-//        var toAppend = '<table class="table table-bordered table-hover" id="partsList"><thead><tr><th>Name</th><th>Type</th></tr></thead><tbody>';
-//        $.each(response["result"], function() {
-//            if (this["Type"].toLowerCase() !== "composite") {
-//                toAppend = toAppend + '<tr><td>' + this["Name"] + '</td><td>' + this["Type"] + '</td></tr>';
-//            }
-//        });
-//        toAppend = toAppend + "</tbody></table>";
-//        $('#partsListArea').html(toAppend);
-//        $("#partsList").dataTable({
-//            "bPaginate": false,
-//            "bScrollCollapse": true
-//        });
-//    });
+    var command = {"command": "read"};
+    $.get("EugeneServlet", command, function(response) {
+        var toAppend = '<table class="table table-bordered table-hover" id="partsList"><thead><tr><th>Name</th><th>Type</th></tr></thead><tbody>';
+        $.each(response["result"], function() {
+            if (this["Type"].toLowerCase() !== "composite") {
+                toAppend = toAppend + '<tr><td>' + this["Name"] + '</td><td>' + this["Type"] + '</td></tr>';
+            }
+        });
+        toAppend = toAppend + "</tbody></table>";
+        $('#partsListArea').html(toAppend);
+        $("#partsList").dataTable({
+            "bPaginate": false,
+            "bScrollCollapse": true
+        });
+        $('tr').dblclick(function(){
+            alert($(this).children("td:first").html())
+        });
+    });
 
 
     var command = {"command": "imageList"};
@@ -46,7 +49,6 @@ $(document).ready(function() {
         $('#iconArea li').on("click", function() {
             $(".selected").removeClass("selected");
             $(this).parent().addClass("selected");
-            refreshPartsList($(this).attr("title"));
         });
     });
 
@@ -217,25 +219,28 @@ $(document).ready(function() {
         } else {
             //Clicking run button sends current text to server
             //May want to modify to send file or collection of files to server(if Eugene program spans multiple files)
-            var input = editor.getValue();
-            $.post("EugeneServlet", {"command": "execute", "input": input}, function(response) {
-                alert('response ' + response["status"]);
-                for(var i=0;i<response["results"].length;i++){
-                    alert(response["results"][i].Pigeon);
-                }
+
+                var input = editor.getValue();
+                $('#runButton').attr("disabled", "disabled");
                 
-                $('textarea#console').text(response["results"]);
-            });
+                $.post("EugeneServlet", {"command": "execute", "input": input}, function(response) {
+                    $('#runButton').removeAttr("disabled");
+
+                    $.each(response["results"], function() {
+                        alert(this["Pigeon"]);
+                    });
+                });
         }
 
     });
-    var editor = CodeMirror.fromTextArea(document.getElementById("textEditor"), {
-        styleActiveLine: true,
-        lineNumbers: true,
-        lineWrapping: true,
-        theme: "neat",
-        mode: "eugene"
-    });
+            
+        var editor = CodeMirror.fromTextArea(document.getElementById("textEditor"), {
+                styleActiveLine: true,
+                lineNumbers: true,
+                lineWrapping: true,
+                theme: "neat",
+                mode: "eugene"
+        });
 
     loadFileTree();
 
