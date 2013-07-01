@@ -167,22 +167,26 @@ $(document).ready(function() {
             //Clicking run button sends current text to server
             //May want to modify to send file or collection of files to server(if Eugene program spans multiple files)
                 var input = editor.getValue();
+                $('#runButton').attr("disabled", "disabled");
                 
-                $.get("EugeneServlet", {"command": "execute", "input": input}, function(response) {
-                    alert('response '+response["status"]);
-                    
-                    $('textarea#console').append(response);
+                $.post("EugeneServlet", {"command": "execute", "input": input}, function(response) {
+                    $('#runButton').removeAttr("disabled");
+
+                    $.each(response["results"], function() {
+                        alert(this["Pigeon"]);
+                    });
                 });
         }
 
     });
-            var editor = CodeMirror.fromTextArea(document.getElementById("textEditor"), {
+            
+        var editor = CodeMirror.fromTextArea(document.getElementById("textEditor"), {
                 styleActiveLine: true,
                 lineNumbers: true,
                 lineWrapping: true,
                 theme: "neat",
                 mode: "eugene"
-            });
+        });
 
 
 });
