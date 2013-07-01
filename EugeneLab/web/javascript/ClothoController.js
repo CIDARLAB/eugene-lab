@@ -1,4 +1,4 @@
- var connection = new WebSocket('ws://cidar.bu.edu/clotho/websocket');
+ var connection = new WebSocket('ws://localhost:8181/clotho/websocket');
 connection.send('{"channel": "query", "data": {"schema":"Part"}}');
 
 connection.onmessage = function(e) {
