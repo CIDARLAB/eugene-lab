@@ -220,8 +220,11 @@ $(document).ready(function() {
             var input = editor.getValue();
             $.post("EugeneServlet", {"command": "execute", "input": input}, function(response) {
                 alert('response ' + response["status"]);
-
-                $('textarea#console').text(response);
+                for(var i=0;i<response["results"].length;i++){
+                    alert(response["results"][i].Pigeon);
+                }
+                
+                $('textarea#console').text(response["results"]);
             });
         }
 
