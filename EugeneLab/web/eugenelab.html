@@ -103,10 +103,10 @@
                                         <p>Or....</p>
                                     </form>
                                     <p>Create a new file</p>
-                                    <input placeholder="New File Name"/>
+                                    <input id="newFileNameInput" placeholder="New File Name"/>
                                 </div>
                                 <div class="modal-footer">
-                                    <button class="btn" data-dismiss="modal" aria-hidden="true">Create New File</button>
+                                    <button id="createNewButton" class="btn" data-dismiss="modal" aria-hidden="true">Create New File</button>
                                 </div>
                             </div>
                         </div>
@@ -118,6 +118,7 @@
                     <ul id="dataTableHeader" class="nav nav-tabs nav-pills">
                         <li ><a href="#spectaclesEditorTab" data-toggle="tab">Graphical Editor</a></li>
                         <li class="active"><a  href="#textEditorTab" data-toggle="tab">Text Editor</a></li>
+                        <li><a>Current Open File: <Strong id="fileName">New File.eug</Strong></a></li>
                         <li class="pull-right"><button style="width:150px" id="saveButton" class="btn btn-success">Save</button></li>
                         <li class="pull-right"><button style="width:150px" id="runButton" class="btn btn-danger">Run</button></li>
                     </ul>
@@ -186,7 +187,7 @@
         <script src="jsLibraries/jquery.cookie.js"></script>
 
         <script src="jsLibraries/eugene.js"></script>
-
+        <div id="tester"></div>
         <footer>
             <div class="container" align="center">
                 <p>Designed and built by <a href="contact.html">Jenhan Tao</a>, <a href="contact.html">Ernst Oberortner</a> and <a href="contact.html">Erik Lindgren</a></p>
