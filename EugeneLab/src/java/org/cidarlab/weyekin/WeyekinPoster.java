@@ -209,7 +209,7 @@ public class WeyekinPoster {
                 try {
                     String path = mGraphVizPath + s.substring(s.indexOf("img src =")+9, s.indexOf("alt =")-1);
                     mGraphVizURI = new URI(path);
-                    launchPage(mGraphVizURI);
+                    //launchPage(mGraphVizURI);
                 } catch (URISyntaxException ex) {
                     Logger.getLogger(WeyekinPoster.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -218,6 +218,7 @@ public class WeyekinPoster {
         }
     }
 
+    /** THIS CODE DOES, OF COURSE, NOT WORK AT THE SERVER-SIDE 
     private static void launchPage(URI pURI) {
         try {
             java.awt.Desktop.getDesktop().browse(pURI);
@@ -225,7 +226,8 @@ public class WeyekinPoster {
             Logger.getLogger(WeyekinPoster.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-
+    **/
+    
     public static URI getmGraphVizURI() {
         return mGraphVizURI;
     }

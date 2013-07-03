@@ -19,6 +19,9 @@ $(document).ready(function() {
             "bPaginate": false,
             "bScrollCollapse": true
         });
+        $('tr').dblclick(function(){
+            alert($(this).children("td:first").html())
+        });
     });
 
 
@@ -46,24 +49,10 @@ $(document).ready(function() {
         $('#iconArea li').on("click", function() {
             $(".selected").removeClass("selected");
             $(this).parent().addClass("selected");
-            refreshPartsList($(this).attr("title"));
         });
     });
 
 
-    //load files list
-    $.get("EugeneServlet", {"command": "getFileTree"}, function(data) {
-        var children = data;
-        $("#filesArea").dynatree({
-            onActivate: function(node) {
-                // A DynaTreeNode object is passed to the activation handler
-                // Note: we also get this event, if persistence is on, and the page is reloaded.
-//                alert("You activated " + node.data.title);
-            },
-            persist: true,
-            children: children
-        });
-    });
 
 
     //Functions
@@ -72,11 +61,75 @@ $(document).ready(function() {
         $('#partsList').html(s);
     };
 
+    //load files list
+    var loadFileTree = function() {
+        $("#filesArea").html("");
+        $.get("EugeneServlet", {"command": "getFileTree"}, function(data) {
+            var children = data;
+            $("#filesArea").dynatree({
+                onActivate: function(node) {
+                    // A DynaTreeNode object is passed to the activation handler
+                    // Note: we also get this event, if persistence is on, and the page is reloaded.
+//                alert("You activated " + node.data.title);
+                },
+                persist: true,
+                children: children
+            });
+        });
+    };
+
+    //save files
+    var saveFile = function(newFileName) {
+        $('#fileName').text(newFileName);
+        var fileContent = editor.getValue();
+        //create new file on server
+        $.post("EugeneServlet", {"command": "saveFileContent", "fileName": newFileName, "fileContent": fileContent}, function(response) {
+            //refresh file tree
+            var rootNode = $("#filesArea").dynatree("getRoot");
+            // Call the DynaTreeNode.addChild() member function and pass options for the new node
+            var childNode = rootNode.addChild({
+                title: newFileName,
+                isFolder: false
+            });
+            //
+            $('#newFileNameInput').val("");
+        });
+    };
 
 
     //Event Handlers
     $('#startButton').click(function() {
         $('#newDeviceButton').trigger("click");
+    });
+
+    $('#createNewButton').click(function() {
+        var newFileName = $('#newFileNameInput').val() + ".eug";
+        saveFile(newFileName);
+    });
+    $('#saveButton').click(function() {
+        var newFileName = $('#fileName').text();
+        saveFile(newFileName);
+    });
+
+    $('#loadButton').click(function() {
+        var node = $("#filesArea").dynatree("getActiveNode")
+        if (node.data.isFolder) {
+            //do nothing i guess...
+        } else {
+            var fileName = node.data.title;
+            $('#fileName').text(fileName);
+            var parent = node.getParent();
+            while (parent.data.title !== null) {
+                fileName = parent.data.title + "/" + fileName;
+                parent = parent.getParent();
+            }
+            $.get("EugeneServlet", {"command": "getFileContent", "fileName": fileName}, function(response) {
+                editor.setValue(response);
+
+            });
+
+        }
+
     });
 
     $('#newDeviceButton').click(function() {
@@ -166,6 +219,7 @@ $(document).ready(function() {
         } else {
             //Clicking run button sends current text to server
             //May want to modify to send file or collection of files to server(if Eugene program spans multiple files)
+
                 var input = editor.getValue();
                 $('#runButton').attr("disabled", "disabled");
                 
@@ -192,6 +246,7 @@ $(document).ready(function() {
                 mode: "eugene"
         });
 
+    loadFileTree();
 
 });
 

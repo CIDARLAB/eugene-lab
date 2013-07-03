@@ -43,17 +43,16 @@ import org.json.JSONObject;
  */
 public class EugeneServlet extends HttpServlet {
 
-    /* here is our Clotho instance */
-    private Clotho clotho;
-
-    @Override
-    public void init() 
-            throws ServletException {
-    
-        super.init();
-        this.clotho = ClothoFactory.getAPI("ws://cidar.bu.edu/clotho/websocket");
-    }
-    
+//    /* here is our Clotho instance */
+//    private Clotho clotho;
+//
+//    @Override
+//    public void init() 
+//            throws ServletException {
+//    
+//        super.init();
+//        this.clotho = ClothoFactory.getAPI("ws://cidar.bu.edu/clotho/websocket");
+//    }
     /**
      * Processes requests for both HTTP
      * <code>GET</code> and
@@ -116,15 +115,11 @@ public class EugeneServlet extends HttpServlet {
                 //out.write(result.toString());
             } else if (command.equals("getFileTree")) {
                 out.write(getFileTree());
-            } else if (command.equals("addNewFile")) {
-                String currentFolder = request.getParameter("currentFolder");
-                String newFileName = request.getParameter("newFileName");
-                boolean isFile = Boolean.parseBoolean(request.getParameter("isFile"));
-                out.write(addNewFile(currentFolder, newFileName, isFile));
             } else if (command.equals("getFileContent")) {
+                response.setContentType("text/html;charset=UTF-8");
                 String fileName = request.getParameter("fileName");
-                String currentFolder = request.getParameter("currentFolder");
-                out.write(loadFile(fileName, currentFolder));
+                String toReturn = loadFile(fileName);
+                out.write(toReturn);
             } else if (command.equals("test")) {
                 out.write("{\"response\":\"test response\"}");
             } else if (command.equals("deleteFile")) {
@@ -184,7 +179,6 @@ public class EugeneServlet extends HttpServlet {
 
     protected void processPostRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
         if (ServletFileUpload.isMultipartContent(request)) {
             //process code for file upload
             ServletFileUpload uploadHandler = new ServletFileUpload(new DiskFileItemFactory());
@@ -247,6 +241,7 @@ public class EugeneServlet extends HttpServlet {
             out.flush();
             out.close();            
         }
+
     }
 
     /**
@@ -467,36 +462,28 @@ public class EugeneServlet extends HttpServlet {
         return rootArray.toString();
     }
 
-    private String addNewFile(String currentFolderExtension, String newFileName, boolean isFile) {
-        currentFolderExtension = this.getServletContext().getRealPath("/") + "data/" + getCurrentUser() + "/" + currentFolderExtension + "/";
-        File newFile = new File(currentFolderExtension + newFileName + "/");
+    private String loadFile(String fileName) {
+        BufferedReader br = null;
         try {
-            if (isFile) {
-                newFile.createNewFile();
-            } else {
-                newFile.mkdir();
+            String currentFileExtension = getFileExtension(fileName, true);
+            File file = new File(currentFileExtension);
+            br = new BufferedReader(new FileReader(file.getAbsolutePath()));
+            String toReturn = "";
+            String line = br.readLine();
+            while (line != null) {
+                toReturn = toReturn + "\n" + line;
+                line = br.readLine();
             }
-        } catch (Exception e) {
-            return "{\"fileCreateSucessful\":false}";
+            br.close();
+            return toReturn;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return "the bads";
         }
-        return "{\"fileCreateSucessful\":true}";
     }
 
-    private String loadFile(String fileName, String currentFolder) throws FileNotFoundException, IOException {
-        String currentFileExtension = getFileExtension(currentFolder + "/" + fileName, true);
-        File file = new File(currentFileExtension);
-        BufferedReader br = new BufferedReader(new FileReader(file.getAbsolutePath()));
-        String currentLine;
-        String toReturn = "";
-        while ((currentLine = br.readLine()) != null) {
-            toReturn += currentLine + "__BR__";
-        }
-        br.close();
-        return "{\"fileContent\":\"" + toReturn + "\"}";
-    }
-
-    private void saveFile(String fileName, String currentFolder, String fileContent) throws IOException {
-        String currentFileExtension = getFileExtension(currentFolder + "/" + fileName, true);
+    private void saveFile(String fileName, String fileContent, String fileContent1) throws IOException {
+        String currentFileExtension = getFileExtension("/" + fileName, true);
         File file = new File(currentFileExtension);
         BufferedWriter bw = new BufferedWriter(new FileWriter(file.getAbsoluteFile()));
         bw.write(fileContent);
