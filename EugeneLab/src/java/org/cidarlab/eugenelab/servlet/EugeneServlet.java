@@ -232,7 +232,7 @@ public class EugeneServlet extends HttpServlet {
                 String fileName = request.getParameter("fileName");
                 String currentFolder = request.getParameter("currentFolder");
                 String fileContent = request.getParameter("fileContent");
-                saveFile(fileName, currentFolder, fileContent);
+                //saveFile(fileName, currentFolder, fileContent);
             } else if("pigeon".equals(command)) {
                 String sPigeon = request.getParameter("pigeon");
                 WeyekinPoster.setPigeonText(sPigeon);
@@ -482,7 +482,7 @@ public class EugeneServlet extends HttpServlet {
         }
     }
 
-    private void saveFile(String fileName, String fileContent, String fileContent1) throws IOException {
+    private void saveFile(String fileName, String fileContent) throws IOException {
         String currentFileExtension = getFileExtension("/" + fileName, true);
         File file = new File(currentFileExtension);
         BufferedWriter bw = new BufferedWriter(new FileWriter(file.getAbsoluteFile()));
