@@ -224,7 +224,7 @@ CodeMirror.defineMode("eugene", function(config, parserConfig) {
 
     CodeMirror.defineMIME("eugene", {
         name: "eugene",
-        keywords: words("boolean num txt Property Part Rule Device include " +
+        keywords: words("boolean num txt PartType Property Rule Device include " +
                 "else for if " +
                 "return while"),
         blockKeywords: words("else for if while"),

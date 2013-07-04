@@ -5,12 +5,16 @@
 
 $(document).ready(function() {
     var deviceCount = 0;
+    var _properties = {};
+    var _partTypes = {};
+    var _parts = [];
     var command = {"command": "read"};
     $.get("EugeneServlet", command, function(response) {
         var toAppend = '<table class="table table-bordered table-hover" id="partsList"><thead><tr><th>Name</th><th>Type</th></tr></thead><tbody>';
         $.each(response["result"], function() {
             if (this["Type"].toLowerCase() !== "composite") {
                 toAppend = toAppend + '<tr><td>' + this["Name"] + '</td><td>' + this["Type"] + '</td></tr>';
+                _parts[this["Name"]] = this;
             }
         });
         toAppend = toAppend + "</tbody></table>";
@@ -19,8 +23,16 @@ $(document).ready(function() {
             "bPaginate": false,
             "bScrollCollapse": true
         });
-        $('tr').dblclick(function(){
-            alert($(this).children("td:first").html())
+        $('tr').dblclick(function() {
+            var newValue = editor.getValue();
+            var type = $(this).children("td:last").text();
+            var name = $(this).children("td:first").text();
+            if (_partTypes[type] === undefined) {
+                _partTypes[type] = "added";
+                newValue = 'PartType ' + type + '(Name, Sequence);\n' + newValue;
+            }
+            newValue = newValue + '\n' + type + ' ' + name + '(' + name + ',' + _parts[name].Sequence + ');';
+            editor.setValue(newValue);
         });
     });
 
@@ -36,8 +48,13 @@ $(document).ready(function() {
             var type = this["fileName"].split("\.")[0];
             $("#iconArea").append('<div class="span5"><li class="draggable partIcon" title= "' + type.replace(/-/g, ' ') + '" id="' + type + '"><div class="thumbnail"><img class="img-rounded" style="width:40px;height:80px" src="images/sbol_visual_jpeg/' + this["fileName"] + '"></div></li></div>');
             $('#' + type).dblclick(function() {
-                //When clicked gives id name
-                alert("creating new " + $(this).attr('id'));
+                var newValue = editor.getValue();
+                var type = $(this).attr('id');
+                if (_partTypes[type] === undefined) {
+                    _partTypes[type] = "added";
+                    newValue = 'PartType ' + type + '(Name, Sequence);\n' + newValue;
+                }
+                editor.setValue(newValue);
             });
             i = i + 1;
         });
@@ -103,16 +120,37 @@ $(document).ready(function() {
     });
 
     $('#createNewButton').click(function() {
+        var input = $('#newFileNameInput').val();
         var newFileName = $('#newFileNameInput').val() + ".eug";
-        saveFile(newFileName);
+        if (input === "") {
+            $('#uploadForm').submit();
+        } else if ($('a.dynatree-title:contains("' + newFileName + '")').length === 0) {
+            editor.setValue("");
+            saveFile(newFileName);
+        }
     });
     $('#saveButton').click(function() {
         var newFileName = $('#fileName').text();
-        saveFile(newFileName);
+        if ($('a.dynatree-title:contains("' + newFileName + '")').length === 0) {
+            saveFile(newFileName);
+        }
+    });
+
+
+
+    $('#deleteModalButton').click(function() {
+        var node = $("#filesArea").dynatree("getActiveNode");
+        if (node.data.isFolder) {
+            //do nothing i guess...
+        } else {
+            var fileName = node.data.title;
+            $('#toDeleteName').html("Do you really want to delete <strong>" + fileName + "</strong>?");
+
+        }
     });
 
     $('#loadButton').click(function() {
-        var node = $("#filesArea").dynatree("getActiveNode")
+        var node = $("#filesArea").dynatree("getActiveNode");
         if (node.data.isFolder) {
             //do nothing i guess...
         } else {
@@ -125,11 +163,25 @@ $(document).ready(function() {
             }
             $.get("EugeneServlet", {"command": "getFileContent", "fileName": fileName}, function(response) {
                 editor.setValue(response);
-
             });
-
         }
+    });
 
+    $('#deleteButton').click(function() {
+        var node = $("#filesArea").dynatree("getActiveNode");
+        if (node.data.isFolder) {
+            //do nothing i guess...
+        } else {
+            var fileName = node.data.title;
+            var parent = node.getParent();
+            while (parent.data.title !== null) {
+                fileName = parent.data.title + "/" + fileName;
+                parent = parent.getParent();
+            }
+            $.get("EugeneServlet", {"command": "deleteFile", "fileName": fileName}, function() {
+                node.remove();
+            });
+        }
     });
 
     $('#newDeviceButton').click(function() {
@@ -220,31 +272,31 @@ $(document).ready(function() {
             //Clicking run button sends current text to server
             //May want to modify to send file or collection of files to server(if Eugene program spans multiple files)
 
-                var input = editor.getValue();
-                $('#runButton').attr("disabled", "disabled");
-                
-                $.post("EugeneServlet", {"command": "execute", "input": input}, function(response) {
-                    $('#runButton').removeAttr("disabled");
+            var input = editor.getValue();
+            $('#runButton').attr("disabled", "disabled");
 
-                    if("good" == response["status"]) {
-                        $.each(response["results"], function() {
-                            window.open(this["pigeon-uri"]);
-                        });
-                    } else {
-                        console.log(response["error"]);                        
-                    }
-                });
+            $.post("EugeneServlet", {"command": "execute", "input": input}, function(response) {
+                $('#runButton').removeAttr("disabled");
+
+                if ("good" == response["status"]) {
+                    $.each(response["results"], function() {
+                        window.open(this["pigeon-uri"]);
+                    });
+                } else {
+                    console.log(response["error"]);
+                }
+            });
         }
 
     });
-            
-        var editor = CodeMirror.fromTextArea(document.getElementById("textEditor"), {
-                styleActiveLine: true,
-                lineNumbers: true,
-                lineWrapping: true,
-                theme: "neat",
-                mode: "eugene"
-        });
+
+    var editor = CodeMirror.fromTextArea(document.getElementById("textEditor"), {
+        styleActiveLine: true,
+        lineNumbers: true,
+        lineWrapping: true,
+        theme: "neat",
+        mode: "eugene"
+    });
 
     loadFileTree();
 

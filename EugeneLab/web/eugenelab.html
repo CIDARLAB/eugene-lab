@@ -64,7 +64,7 @@
                         <div class="tab-pane" id="partsTab">
                             <h4>Parts List</h4>
                             <hr/>
-                            <div style="height:400px;overflow:auto" id="partsListArea">
+                            <div style="height:400px;overflow-y: auto;overflow-x:hidden" id="partsListArea">
                                 <hr/>
                                 <button class="btn" data-toggle="collapse" data-target="#uploadArea">Add More Parts</button>
                                 <div id="uploadArea" class="collapse out">
@@ -86,9 +86,9 @@
                             <br/>
                             <div class="row-fluid">
                                 <div class="btn-group btn-group-vertical">
-                                    <button id="loadButton" class="btn btn-primary" style="width:100%">Load File</button>
-                                    <a href="#newFileModal" role="button" class="btn btn-success" data-toggle="modal">New File</a>
-                                    <button id="deleteButton" class="btn-danger" style="width:100%">Delete File</button>
+                                    <button id="loadButton" class="btn btn-primary" style="width:100px">Load File</button>
+                                    <a href="#newFileModal" role="button" class="btn btn-success" data-toggle="modal" style="width:100px">New File</a>
+                                    <a href="#deleteFileModal" id="deleteModalButton" class="btn btn-danger" style="width:100px" role="button" data-toggle="modal">Delete File</a>
                                 </div>
                             </div>
                             <div id="newFileModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="newFileModalLabel" aria-hidden="true">
@@ -97,16 +97,33 @@
                                     <h4 id="newFileModalLabel">New File</h4>
                                 </div>
                                 <div class="modal-body">
-                                    <form method="POST" action="EugeneServlet" enctype="multipart/form-data" target="hiddenIFrame">
-                                        <p>You can either upload an existing file.</p>
+                                    <p>You can either upload an existing file.</p>
+
+                                    <form id="uploadForm" method="POST" action="EugeneServlet" enctype="multipart/form-data" target="hiddenIFrame">
                                         <input type="file" name="file" id="file" />
-                                        <p>Or....</p>
+                                        <input type="submit" value="Upload File" name="upload" id="uploadFileButton" class="btn" style="width:150px" />
                                     </form>
+                                    <p>Or....</p>
                                     <p>Create a new file</p>
                                     <input id="newFileNameInput" placeholder="New File Name"/>
                                 </div>
                                 <div class="modal-footer">
-                                    <button id="createNewButton" class="btn" data-dismiss="modal" aria-hidden="true">Create New File</button>
+                                    <button id="createNewButton" class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Create New File</button>
+                                    <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+                                </div>
+                            </div>
+
+                            <div id="deleteFileModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="deleteFileModalLabel" aria-hidden="true">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                                    <h4 id="deleteFileModalLabel">Delete File</h4>
+                                </div>
+                                <div class="modal-body">                                      
+                                    <p id="toDeleteName"></p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button id="deleteButton" class="btn btn-danger" data-dismiss="modal" aria-hidden="true">Delete File</button>
+                                    <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
                                 </div>
                             </div>
                         </div>
@@ -136,8 +153,8 @@
                                 <div class="accordion-group">
                                     <div class="accordion-heading">
                                         <h5><a class="accordion-toggle" data-toggle="collapse" data-target="#editorArea" href="#editorArea">
-                                            Editor
-                                        </a>
+                                                Editor
+                                            </a>
                                         </h5>
                                     </div>
                                     <div id="editorArea" class="accordion-body collapse in">

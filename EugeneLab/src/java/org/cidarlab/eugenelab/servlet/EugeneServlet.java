@@ -80,39 +80,35 @@ public class EugeneServlet extends HttpServlet {
                 toReturn = "{\"response\":\"response\"}";
                 out.write(toReturn);
             } else if (command.equals("read")) {
-                
+
                 // That's how the query should look like:
-                
+
                 // {"channel":"query","data":{"Schema":"org.cidarlab.eugene.dom.component.Part"}}
-                
+
                 // process the data for EugeneLab...
                 //System.out.println(this.getData());
-                
+
                 /* option 1: 
                  * retrieve the parts from Clotho
                  */
                 /*
-                    JSONObject queryJSON = new JSONObject();
-                    try {
-                        queryJSON.put("Schema", "qugene.dom.component.Part");
-                        clotho.query(queryJSON);
-                    } catch(Exception e) {}
-                */
-                
+                 JSONObject queryJSON = new JSONObject();
+                 try {
+                 queryJSON.put("Schema", "qugene.dom.component.Part");
+                 clotho.query(queryJSON);
+                 } catch(Exception e) {}
+                 */
+
                 /* option 2:
                  * load the parts from a Eugene script
                  */
                 JSONObject json = this.getData();
-                if(null != json) {
+                if (null != json) {
                     out.write(this.getData().toString());
                 }
-                
+
                 //out.write(simulateReadingPartsFromClotho());
                 //out.write(readFiles());
-            } else if ("execute".equals(command)) {
-                //String input = request.getParameter("input");
-                //JSONObject result = executeEugene(input);
-                //out.write(result.toString());
             } else if (command.equals("getFileTree")) {
                 out.write(getFileTree());
             } else if (command.equals("getFileContent")) {
@@ -124,11 +120,16 @@ public class EugeneServlet extends HttpServlet {
                 out.write("{\"response\":\"test response\"}");
             } else if (command.equals("deleteFile")) {
                 String fileName = request.getParameter("fileName");
-                String currentFolder = request.getParameter("currentFolder");
-                deleteFile(fileName, currentFolder);
+                deleteFile(fileName);
+                out.write("{\"status\":\"good\"}");
             }
         } catch (Exception e) {
             e.printStackTrace();
+            StringWriter stringWriter = new StringWriter();
+            PrintWriter printWriter = new PrintWriter(stringWriter);
+            e.printStackTrace(printWriter);
+            String exceptionAsString = stringWriter.toString().replaceAll("[\r\n\t]+", "<br/>");
+            out.println("{\"result\":\"" + exceptionAsString + "\",\"status\":\"bad\"}");
         } finally {
             out.flush();
             out.close();
@@ -177,19 +178,15 @@ public class EugeneServlet extends HttpServlet {
     }
     // </editor-fold>
 
-    protected void processPostRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+    protected void processPostRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
         if (ServletFileUpload.isMultipartContent(request)) {
             //process code for file upload
-            ServletFileUpload uploadHandler = new ServletFileUpload(new DiskFileItemFactory());
             PrintWriter writer = response.getWriter();
-            response.setContentType("text/plain");
-            response.sendRedirect("eugenelab.html");
-            String uploadFilePath = this.getServletContext().getRealPath("/") + "data";
+            ServletFileUpload uploadHandler = new ServletFileUpload(new DiskFileItemFactory());
             try {
+                String uploadFilePath = this.getServletContext().getRealPath("/") + "/data/" + getCurrentUser() + "/";
                 List<FileItem> items = uploadHandler.parseRequest(request);
-                new File(uploadFilePath).mkdir();
-                ArrayList<File> toLoad = new ArrayList();
+//                new File(uploadFilePath).mkdir();
                 for (FileItem item : items) {
                     File file;
                     if (!item.isFormField()) {
@@ -198,17 +195,14 @@ public class EugeneServlet extends HttpServlet {
                             System.out.println("You forgot to choose a file.");
                         }
                         if (fileName.lastIndexOf("\\") >= 0) {
-                            file = new File(uploadFilePath + "\\" + fileName.substring(fileName.lastIndexOf("\\")));
+                            file = new File(uploadFilePath + fileName.substring(fileName.lastIndexOf("\\")));
                         } else {
-                            file = new File(uploadFilePath + "\\" + fileName.substring(fileName.lastIndexOf("\\") + 1));
+                            file = new File(uploadFilePath + fileName.substring(fileName.lastIndexOf("\\") + 1));
                         }
                         item.write(file);
-                        toLoad.add(file);
                     }
                     writer.write("{\"result\":\"good\",\"status\":\"good\"}");
                 }
-            } catch (FileUploadException e) {
-                throw new RuntimeException(e);
             } catch (Exception e) {
                 e.printStackTrace();
                 StringWriter stringWriter = new StringWriter();
@@ -216,55 +210,57 @@ public class EugeneServlet extends HttpServlet {
                 e.printStackTrace(printWriter);
                 String exceptionAsString = stringWriter.toString().replaceAll("[\r\n\t]+", "<br/>");
                 writer.write("{\"result\":\"" + exceptionAsString + "\",\"status\":\"bad\"}");
+
             } finally {
-                writer.flush();
                 writer.close();
+
             }
         } else {
-            response.setContentType("application/json");
-            PrintWriter out = response.getWriter();
-            String command = request.getParameter("command");
-            if (command.equals("execute")) {
-                String input = request.getParameter("input");
-                JSONObject result = executeEugene(input);
-                out.write(result.toString());
-            } else if (command.equals("saveFileContent")) {
-                String fileName = request.getParameter("fileName");
-                String currentFolder = request.getParameter("currentFolder");
-                String fileContent = request.getParameter("fileContent");
-                //saveFile(fileName, currentFolder, fileContent);
-            } else if("pigeon".equals(command)) {
-                String sPigeon = request.getParameter("pigeon");
-                WeyekinPoster.setPigeonText(sPigeon);
-                WeyekinPoster.postMyBird();
-           }
-            out.flush();
-            out.close();            
+            PrintWriter out = null;
+            try {
+                response.setContentType("application/json");
+                out = response.getWriter();
+                String command = request.getParameter("command");
+                if (command.equals("execute")) {
+                    String input = request.getParameter("input");
+                    JSONObject result = executeEugene(input);
+                    out.write(result.toString());
+                } else if (command.equals("saveFileContent")) {
+                    String fileName = request.getParameter("fileName");
+                    String fileContent = request.getParameter("fileContent");
+                    saveFile(fileName, fileContent);
+                    out.write("{\"status\":\"good\"}");
+                } else if ("pigeon".equals(command)) {
+                    String sPigeon = request.getParameter("pigeon");
+                    WeyekinPoster.setPigeonText(sPigeon);
+                    WeyekinPoster.postMyBird();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                out.flush();
+                out.close();
+            }
         }
 
     }
 
     /**
-    private String simulateReadingPartsFromClotho() {
-        JSONObject resultsJSON = new JSONObject();
-        
-        try {
-            List<JSONObject> lstResults = new ArrayList<JSONObject>();
-            resultsJSON.put("results", lstResults);        
-
-            JSONObject partJSON = new JSONObject();
-            partJSON.put("Name", "J23100");
-            partJSON.put("Type", "Promoter");
-            partJSON.put("Sequence", "TTGACGGCTAGCTCAGTCCTAGGTACAGTGCTAGC");
-            partJSON.put("Pigeon", "p J23100");
-            
-            lstResults.add(partJSON);
-        } catch(Exception e) {}
-        
-        return resultsJSON.toString();
-    }
-    **/
-    
+     * private String simulateReadingPartsFromClotho() { JSONObject resultsJSON
+     * = new JSONObject();
+     *
+     * try { List<JSONObject> lstResults = new ArrayList<JSONObject>();
+     * resultsJSON.put("results", lstResults); * JSONObject partJSON = new
+     * JSONObject(); partJSON.put("Name", "J23100"); partJSON.put("Type",
+     * "Promoter"); partJSON.put("Sequence",
+     * "TTGACGGCTAGCTCAGTCCTAGGTACAGTGCTAGC"); partJSON.put("Pigeon", "p
+     * J23100");
+     *
+     * lstResults.add(partJSON); } catch(Exception e) {}
+     *
+     * return resultsJSON.toString(); }
+     *
+     */
     private String readFiles() {
         String toReturn = "[";
 
@@ -318,7 +314,6 @@ public class EugeneServlet extends HttpServlet {
     }
 
     private String run(String devices) throws RecognitionException {
-        System.out.println("running");
         System.out.println(devices);
         String[] deviceArray = devices.split("\\|");
         for (int i = 0; i < deviceArray.length; i++) {
@@ -360,14 +355,14 @@ public class EugeneServlet extends HttpServlet {
             results = (HashMap<String, SavableElement>) EugeneExecutor.execute(input, 2);
 
             if (null != results && !results.isEmpty()) {
-                
+
                 List<JSONObject> lstDeviceJSON = new ArrayList<JSONObject>();
                 for (String s : results.keySet()) {
                     SavableElement objElement = results.get(s);
                     if (objElement instanceof Device) {
 
                         Device objDevice = (Device) objElement;
-                        
+
                         JSONObject deviceJSON = this.toJSON(objDevice);
 
                         // now, we could store it in the Clotho DB...
@@ -375,11 +370,10 @@ public class EugeneServlet extends HttpServlet {
                                 deviceJSON.get("Pigeon").toString());
                         deviceJSON.put("pigeon-uri", WeyekinPoster.postMyBird());
                         lstDeviceJSON.add(deviceJSON);
-                        
+
                         /**
                          * clotho.create(deviceJSON); *
                          */
-                        
                     }
                 }
 
@@ -395,7 +389,6 @@ public class EugeneServlet extends HttpServlet {
                 returnJSON.put("status", "bad");
                 returnJSON.put("error", e.getMessage());
             } catch (Exception e1) {
-                
             }
         }
 
@@ -490,8 +483,8 @@ public class EugeneServlet extends HttpServlet {
         bw.close();
     }
 
-    private void deleteFile(String fileName, String currentFolder) {
-        String currentFileExtension = getFileExtension(currentFolder + "/" + fileName, true);
+    private void deleteFile(String fileName) {
+        String currentFileExtension = getFileExtension("/" + fileName, true);
         File file = new File(currentFileExtension);
         file = file.getAbsoluteFile();
         file.delete();
@@ -507,46 +500,46 @@ public class EugeneServlet extends HttpServlet {
 
     public JSONObject getData() {
         List<JSONObject> lstParts = new ArrayList<JSONObject>();
-        
+
         try {
-            File f = new File(this.getServletContext().getRealPath("/")+
-                    "eugene-examples/inverter_data.eug");
-            
-            HashMap<String, SavableElement> hm = 
-                    (HashMap<String, SavableElement>)EugeneExecutor.execute(f, 2);
-            
-            for(String s:hm.keySet()) {
+            File f = new File(this.getServletContext().getRealPath("/")
+                    + "eugene-examples/inverter_data.eug");
+
+            HashMap<String, SavableElement> hm =
+                    (HashMap<String, SavableElement>) EugeneExecutor.execute(f, 2);
+
+            for (String s : hm.keySet()) {
                 SavableElement objElement = hm.get(s);
-                
-                if(objElement instanceof Part) {
+
+                if (objElement instanceof Part) {
                     JSONObject partJSON = new JSONObject();
-                    Part objPart = (Part)objElement;
-                    
-                    partJSON.put("Schema", "eugene.dom.components.Part");                    
+                    Part objPart = (Part) objElement;
+
+                    partJSON.put("Schema", "eugene.dom.components.Part");
                     partJSON.put("Name", objPart.getName());
                     partJSON.put("Type", objPart.getPartType().getName());
                     partJSON.put("Sequence", objPart.get("Sequence"));
                     partJSON.put("Pigeon", objPart.get("Pigeon"));
-                    if(null != objPart.get("Represses")) {
+                    if (null != objPart.get("Represses")) {
                         partJSON.put("Represses", objPart.get("Represses"));
                     }
-                    
+
                     lstParts.add(partJSON);
-                }   
+                }
             }
-            
+
             JSONObject resultJSON = new JSONObject();
             resultJSON.put("result", lstParts);
             //System.out.println(dataJSON);
-            
+
             return resultJSON;
             //this.clotho.create(dataJSON);
-        } catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
     }
-    
+
     private JSONObject toJSON(Device objDevice)
             throws Exception {
         String NEWLINE = System.getProperty("line.separator");
@@ -581,7 +574,7 @@ public class EugeneServlet extends HttpServlet {
                             .append(" rep ")
                             .append(objPart.get("Represses"))
                             .append(NEWLINE);
-               }
+                }
             }
             lstComponentsJSON.add(componentJSON);
         }
