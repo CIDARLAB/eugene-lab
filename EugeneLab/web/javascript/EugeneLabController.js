@@ -279,8 +279,10 @@ $(document).ready(function() {
                 $('#runButton').removeAttr("disabled");
 
                 if ("good" == response["status"]) {
+                    var pigeonLinks = [];
                     $.each(response["results"], function() {
-                        window.open(this["pigeon-uri"]);
+                        pigeonLinks.push(this["pigeon-uri"]);
+                        $('#outputArea').append('<img src="'+this["pigeon-uri"]+'"/>');
                     });
                 } else {
                     console.log(response["error"]);
