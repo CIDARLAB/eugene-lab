@@ -99,8 +99,8 @@
                                 <div class="modal-body">
                                     <p>You can either upload an existing file.</p>
 
-                                    <form id="uploadForm" method="POST" action="EugeneServlet" enctype="multipart/form-data" target="hiddenIFrame">
-                                        <input type="file" name="file" id="file" />
+                                    <form id="uploadForm" method="POST" action="EugeneServlet" enctype="multipart/form-data">
+                                        <input type="file" name="file" id="file" multiple/>
                                         <input type="submit" value="Upload File" name="upload" id="uploadFileButton" class="btn" style="width:150px" />
                                     </form>
                                     <p>Or....</p>
@@ -149,10 +149,10 @@
                             </div>
                         </div>
                         <div class="tab-pane active" id="textEditorTab">
-                            <div class="accordion" id="accordion2">
+                            <div class="accordion" id="accoridion">
                                 <div class="accordion-group">
                                     <div class="accordion-heading">
-                                        <h5><a class="accordion-toggle" data-toggle="collapse" data-target="#editorArea" href="#editorArea">
+                                        <h5><a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#editorArea">
                                                 Editor
                                             </a>
                                         </h5>
@@ -167,14 +167,16 @@
                                 <div class="accordion-group">
                                     <div class="accordion-heading">
                                         <h5>
-                                            <a class="accordion-toggle" data-toggle="collapse" data-target="#outputArea" href="#outputArea">
+                                            <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#outputArea">
                                                 Output 
                                             </a>
                                         </h5>
                                     </div>
                                     <div id="outputArea" class="accordion-body collapse">
-                                        <div class="accordion-inner">
-                                            <textarea id="console" readonly style="width:95%">Output Goes Here</textarea>
+                                        <div class= "accordion-inner">
+                                            <div id="output" style="background-color:grey;padding:20px">
+                                                <textarea id="console" readonly style="width:95%">Output Goes Here</textarea>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -202,7 +204,7 @@
         <script src="jsLibraries/active-line.js"></script>
         <script src="jsLibraries/jquery.dynatree.min.js"></script>
         <script src="jsLibraries/jquery.cookie.js"></script>
-
+        <script src="jsLibraries/jquery.flowgallery.min.js"></script>
         <script src="jsLibraries/eugene.js"></script>
         <div id="tester"></div>
         <footer>

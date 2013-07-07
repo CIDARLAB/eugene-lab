@@ -101,7 +101,6 @@ $(document).ready(function() {
         var fileContent = editor.getValue();
         //create new file on server
         $.post("EugeneServlet", {"command": "saveFileContent", "fileName": newFileName, "fileContent": fileContent}, function(response) {
-            //refresh file tree
             var rootNode = $("#filesArea").dynatree("getRoot");
             // Call the DynaTreeNode.addChild() member function and pass options for the new node
             var childNode = rootNode.addChild({
@@ -115,9 +114,6 @@ $(document).ready(function() {
 
 
     //Event Handlers
-    $('#startButton').click(function() {
-        $('#newDeviceButton').trigger("click");
-    });
 
     $('#createNewButton').click(function() {
         var input = $('#newFileNameInput').val();
@@ -278,11 +274,18 @@ $(document).ready(function() {
             $.post("EugeneServlet", {"command": "execute", "input": input}, function(response) {
                 $('#runButton').removeAttr("disabled");
 
-                if ("good" == response["status"]) {
+                if ("good" === response["status"]) {
                     var pigeonLinks = [];
+                    var images = "";
                     $.each(response["results"], function() {
                         pigeonLinks.push(this["pigeon-uri"]);
-                        $('#outputArea').append('<img src="'+this["pigeon-uri"]+'"/>');
+                        images = images + '<li><img src="' + this["pigeon-uri"] + '" title="' + this["name"] + '" alt="' + this["name"] + '"/></li>';
+                    });
+                    images = '<ul id="imageList">' + images + '</ul>';
+                    $('#output').html(images);
+                    $('#imageList').flowGallery({
+                        easing: 'easeOutCubic',
+                        backgroundColor: "white"
                     });
                 } else {
                     console.log(response["error"]);

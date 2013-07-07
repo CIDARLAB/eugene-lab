@@ -13,7 +13,7 @@ $(document).ready(function() {
     };
     
     connection.onclose = function() {
-        alert('closing');
+//        alert('closing');
     }
     
         if (connection.readyState == 1) {

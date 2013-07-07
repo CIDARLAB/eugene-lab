@@ -162,8 +162,7 @@ public class EugeneServlet extends HttpServlet {
      * @throws IOException if an I/O error occurs
      */
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         processPostRequest(request, response);
     }
 
@@ -180,13 +179,15 @@ public class EugeneServlet extends HttpServlet {
 
     protected void processPostRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
         if (ServletFileUpload.isMultipartContent(request)) {
-            //process code for file upload
-            PrintWriter writer = response.getWriter();
-            ServletFileUpload uploadHandler = new ServletFileUpload(new DiskFileItemFactory());
             try {
-                String uploadFilePath = this.getServletContext().getRealPath("/") + "/data/" + getCurrentUser() + "/";
+                ServletFileUpload uploadHandler = new ServletFileUpload(new DiskFileItemFactory());
+                PrintWriter writer = response.getWriter();
+                response.setContentType("application/json");
+                response.sendRedirect("eugenelab.html");
                 List<FileItem> items = uploadHandler.parseRequest(request);
-//                new File(uploadFilePath).mkdir();
+                String uploadFilePath = this.getServletContext().getRealPath("/") + "/data/" + getCurrentUser() + "/";
+                new File(uploadFilePath).mkdir();
+                ArrayList<File> toLoad = new ArrayList();
                 for (FileItem item : items) {
                     File file;
                     if (!item.isFormField()) {
@@ -200,21 +201,16 @@ public class EugeneServlet extends HttpServlet {
                             file = new File(uploadFilePath + fileName.substring(fileName.lastIndexOf("\\") + 1));
                         }
                         item.write(file);
+                        toLoad.add(file);
                     }
-                    writer.write("{\"result\":\"good\",\"status\":\"good\"}");
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
-                StringWriter stringWriter = new StringWriter();
-                PrintWriter printWriter = new PrintWriter(stringWriter);
-                e.printStackTrace(printWriter);
-                String exceptionAsString = stringWriter.toString().replaceAll("[\r\n\t]+", "<br/>");
-                writer.write("{\"result\":\"" + exceptionAsString + "\",\"status\":\"bad\"}");
-
-            } finally {
-                writer.close();
-
+                writer.write("{\"result\":\"good\",\"status\":\"good\"}");
+            } catch (FileUploadException ex) {
+                Logger.getLogger(EugeneServlet.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (Exception ex) {
+                Logger.getLogger(EugeneServlet.class.getName()).log(Level.SEVERE, null, ex);
             }
+
         } else {
             PrintWriter out = null;
             try {
@@ -242,7 +238,6 @@ public class EugeneServlet extends HttpServlet {
                 out.close();
             }
         }
-
     }
 
     /**
