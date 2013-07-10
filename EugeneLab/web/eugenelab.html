@@ -56,26 +56,14 @@
             <div class="span2 well">
                 <div class="tabbable">
                     <ul id="leftTabHeader" class="nav nav-tabs">
-                        <li ><a href="#partsTab" data-toggle="tab">Parts</a></li>
+                        <li><a href="#partsTab" data-toggle="tab">Parts</a></li>
                         <li class="active"><a  href="#filesTab" data-toggle="tab">Files</a></li>
+                        <li class="pull-right"><button id="refreshButton"><i class="icon-refresh"></i></button></li>
                     </ul>
 
                     <div id="leftTabs" class="tab-content">
-                        <div class="tab-pane" id="partsTab">
-                            <h4>Parts List</h4>
-                            <hr/>
-                            <div style="height:400px;overflow-y: auto;overflow-x:hidden" id="partsListArea">
-                                <hr/>
-                                <button class="btn" data-toggle="collapse" data-target="#uploadArea">Add More Parts</button>
-                                <div id="uploadArea" class="collapse out">
-                                    <form id="file_upload" action="EugeneServlet" method="POST" enctype="multipart/form-data">
-                                        <input id="file_1" type="file" name="file_1" multiple/>
-                                        <br>
-                                        <button id="uploadButton" data-toggle="collapse" data-target="#uploadArea">Upload</button>
-                                    </form>
-                                </div>
-                            </div>
-                            <div id="partsList"></div>
+                        <div class="tab-pane" id="partsTab">                          
+                            <div id="partsListArea"></div>
                             <hr/>
                         </div>
                         <div class="tab-pane active" id="filesTab">
@@ -175,7 +163,8 @@
                                     <div id="outputArea" class="accordion-body collapse">
                                         <div class= "accordion-inner">
                                             <div id="output" style="background-color:grey;padding:20px">
-                                                <textarea id="console" readonly style="width:95%">Output Goes Here</textarea>
+                                                <div id="outputImageArea"></div>
+                                                <div id="outputListArea"></div>
                                             </div>
                                         </div>
                                     </div>
@@ -201,11 +190,11 @@
         <script src="jsLibraries/bootstrap.min.js"></script>
         <script src="javascript/EugeneLabController.js"></script>
         <script src="jsLibraries/codemirror.js"></script>
-        <script src="jsLibraries/active-line.js"></script>
         <script src="jsLibraries/jquery.dynatree.min.js"></script>
         <script src="jsLibraries/jquery.cookie.js"></script>
         <script src="jsLibraries/jquery.flowgallery.min.js"></script>
         <script src="jsLibraries/eugene.js"></script>
+        <script src="javascript/ClothoController.js"></script>
         <div id="tester"></div>
         <footer>
             <div class="container" align="center">

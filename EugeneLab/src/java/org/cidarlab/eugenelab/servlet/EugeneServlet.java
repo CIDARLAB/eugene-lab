@@ -44,15 +44,16 @@ import org.json.JSONObject;
 public class EugeneServlet extends HttpServlet {
 
 //    /* here is our Clotho instance */
-//    private Clotho clotho;
-//
-//    @Override
-//    public void init() 
-//            throws ServletException {
-//    
-//        super.init();
-//        this.clotho = ClothoFactory.getAPI("ws://cidar.bu.edu/clotho/websocket");
-//    }
+    private Clotho clotho;
+
+    @Override
+    public void init()
+            throws ServletException {
+
+        super.init();
+        this.clotho = ClothoFactory.getAPI("ws://localhost:8080/websocket");
+    }
+
     /**
      * Processes requests for both HTTP
      * <code>GET</code> and
@@ -83,7 +84,7 @@ public class EugeneServlet extends HttpServlet {
 
                 // That's how the query should look like:
 
-                // {"channel":"query","data":{"Schema":"org.cidarlab.eugene.dom.component.Part"}}
+                // {"channel":"query","data":{"schema":"org.cidarlab.eugene.dom.component.Part"}}
 
                 // process the data for EugeneLab...
                 //System.out.println(this.getData());
@@ -91,13 +92,15 @@ public class EugeneServlet extends HttpServlet {
                 /* option 1: 
                  * retrieve the parts from Clotho
                  */
-                /*
-                 JSONObject queryJSON = new JSONObject();
-                 try {
-                 queryJSON.put("Schema", "qugene.dom.component.Part");
-                 clotho.query(queryJSON);
-                 } catch(Exception e) {}
-                 */
+
+//                 JSONObject queryJSON = new JSONObject();
+//                 try {
+//                 queryJSON.put("schema", "eugene.dom.component.Part");
+//                 out.write(clotho.query(queryJSON).toString());
+//                 } catch(Exception e) {
+//                     e.printStackTrace();
+//                 }
+//                 
 
                 /* option 2:
                  * load the parts from a Eugene script
@@ -107,8 +110,8 @@ public class EugeneServlet extends HttpServlet {
                     out.write(this.getData().toString());
                 }
 
-                //out.write(simulateReadingPartsFromClotho());
-                //out.write(readFiles());
+//                out.write(simulateReadingPartsFromClotho());
+//                out.write(readFiles());
             } else if (command.equals("getFileTree")) {
                 out.write(getFileTree());
             } else if (command.equals("getFileContent")) {
@@ -226,8 +229,8 @@ public class EugeneServlet extends HttpServlet {
                     String fileContent = request.getParameter("fileContent");
                     saveFile(fileName, fileContent);
                     out.write("{\"status\":\"good\"}");
-                } else if ("pigeon".equals(command)) {
-                    String sPigeon = request.getParameter("pigeon");
+                } else if ("Pigeon".equals(command)) {
+                    String sPigeon = request.getParameter("Pigeon");
                     WeyekinPoster.setPigeonText(sPigeon);
                     WeyekinPoster.postMyBird();
                 }
@@ -246,8 +249,8 @@ public class EugeneServlet extends HttpServlet {
      *
      * try { List<JSONObject> lstResults = new ArrayList<JSONObject>();
      * resultsJSON.put("results", lstResults); * JSONObject partJSON = new
-     * JSONObject(); partJSON.put("Name", "J23100"); partJSON.put("Type",
-     * "Promoter"); partJSON.put("Sequence",
+     * JSONObject(); partJSON.put("name", "J23100"); partJSON.put("type",
+     * "Promoter"); partJSON.put("sequence",
      * "TTGACGGCTAGCTCAGTCCTAGGTACAGTGCTAGC"); partJSON.put("Pigeon", "p
      * J23100");
      *
@@ -294,7 +297,7 @@ public class EugeneServlet extends HttpServlet {
                                     + "{\"Name\":\"" + name
                                     + "\",\"LO\":\"" + leftOverhang
                                     + "\",\"RO\":\"" + rightOverhang
-                                    + "\",\"Type\":\"" + type + "\"},";
+                                    + "\",\"type\":\"" + type + "\"},";
                             line = reader.readLine();
                         }
                         reader.close();
@@ -510,13 +513,13 @@ public class EugeneServlet extends HttpServlet {
                     JSONObject partJSON = new JSONObject();
                     Part objPart = (Part) objElement;
 
-                    partJSON.put("Schema", "eugene.dom.components.Part");
-                    partJSON.put("Name", objPart.getName());
-                    partJSON.put("Type", objPart.getPartType().getName());
-                    partJSON.put("Sequence", objPart.get("Sequence"));
+                    partJSON.put("schema", "eugene.dom.components.Part");
+                    partJSON.put("name", objPart.getName());
+                    partJSON.put("type", objPart.getPartType().getName());
+                    partJSON.put("sequence", objPart.get("sequence"));
                     partJSON.put("Pigeon", objPart.get("Pigeon"));
-                    if (null != objPart.get("Represses")) {
-                        partJSON.put("Represses", objPart.get("Represses"));
+                    if (null != objPart.get("represses")) {
+                        partJSON.put("represses", objPart.get("represses"));
                     }
 
                     lstParts.add(partJSON);
@@ -545,15 +548,15 @@ public class EugeneServlet extends HttpServlet {
 
         JSONObject deviceJSON = new JSONObject();
         deviceJSON.put("name", objDevice.getName());
-        deviceJSON.put("Schema", objDevice.getClass().getCanonicalName());
-
+        deviceJSON.put("schema", objDevice.getClass().getCanonicalName());
+        deviceJSON.put("type", "composite");
         List<Component> lstComponents = objDevice.getAllComponents();
         List<JSONObject> lstComponentsJSON = new ArrayList<JSONObject>();
 
         for (Component component : lstComponents) {
             JSONObject componentJSON = new JSONObject();
             componentJSON.put("name", component.getName());
-            componentJSON.put("Schema", component.getClass().getCanonicalName());
+            componentJSON.put("schema", component.getClass().getCanonicalName());
             if (component instanceof Device) {
                 componentJSON = this.toJSON((Device) component);
             } else if (component instanceof PartType) {
@@ -561,13 +564,14 @@ public class EugeneServlet extends HttpServlet {
             } else if (component instanceof Part) {
                 Part objPart = (Part) component;
                 List<JSONObject> lstPropertyValuesJSON = new ArrayList<JSONObject>();
-                componentJSON.put("pigeon", objPart.get("Pigeon"));
+                componentJSON.put("Pigeon", objPart.get("Pigeon"));
                 sbPigeon.append(objPart.get("Pigeon")).append(NEWLINE);
-
-                if (null != objPart.get("Represses")) {
+                componentJSON.put("sequence", objPart.get("sequence"));
+                componentJSON.put("type", objPart.getPartType().getName());
+                if (null != objPart.get("represses")) {
                     sbPigeonArcs.append(objPart.getName())
                             .append(" rep ")
-                            .append(objPart.get("Represses"))
+                            .append(objPart.get("represses"))
                             .append(NEWLINE);
                 }
             }

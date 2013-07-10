@@ -4,37 +4,12 @@
 
 
 $(document).ready(function() {
+    /********"Field" Variables********/
     var deviceCount = 0;
     var _properties = {};
     var _partTypes = {};
     var _parts = [];
-    var command = {"command": "read"};
-    $.get("EugeneServlet", command, function(response) {
-        var toAppend = '<table class="table table-bordered table-hover" id="partsList"><thead><tr><th>Name</th><th>Type</th></tr></thead><tbody>';
-        $.each(response["result"], function() {
-            if (this["Type"].toLowerCase() !== "composite") {
-                toAppend = toAppend + '<tr><td>' + this["Name"] + '</td><td>' + this["Type"] + '</td></tr>';
-                _parts[this["Name"]] = this;
-            }
-        });
-        toAppend = toAppend + "</tbody></table>";
-        $('#partsListArea').html(toAppend);
-        $("#partsList").dataTable({
-            "bPaginate": false,
-            "bScrollCollapse": true
-        });
-        $('tr').dblclick(function() {
-            var newValue = editor.getValue();
-            var type = $(this).children("td:last").text();
-            var name = $(this).children("td:first").text();
-            if (_partTypes[type] === undefined) {
-                _partTypes[type] = "added";
-                newValue = 'PartType ' + type + '(Name, Sequence);\n' + newValue;
-            }
-            newValue = newValue + '\n' + type + ' ' + name + '(' + name + ',' + _parts[name].Sequence + ');';
-            editor.setValue(newValue);
-        });
-    });
+
 
 
     var command = {"command": "imageList"};
@@ -52,7 +27,7 @@ $(document).ready(function() {
                 var type = $(this).attr('id');
                 if (_partTypes[type] === undefined) {
                     _partTypes[type] = "added";
-                    newValue = 'PartType ' + type + '(Name, Sequence);\n' + newValue;
+                    newValue = 'PartType ' + type + '(name, sequence);\n' + newValue;
                 }
                 editor.setValue(newValue);
             });
@@ -70,15 +45,39 @@ $(document).ready(function() {
     });
 
 
+    /********Functions********/
+    //load files list
 
-
-    //Functions
-    var refreshPartsList = function(s) {
-        //TODO render parts list
-        $('#partsList').html(s);
+    var drawPartsList = function(data) {
+        var toAppend = '<table class="table table-bordered table-hover" id="partsList"><thead><tr><th>Name</th><th>Type</th></tr></thead><tbody>';
+        $.each(data, function() {
+            if (this["type"] !== undefined) {
+                if (this["type"].toLowerCase() !== "composite") {
+                    toAppend = toAppend + '<tr><td>' + this["name"] + '</td><td>' + this["type"] + '</td></tr>';
+                    _parts[this["name"]] = this;
+                }
+            }
+        });
+        toAppend = toAppend + "</tbody></table>";
+        $('#partsListArea').html(toAppend);
+        $("#partsList").dataTable({
+            "bPaginate": false,
+            "bScrollCollapse": true
+        });
+        $('tr').dblclick(function() {
+            var newValue = editor.getValue();
+            var type = $(this).children("td:last").text();
+            var name = $(this).children("td:first").text();
+            if (_partTypes[type] === undefined) {
+                _partTypes[type] = "added";
+                newValue = 'PartType ' + type + '(name, sequence);\n' + newValue;
+            }
+            newValue = newValue + '\n' + type + ' ' + name + '(' + name + ',' + _parts[name].sequence + ');';
+            editor.setValue(newValue);
+        });
     };
 
-    //load files list
+    //draw the file table tree based on users file contents
     var loadFileTree = function() {
         $("#filesArea").html("");
         $.get("EugeneServlet", {"command": "getFileTree"}, function(data) {
@@ -92,6 +91,7 @@ $(document).ready(function() {
                 persist: true,
                 children: children
             });
+            $('#filesArea').dynatree("getTree").reload();
         });
     };
 
@@ -114,6 +114,18 @@ $(document).ready(function() {
 
 
     //Event Handlers
+    $('#refreshButton').click(function() {
+        var refreshType = $('ul#leftTabHeader li.active').text();
+        if (refreshType === "Parts") {
+            send("query", '{"className":"BasicPart"}', function(data) {
+                drawPartsList(data);
+            });
+
+        } else {
+            //refresh files
+            loadFileTree();
+        }
+    });
 
     $('#createNewButton').click(function() {
         var input = $('#newFileNameInput').val();
@@ -281,12 +293,48 @@ $(document).ready(function() {
                         pigeonLinks.push(this["pigeon-uri"]);
                         images = images + '<li><img src="' + this["pigeon-uri"] + '" title="' + this["name"] + '" alt="' + this["name"] + '"/></li>';
                     });
+                    //render images
                     images = '<ul id="imageList">' + images + '</ul>';
-                    $('#output').html(images);
+                    alert(images)
+                    $('#outputImageArea').html(images);
                     $('#imageList').flowGallery({
                         easing: 'easeOutCubic',
                         backgroundColor: "white"
                     });
+                    var newParts = {};
+                    //render new parts list
+                    var toAppend = '<table class="table table-bordered table-hover" id="outputList"><thead><tr><th>Name</th><th>Type</th></tr></thead><tbody>';
+                    $.each(response["results"], function() {
+                        if (newParts[this["name"]] === undefined && _parts[this["name"]] === undefined) {
+                            newParts[this["name"]] = "added";
+                            toAppend = toAppend + '<tr><td>' + this["name"] + '</td><td>' + this["type"] + '</td><td><button class="btn btn-success savePartButton">Save</button></td></tr>';
+                        }
+                        //handle each component
+                        alert(this["components"])
+                        $.each(this["components"], function() {
+                            if (this["type"] !== undefined && newParts[this["name"]]===undefined && _parts[this["name"]] === undefined) {
+                                newParts[this["name"]] = "added";
+                                toAppend = toAppend + '<tr><td>' + this["name"] + '</td><td>' + this["type"] + '</td><td><button class="btn btn-success savePartButton">Save</button></td></tr>';
+                            }
+                        });
+                    });
+                    toAppend = toAppend + "</tbody></table>";
+                    $('#outputListArea').html(toAppend);
+                    $("#outputList").dataTable({
+                        "bPaginate": false,
+                        "bScrollCollapse": true
+                    });
+                    $('#output').append('<button class=btn btn-large btn-success" id="saveAllButton">Save All Parts</button>')
+                    $('.savePartButton').click(function(){
+                        //save a part
+                        alert("saving a part")
+                    })
+                    $('#saveAllButton').click(function(){
+                        //save all parts
+                        alert("saving all parts")
+                    })
+
+
                 } else {
                     console.log(response["error"]);
                 }
@@ -294,6 +342,91 @@ $(document).ready(function() {
         }
 
     });
+
+
+
+
+
+
+
+
+
+    /********Clotho Functions and Variables********/
+    var _connection = new WebSocket('ws://localhost:8080/websocket');
+
+    var _requestCommand = {}; //key request id, value: callback function
+    var _requestID = 0;
+
+
+    _connection.onmessage = function(e) {
+        //parase message into JSON
+        var dataJSON = $.parseJSON(e.data);
+        //ignore say messages which have not requestId
+        var requestId = dataJSON["requestId"];
+        if (requestId !== null) {
+            //if callback function exists, run it
+            var callback = _requestCommand[requestId];
+            if (callback !== undefined) {
+//                alert("calling back with: " + e.data)
+                callback(dataJSON["data"]);
+                //remove the callback
+                delete _requestCommand[requestId];
+            }
+        }
+    };
+
+    _connection.onerror = function(e) {
+        alert("F**K");
+    };
+
+    _connection.onclose = function() {
+//        alert('closing connection');
+    };
+
+    _connection.onopen = function(e) {
+        send("query", '{"className":"BasicPart"}', function(data) {
+//            createTestData();
+            drawPartsList(data);
+        });
+    };
+
+
+    var send = function(channel, data, callback) {
+        if (_connection.readyState === 1) {
+            var message = '{"channel":"' + channel + '", "data":' + data + ',"requestId":"' + _requestID + '"}';
+//            alert("sending:\n" + message);
+            _requestCommand[_requestID] = callback;
+            _connection.send(message);
+            _requestID++;
+        } else {
+            _connection = new WebSocket('ws://localhost:8080/websocket');
+        }
+    };
+
+
+
+    var createTestData = function() {
+        var data = '{"schema": "BasicPart", "name": "tester1", "sequence": "aaaaaaaaaaaaaaaaaa", "type":"promoter"}';
+        send("create", data);
+        var data = '{"schema": "BasicPart", "name": "tester2", "sequence": "tttttttttttttttttt", "type":"rbs"}';
+        send("create", data);
+        var data = '{"schema": "BasicPart", "name": "tester3", "sequence": "cccccccccccccccccc", "type":"gene"}';
+        send("create", data);
+        var data = '{"schema": "BasicPart", "name": "tester4", "sequence": "gggggggggggggggggg", "type":"terminator"}';
+        send("create", data);
+    };
+
+
+
+
+
+
+
+
+
+
+
+    //functions to run on page load
 
     var editor = CodeMirror.fromTextArea(document.getElementById("textEditor"), {
         styleActiveLine: true,
@@ -305,5 +438,12 @@ $(document).ready(function() {
 
     loadFileTree();
 
-});
 
+
+//draw parts list using eugene servlet
+// var command = {"command": "read"};
+//    $.get("EugeneServlet", command, function(response) {
+//        drawPartsList(response["result"])
+//    });
+
+});
