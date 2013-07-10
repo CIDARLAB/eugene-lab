@@ -160,11 +160,24 @@
                                             </a>
                                         </h5>
                                     </div>
-                                    <div id="outputArea" class="accordion-body collapse">
+                                    <div id="outputArea" class="accordion-body collapse out">
                                         <div class= "accordion-inner">
-                                            <div id="output" style="background-color:grey;padding:20px">
-                                                <div id="outputImageArea"></div>
-                                                <div id="outputListArea"></div>
+                                            <div id="output" class="well">
+                                                <div class="tabbable">
+                                                    <ul class="nav nav-tabs" id="outputTabs">
+                                                        <li class="active"><a href="#outputImageTab" data-toggle="tab">Pigeon Images</a></li>
+                                                        <li><a href="#outputListTab" data-toggle="tab">Generated Parts</a></li>
+                                                    </ul>
+
+                                                    <div class="tab-content">
+                                                        <div class="tab-pane active" id="outputImageTab">
+                                                            <div id="outputImageArea"></div>
+                                                        </div>
+                                                        <div class="tab-pane" id="outputListTab">
+                                                            <div id="outputListArea"></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -192,9 +205,7 @@
         <script src="jsLibraries/codemirror.js"></script>
         <script src="jsLibraries/jquery.dynatree.min.js"></script>
         <script src="jsLibraries/jquery.cookie.js"></script>
-        <script src="jsLibraries/jquery.flowgallery.min.js"></script>
         <script src="jsLibraries/eugene.js"></script>
-        <script src="javascript/ClothoController.js"></script>
         <div id="tester"></div>
         <footer>
             <div class="container" align="center">

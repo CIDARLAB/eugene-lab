@@ -513,7 +513,7 @@ public class EugeneServlet extends HttpServlet {
                     JSONObject partJSON = new JSONObject();
                     Part objPart = (Part) objElement;
 
-                    partJSON.put("schema", "eugene.dom.components.Part");
+                    partJSON.put("schema", "BasicPart");
                     partJSON.put("name", objPart.getName());
                     partJSON.put("type", objPart.getPartType().getName());
                     partJSON.put("sequence", objPart.get("sequence"));
@@ -548,7 +548,7 @@ public class EugeneServlet extends HttpServlet {
 
         JSONObject deviceJSON = new JSONObject();
         deviceJSON.put("name", objDevice.getName());
-        deviceJSON.put("schema", objDevice.getClass().getCanonicalName());
+        deviceJSON.put("schema", "CompositePart");
         deviceJSON.put("type", "composite");
         List<Component> lstComponents = objDevice.getAllComponents();
         List<JSONObject> lstComponentsJSON = new ArrayList<JSONObject>();
@@ -556,7 +556,7 @@ public class EugeneServlet extends HttpServlet {
         for (Component component : lstComponents) {
             JSONObject componentJSON = new JSONObject();
             componentJSON.put("name", component.getName());
-            componentJSON.put("schema", component.getClass().getCanonicalName());
+            componentJSON.put("schema", "BasicPart");
             if (component instanceof Device) {
                 componentJSON = this.toJSON((Device) component);
             } else if (component instanceof PartType) {

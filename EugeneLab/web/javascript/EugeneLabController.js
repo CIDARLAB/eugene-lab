@@ -12,49 +12,24 @@ $(document).ready(function() {
 
 
 
-    var command = {"command": "imageList"};
-    // Get the JSON object with the location of the images
-    // JSON has key imageList with a value as a array of JSON objects with a single key "location"
 
-    $.get("EugeneServlet", command, function(response) {
-        var i = 0;
-        $('#iconArea').html("");
-        $.each(response, function() {
-            var type = this["fileName"].split("\.")[0];
-            $("#iconArea").append('<div class="span5"><li class="draggable partIcon" title= "' + type.replace(/-/g, ' ') + '" id="' + type + '"><div class="thumbnail"><img class="img-rounded" style="width:40px;height:80px" src="images/sbol_visual_jpeg/' + this["fileName"] + '"></div></li></div>');
-            $('#' + type).dblclick(function() {
-                var newValue = editor.getValue();
-                var type = $(this).attr('id');
-                if (_partTypes[type] === undefined) {
-                    _partTypes[type] = "added";
-                    newValue = 'PartType ' + type + '(name, sequence);\n' + newValue;
-                }
-                editor.setValue(newValue);
-            });
-            i = i + 1;
-        });
-        $('#iconArea .draggable').draggable({
-            helper: "clone",
-            connectToSortable: ".sortable, #trash",
-            revert: "invalid"
-        });
-        $('#iconArea li').on("click", function() {
-            $(".selected").removeClass("selected");
-            $(this).parent().addClass("selected");
-        });
-    });
 
 
     /********Functions********/
     //load files list
-
+    var savePart = function(part) {
+//        alert(JSON.stringify(part));
+        send("create", JSON.stringify(part));
+    };
     var drawPartsList = function(data) {
+        var drawn = {};
         var toAppend = '<table class="table table-bordered table-hover" id="partsList"><thead><tr><th>Name</th><th>Type</th></tr></thead><tbody>';
         $.each(data, function() {
-            if (this["type"] !== undefined) {
-                if (this["type"].toLowerCase() !== "composite") {
+            if (this["type"] !== undefined && drawn[this["name"]] === undefined) {
+                if (this["type"].toLowerCase()) {
                     toAppend = toAppend + '<tr><td>' + this["name"] + '</td><td>' + this["type"] + '</td></tr>';
                     _parts[this["name"]] = this;
+                    drawn[this["name"]] = "added";
                 }
             }
         });
@@ -287,54 +262,67 @@ $(document).ready(function() {
                 $('#runButton').removeAttr("disabled");
 
                 if ("good" === response["status"]) {
-                    var pigeonLinks = [];
-                    var images = "";
-                    $.each(response["results"], function() {
-                        pigeonLinks.push(this["pigeon-uri"]);
-                        images = images + '<li><img src="' + this["pigeon-uri"] + '" title="' + this["name"] + '" alt="' + this["name"] + '"/></li>';
-                    });
-                    //render images
-                    images = '<ul id="imageList">' + images + '</ul>';
-                    alert(images)
-                    $('#outputImageArea').html(images);
-                    $('#imageList').flowGallery({
-                        easing: 'easeOutCubic',
-                        backgroundColor: "white"
-                    });
-                    var newParts = {};
-                    //render new parts list
-                    var toAppend = '<table class="table table-bordered table-hover" id="outputList"><thead><tr><th>Name</th><th>Type</th></tr></thead><tbody>';
-                    $.each(response["results"], function() {
-                        if (newParts[this["name"]] === undefined && _parts[this["name"]] === undefined) {
-                            newParts[this["name"]] = "added";
-                            toAppend = toAppend + '<tr><td>' + this["name"] + '</td><td>' + this["type"] + '</td><td><button class="btn btn-success savePartButton">Save</button></td></tr>';
-                        }
-                        //handle each component
-                        alert(this["components"])
-                        $.each(this["components"], function() {
-                            if (this["type"] !== undefined && newParts[this["name"]]===undefined && _parts[this["name"]] === undefined) {
-                                newParts[this["name"]] = "added";
+                    if (response["results"] !== undefined) {
+                        var pigeonLinks = [];
+                        var imageHeader = '<div id="outputCarousel" class="slide carousel"><ol class="carousel-indicators">';
+                        var images = '<div class="carousel-inner">';
+                        var imageCount = 0;
+                        $.each(response["results"], function() {
+                            pigeonLinks.push(this["pigeon-uri"]);
+                            var active = "";
+                            if (imageCount === 0) {
+                                active = "active";
+                            }
+                            imageHeader = imageHeader + '<li class="' + active + '" data-target="#outputCarousel" +data-slide-to="' + imageCount + '"></li>';
+                            images = images + '<div class="item ' + active + '"><img src="' + this["pigeon-uri"] + '"/><div class="carousel-caption"><h4>' + this["name"] + '</h4></div></div>';
+                            imageCount++;
+                        });
+                        //render images
+                        imageHeader = imageHeader + '</ol>';
+                        images = images + '</div><a class="carousel-control left" href="#outputCarousel" data-slide="prev">&lsaquo;</a> <a class="carousel-control right" href="#outputCarousel" data-slide="next">&rsaquo;</a></div>';
+                        var slideShow = imageHeader + images;
+                        $('#outputImageArea').html(slideShow);
+                        $('#outputCarousel').carousel({interval: 5000});
+                        //render new parts list
+                        var toAppend = '<table class="table table-bordered table-hover" id="outputList"><thead><tr><th>Name</th><th>Type</th><th></th></tr></thead><tbody>';
+                        //handle each device
+                        $.each(response["results"], function() {
+                            if (_parts[this["name"]] === undefined) {
+                                _parts[this["name"]] = this;
                                 toAppend = toAppend + '<tr><td>' + this["name"] + '</td><td>' + this["type"] + '</td><td><button class="btn btn-success savePartButton">Save</button></td></tr>';
                             }
+                            //handle each component
+                            $.each(this["components"], function() {
+                                if (this["type"] !== undefined && _parts[this["name"]] === undefined) {
+                                    _parts[this["name"]] = this;
+                                    toAppend = toAppend + '<tr><td>' + this["name"] + '</td><td>' + this["type"] + '</td><td><button class="btn btn-success savePartButton">Save</button></td></tr>';
+                                }
+                            });
                         });
-                    });
-                    toAppend = toAppend + "</tbody></table>";
-                    $('#outputListArea').html(toAppend);
-                    $("#outputList").dataTable({
-                        "bPaginate": false,
-                        "bScrollCollapse": true
-                    });
-                    $('#output').append('<button class=btn btn-large btn-success" id="saveAllButton">Save All Parts</button>')
-                    $('.savePartButton').click(function(){
-                        //save a part
-                        alert("saving a part")
-                    })
-                    $('#saveAllButton').click(function(){
-                        //save all parts
-                        alert("saving all parts")
-                    })
-
-
+                        toAppend = toAppend + "</tbody></table>";
+                        $('#outputListArea').html(toAppend);
+                        $("#outputList").dataTable({
+                            "bPaginate": false,
+                            "bScrollCollapse": true
+                        });
+                        $('#outputListArea').parent().append('<button class=btn btn-large btn-success" id="saveAllButton">Save All Parts</button>');
+                        $('.savePartButton').click(function() {
+                            //save a part
+                            savePart(_parts[$(this).parent().parent().children("td:first").text()]);
+                            $(this).text("Saved");
+                            $(this).addClass("disabled");
+                        });
+                        $('#saveAllButton').click(function() {
+                            $('#outputList tr').each(function(i) {
+                                if (i > 0) {
+                                    savePart(_parts[$(this).children('td:first').text()]);
+                                }
+                            })
+                            $(this).text("All Parts Saved");
+                            $(this).addClass("disabled");
+                        });
+                        $('#outputArea').collapse('show');
+                    }
                 } else {
                     console.log(response["error"]);
                 }
@@ -421,11 +409,6 @@ $(document).ready(function() {
 
 
 
-
-
-
-
-
     //functions to run on page load
 
     var editor = CodeMirror.fromTextArea(document.getElementById("textEditor"), {
@@ -437,13 +420,36 @@ $(document).ready(function() {
     });
 
     loadFileTree();
+    var command = {"command": "imageList"};
+    // Get the JSON object with the location of the images
+    // JSON has key imageList with a value as a array of JSON objects with a single key "location"
 
-
-
-//draw parts list using eugene servlet
-// var command = {"command": "read"};
-//    $.get("EugeneServlet", command, function(response) {
-//        drawPartsList(response["result"])
-//    });
+    $.get("EugeneServlet", command, function(response) {
+        var i = 0;
+        $('#iconArea').html("");
+        $.each(response, function() {
+            var type = this["fileName"].split("\.")[0];
+            $("#iconArea").append('<div class="span5"><li class="draggable partIcon" title= "' + type.replace(/-/g, ' ') + '" id="' + type + '"><div class="thumbnail"><img class="img-rounded" style="width:40px;height:80px" src="images/sbol_visual_jpeg/' + this["fileName"] + '"></div></li></div>');
+            $('#' + type).dblclick(function() {
+                var newValue = editor.getValue();
+                var type = $(this).attr('id');
+                if (_partTypes[type] === undefined) {
+                    _partTypes[type] = "added";
+                    newValue = 'PartType ' + type + '(name, sequence);\n' + newValue;
+                }
+                editor.setValue(newValue);
+            });
+            i = i + 1;
+        });
+        $('#iconArea .draggable').draggable({
+            helper: "clone",
+            connectToSortable: ".sortable, #trash",
+            revert: "invalid"
+        });
+        $('#iconArea li').on("click", function() {
+            $(".selected").removeClass("selected");
+            $(this).parent().addClass("selected");
+        });
+    });
 
 });
