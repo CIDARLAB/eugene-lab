@@ -518,8 +518,8 @@ public class EugeneServlet extends HttpServlet {
                     partJSON.put("type", objPart.getPartType().getName());
                     partJSON.put("sequence", objPart.get("sequence"));
                     partJSON.put("Pigeon", objPart.get("Pigeon"));
-                    if (null != objPart.get("represses")) {
-                        partJSON.put("represses", objPart.get("represses"));
+                    if (null != objPart.get("Represses")) {
+                        partJSON.put("represses", objPart.get("Represses"));
                     }
 
                     lstParts.add(partJSON);
@@ -568,10 +568,10 @@ public class EugeneServlet extends HttpServlet {
                 sbPigeon.append(objPart.get("Pigeon")).append(NEWLINE);
                 componentJSON.put("sequence", objPart.get("sequence"));
                 componentJSON.put("type", objPart.getPartType().getName());
-                if (null != objPart.get("represses")) {
+                if (null != objPart.get("Represses")) {
                     sbPigeonArcs.append(objPart.getName())
                             .append(" rep ")
-                            .append(objPart.get("represses"))
+                            .append(objPart.get("Represses"))
                             .append(NEWLINE);
                 }
             }

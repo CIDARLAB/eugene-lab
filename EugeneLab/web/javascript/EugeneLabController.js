@@ -286,24 +286,27 @@ $(document).ready(function() {
                         //render new parts list
                         var toAppend = '<table class="table table-bordered table-hover" id="outputList"><thead><tr><th>Name</th><th>Type</th><th></th></tr></thead><tbody>';
                         //handle each device
+                        var newParts = {};
                         $.each(response["results"], function() {
-                            if (_parts[this["name"]] === undefined) {
+                            if (newParts[this["name"]] !== "added") {
                                 _parts[this["name"]] = this;
                                 toAppend = toAppend + '<tr><td>' + this["name"] + '</td><td>' + this["type"] + '</td><td><button class="btn btn-success savePartButton">Save</button></td></tr>';
+                                //handle each component
+                                $.each(this["components"], function() {
+                                    if (this["type"] !== undefined && newParts[this["name"]] !== "added") {
+                                        _parts[this["name"]] = this;
+                                        toAppend = toAppend + '<tr><td>' + this["name"] + '</td><td>' + this["type"] + '</td><td><button class="btn btn-success savePartButton">Save</button></td></tr>';
+                                        newParts[this["name"]] = "added";
+                                     }
+                                });
+                                newParts[this["name"]] = "added";
                             }
-                            //handle each component
-                            $.each(this["components"], function() {
-                                if (this["type"] !== undefined && _parts[this["name"]] === undefined) {
-                                    _parts[this["name"]] = this;
-                                    toAppend = toAppend + '<tr><td>' + this["name"] + '</td><td>' + this["type"] + '</td><td><button class="btn btn-success savePartButton">Save</button></td></tr>';
-                                }
-                            });
                         });
                         toAppend = toAppend + "</tbody></table>";
                         $('#outputListArea').html(toAppend);
                         $("#outputList").dataTable({
                             "bPaginate": false,
-                            "bScrollCollapse": true
+                            "sScrollY": "300px",
                         });
                         $('#outputListArea').parent().append('<button class=btn btn-large btn-success" id="saveAllButton">Save All Parts</button>');
                         $('.savePartButton').click(function() {
@@ -317,7 +320,9 @@ $(document).ready(function() {
                                 if (i > 0) {
                                     savePart(_parts[$(this).children('td:first').text()]);
                                 }
-                            })
+                            });
+                            $('.savePartButton').text("Saved");
+                            $('.savePartButton').addClass("disabled");
                             $(this).text("All Parts Saved");
                             $(this).addClass("disabled");
                         });
