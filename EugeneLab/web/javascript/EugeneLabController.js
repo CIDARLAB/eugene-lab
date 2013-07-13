@@ -47,6 +47,13 @@ $(document).ready(function() {
                 _partTypes[type] = "added";
                 newValue = 'PartType ' + type + '(name, sequence);\n' + newValue;
             }
+            var sequence = "";
+            if (_parts[name].sequence instanceof String) {
+                sequence = _parts[name].sequence;
+            } else {
+                sequence = _parts[name].sequence.sequence;
+            }
+            _parts[name].sequence
             newValue = newValue + '\n' + type + ' ' + name + '(' + name + ',' + _parts[name].sequence + ');';
             editor.setValue(newValue);
         });
@@ -297,7 +304,7 @@ $(document).ready(function() {
                                         _parts[this["name"]] = this;
                                         toAppend = toAppend + '<tr><td>' + this["name"] + '</td><td>' + this["type"] + '</td><td><button class="btn btn-success savePartButton">Save</button></td></tr>';
                                         newParts[this["name"]] = "added";
-                                     }
+                                    }
                                 });
                                 newParts[this["name"]] = "added";
                             }
