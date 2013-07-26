@@ -25,12 +25,13 @@ $(document).ready(function() {
         var drawn = {};
         var toAppend = '<table class="table table-bordered table-hover" id="partsList"><thead><tr><th>Name</th><th>Type</th></tr></thead><tbody>';
         $.each(data, function() {
-            if (this["type"] !== undefined && drawn[this["name"]] === undefined) {
-                if (this["type"].toLowerCase()) {
+            if (drawn[this["name"]] === undefined) {
+                if(this["type"] === undefined) {
+                    this["type"]="gene";
+                }
                     toAppend = toAppend + '<tr><td>' + this["name"] + '</td><td>' + this["type"] + '</td></tr>';
                     _parts[this["name"]] = this;
                     drawn[this["name"]] = "added";
-                }
             }
         });
         toAppend = toAppend + "</tbody></table>";
@@ -54,7 +55,7 @@ $(document).ready(function() {
                 sequence = _parts[name].sequence.sequence;
             }
             _parts[name].sequence
-            newValue = newValue + '\n' + type + ' ' + name + '(' + name + ',' + _parts[name].sequence + ');';
+            newValue = newValue + '\n' + type + ' ' + name + '(' + name + ',' + sequence + ');';
             editor.setValue(newValue);
         });
     };
@@ -99,7 +100,7 @@ $(document).ready(function() {
     $('#refreshButton').click(function() {
         var refreshType = $('ul#leftTabHeader li.active').text();
         if (refreshType === "Parts") {
-            send("query", '{"className":"BasicPart"}', function(data) {
+            send("query", '{"className":"org.clothocad.model.BasicPart"}', function(data) {
                 drawPartsList(data);
             });
 
@@ -384,7 +385,7 @@ $(document).ready(function() {
     };
 
     _connection.onopen = function(e) {
-        send("query", '{"className":"BasicPart"}', function(data) {
+        send("query", '{"className":"org.clothocad.model.BasicPart"}', function(data) {
 //            createTestData();
             drawPartsList(data);
         });
