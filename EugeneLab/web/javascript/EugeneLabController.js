@@ -1,4 +1,4 @@
-/* Gets a list of images from the server and adds them to the imageList
+ /* Gets a list of images from the server and adds them to the imageList
  * Also adds a unique id to each part, viewable when clicked
  */
 
@@ -20,7 +20,7 @@ $(document).ready(function() {
             "bScrollCollapse": true
         });
         $('tr').dblclick(function(){
-            alert($(this).children("td:first").html())
+            alert($(this).children("td:first").html());
         });
     });
 
@@ -72,10 +72,50 @@ $(document).ready(function() {
                     // Note: we also get this event, if persistence is on, and the page is reloaded.
 //                alert("You activated " + node.data.title);
                 },
+                onDblClick: function() {
+                    loadFile();
+                },      
                 persist: true,
                 children: children
             });
         });
+    };
+    
+    var getActiveNode = function() {
+        return $("#filesArea").dynatree("getActiveNode");
+    };
+    
+    // Return the active node's file extension
+    var getActiveNodeExtension = function() {
+        var node = getActiveNode();
+        var nodeName = node.data.title;
+            var parent = node.getParent();
+            while (parent.data.title !== null) {
+                nodeName = parent.data.title + "/" + nodeName;
+                parent = parent.getParent();
+            }
+        if (node.data.isFolder) {
+            nodeName += "/";
+        }
+        return nodeName;   
+    };
+    
+    var addNewFolder = function(newFolderName) {
+        var activeFolder = getActiveNodeExtension();
+        var newFolderExtension = activeFolder + newFolderName + "/";
+        var command = {"command": "addNewFolder", "extension": newFolderExtension };
+        $.post("EugeneServlet", command, function(response) {
+            var isSuccessful = response["isSuccessful"];
+            alert(JSON.stringify(response));
+            if(isSuccessful) {
+                getActiveNode().addChild({
+                    title: newFolderName,
+                    isFolder: true
+                });
+            } else {
+                alert("Folder name already exists");
+            }
+        });   
     };
 
     //save files
@@ -95,7 +135,40 @@ $(document).ready(function() {
             $('#newFileNameInput').val("");
         });
     };
+    
+    var getFileType = function() {
+        var fileName = $('#fileName').text();
+        var index = fileName.lastIndexOf('.');
+        var fileType = fileName.substring(index + 1);
+        return fileType;
+             
+    };
+    
+    
+    var currentFileExtension;
+    var setCurrentFileExtension = function(fileExtension) {
+        currentFileExtension = fileExtension;
+    };
+    var getCurrentFileExtension = function() {
+        return currentFileExtension;
+    };
+    
+    var loadFile = function() {
+        var node = getActiveNode();
+        if (node.data.isFolder) {
+            //do nothing i guess...
+        } else {
+            $('#fileName').text(node.data.title);
+            var fileName = getActiveNodeExtension();
+            setCurrentFileExtension(fileName);
+            $.get("EugeneServlet", {"command": "getFileContent", "fileName": fileName}, function(response) {
+                editor.setValue(response);
 
+            });
+        }
+    };
+    
+    
 
     //Event Handlers
     $('#startButton').click(function() {
@@ -103,7 +176,8 @@ $(document).ready(function() {
     });
 
     $('#createNewButton').click(function() {
-        var newFileName = $('#newFileNameInput').val() + ".eug";
+        var fileType = $("input:radio[name='file-type']:checked").val();
+        var newFileName = $('#newFileNameInput').val() + '.' + fileType;
         saveFile(newFileName);
     });
     $('#saveButton').click(function() {
@@ -112,24 +186,7 @@ $(document).ready(function() {
     });
 
     $('#loadButton').click(function() {
-        var node = $("#filesArea").dynatree("getActiveNode")
-        if (node.data.isFolder) {
-            //do nothing i guess...
-        } else {
-            var fileName = node.data.title;
-            $('#fileName').text(fileName);
-            var parent = node.getParent();
-            while (parent.data.title !== null) {
-                fileName = parent.data.title + "/" + fileName;
-                parent = parent.getParent();
-            }
-            $.get("EugeneServlet", {"command": "getFileContent", "fileName": fileName}, function(response) {
-                editor.setValue(response);
-
-            });
-
-        }
-
+        loadFile();
     });
 
     $('#newDeviceButton').click(function() {
@@ -220,15 +277,29 @@ $(document).ready(function() {
             //Clicking run button sends current text to server
             //May want to modify to send file or collection of files to server(if Eugene program spans multiple files)
 
-                var input = editor.getValue();
                 $('#runButton').attr("disabled", "disabled");
+                var command;
                 
-                $.post("EugeneServlet", {"command": "execute", "input": input}, function(response) {
+                // Get file type to determine command
+                var fileType = getFileType();
+                var fileExtension = getCurrentFileExtension();
+                
+                // Command is based on the file type
+                if(fileType === 'eug') {
+                    command = {"input": editor.getValue(), "command":"execute"};
+                } else if(fileType === 'sbol') {
+                    command = {"input":fileExtension, "command":"executeSBOL"};
+                } else if(fileType === 'gbk') {
+                    command = {"input":fileExtension, "command":"executeGenBank"};
+                } else {
+                    command["command"] =  "executeOther";
+                }
+                $.post("EugeneServlet", command, function(response) {
+                    alert(JSON.stringify(response));  
                     $('#runButton').removeAttr("disabled");
-
                     if("good" == response["status"]) {
                         $.each(response["results"], function() {
-                            window.open(this["pigeon-uri"]);
+                            //window.open(this["pigeon-uri"]);
                         });
                     } else {
                         console.log(response["error"]);                        

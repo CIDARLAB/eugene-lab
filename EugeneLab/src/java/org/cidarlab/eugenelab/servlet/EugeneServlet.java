@@ -1,11 +1,17 @@
 package org.cidarlab.eugenelab.servlet;
 
 import eugene.EugeneExecutor;
+import eugene.data.genbank.GenbankImporter;
+import eugene.data.sbol.SBOLImporter;
+import eugene.dom.NamedElement;
 import eugene.dom.SavableElement;
+import eugene.dom.collection.Collection;
 import eugene.dom.components.Component;
 import eugene.dom.components.Device;
 import eugene.dom.components.Part;
 import eugene.dom.components.types.PartType;
+import eugene.exception.EugeneException;
+import eugene.exception.InvalidEugeneAssignmentException;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -43,16 +49,17 @@ import org.json.JSONObject;
  */
 public class EugeneServlet extends HttpServlet {
 
-//    /* here is our Clotho instance */
-//    private Clotho clotho;
-//
-//    @Override
-//    public void init() 
-//            throws ServletException {
-//    
-//        super.init();
-//        this.clotho = ClothoFactory.getAPI("ws://cidar.bu.edu/clotho/websocket");
-//    }
+    /* here is our Clotho instance */
+    /*private Clotho clotho;
+
+    @Override
+    public void init() 
+            throws ServletException {
+    
+        super.init();
+        this.clotho = ClothoFactory.getAPI("ws://cidar.bu.edu/clotho/websocket");
+    }
+    */ 
     /**
      * Processes requests for both HTTP
      * <code>GET</code> and
@@ -228,7 +235,30 @@ public class EugeneServlet extends HttpServlet {
                 String input = request.getParameter("input");
                 JSONObject result = executeEugene(input);
                 out.write(result.toString());
-            } else if (command.equals("saveFileContent")) {
+            } else if(command.equals("executeSBOL")) {
+                //@TODO: response should be JSON
+                response.setContentType("text/html;charset=UTF-8");
+                String fileName = request.getParameter("input");
+                fileName = getFileExtension(fileName, true);
+                NamedElement eugeneConversion;
+                String exceptionAsString = "";
+                try {
+                    eugeneConversion = convertSBOL(fileName);
+                } catch (EugeneException ex) {
+                    Logger.getLogger(EugeneServlet.class.getName()).log(Level.SEVERE, null, ex);
+                    exceptionAsString = ex.toString();
+                    eugeneConversion = null;
+                }
+                String results;
+                if(eugeneConversion == null) {
+                    results = "{\"result\":\"" + exceptionAsString + "\",\"status\":\"bad\"}";
+                } else {
+                    results = "{\"results\":\"" + eugeneConversion.toString() + "\"}";
+                }
+                out.write(results);
+            } else if(command.equals("executeGenBank")) {
+                
+            }else if (command.equals("saveFileContent")) {
                 String fileName = request.getParameter("fileName");
                 String currentFolder = request.getParameter("currentFolder");
                 String fileContent = request.getParameter("fileContent");
@@ -237,6 +267,10 @@ public class EugeneServlet extends HttpServlet {
                 String sPigeon = request.getParameter("pigeon");
                 WeyekinPoster.setPigeonText(sPigeon);
                 WeyekinPoster.postMyBird();
+           } else if("addNewFolder".equals(command)) {
+               String extension = request.getParameter("extension");
+               boolean isSuccessful = createNewFolder(extension);
+               out.write("{\"isSuccessful\":" + isSuccessful + "}");
            }
             out.flush();
             out.close();            
@@ -369,7 +403,6 @@ public class EugeneServlet extends HttpServlet {
                         Device objDevice = (Device) objElement;
                         
                         JSONObject deviceJSON = this.toJSON(objDevice);
-
                         // now, we could store it in the Clotho DB...
                         WeyekinPoster.setPigeonText(
                                 deviceJSON.get("Pigeon").toString());
@@ -496,6 +529,12 @@ public class EugeneServlet extends HttpServlet {
         file = file.getAbsoluteFile();
         file.delete();
     }
+    
+    private boolean createNewFolder(String folderExtension) {
+        folderExtension = getFileExtension(folderExtension, false);
+        File newFolder = new File(folderExtension);
+        return newFolder.mkdir(); //returns true if successful
+    }
 
     private String getFileExtension(String localExtension, boolean isFile) {
         String extension = this.getServletContext().getRealPath("/") + "data/" + getCurrentUser() + "/" + localExtension;
@@ -591,5 +630,33 @@ public class EugeneServlet extends HttpServlet {
         deviceJSON.put("Pigeon", sPigeon);
 
         return deviceJSON;
+    }
+    
+    // Takes an SBOL file and converts it into a eugene device
+    private NamedElement convertSBOL(String sbolFileName) throws EugeneException {
+        return SBOLImporter.importSBOL(sbolFileName);
+    }
+    
+    private Part convertGenbank(String genBankFileName, PartType partType) {
+        try {
+            return GenbankImporter.importPart(partType, genBankFileName);
+        } catch (Exception ex) {
+            Logger.getLogger(EugeneServlet.class.getName()).log(Level.SEVERE, null, ex);
+            return null;
+        }
+    }
+    
+    // Takes a device and stores it in Clotho
+    private boolean toClotho(NamedElement element) {
+        try {
+            if(element instanceof Device) {
+                //return clotho.create(this.toJSON((Device)element));   
+            } else if(element instanceof Part) {
+                
+            }
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+        return true;
     }
 }
