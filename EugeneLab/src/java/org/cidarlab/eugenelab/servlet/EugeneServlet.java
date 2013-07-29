@@ -236,26 +236,21 @@ public class EugeneServlet extends HttpServlet {
                 JSONObject result = executeEugene(input);
                 out.write(result.toString());
             } else if(command.equals("executeSBOL")) {
-                //@TODO: response should be JSON
-                response.setContentType("text/html;charset=UTF-8");
                 String fileName = request.getParameter("input");
                 fileName = getFileExtension(fileName, true);
                 NamedElement eugeneConversion;
-                String exceptionAsString = "";
+                String result;
                 try {
                     eugeneConversion = convertSBOL(fileName);
-                } catch (EugeneException ex) {
-                    Logger.getLogger(EugeneServlet.class.getName()).log(Level.SEVERE, null, ex);
-                    exceptionAsString = ex.toString();
-                    eugeneConversion = null;
+                    result = eugeneConversion.toString().replaceAll("[\r\n\t]+", " ");
+                    result = "{\"results\":\"" + result + "\", \"status\":\"good\"}";
+                } catch (EugeneException e) {
+                    e.printStackTrace();
+                    String exceptionAsString = e.toString().replaceAll("[\r\n\t]+", " ");
+                    exceptionAsString = exceptionAsString.replaceAll("[\"]+", "'");
+                    result = "{\"result\":\"" + exceptionAsString + "\",\"status\":\"bad\"}";
                 }
-                String results;
-                if(eugeneConversion == null) {
-                    results = "{\"result\":\"" + exceptionAsString + "\",\"status\":\"bad\"}";
-                } else {
-                    results = "{\"results\":\"" + eugeneConversion.toString() + "\"}";
-                }
-                out.write(results);
+                out.write(result);
             } else if(command.equals("executeGenBank")) {
                 
             }else if (command.equals("saveFileContent")) {

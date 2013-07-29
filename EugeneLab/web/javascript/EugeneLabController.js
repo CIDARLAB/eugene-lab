@@ -292,7 +292,7 @@ $(document).ready(function() {
                 } else if(fileType === 'gbk') {
                     command = {"input":fileExtension, "command":"executeGenBank"};
                 } else {
-                    command["command"] =  "executeOther";
+                    // @TODO: Add other file types
                 }
                 $.post("EugeneServlet", command, function(response) {
                     alert(JSON.stringify(response));  
