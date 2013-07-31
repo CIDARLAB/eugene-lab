@@ -20,6 +20,11 @@ $(document).ready(function() {
     var savePart = function(part) {
 //        alert(JSON.stringify(part));
         send("create", JSON.stringify(part));
+        if(part["schema"]==="BasicPart") {
+            //save basic part
+        } else {
+            
+        }
     };
     var drawPartsList = function(data) {
         var drawn = {};
@@ -100,7 +105,7 @@ $(document).ready(function() {
     $('#refreshButton').click(function() {
         var refreshType = $('ul#leftTabHeader li.active').text();
         if (refreshType === "Parts") {
-            send("query", '{"className":"org.clothocad.model.BasicPart"}', function(data) {
+            send("query", '{"schema":"BasicPart"}', function(data) {
                 drawPartsList(data);
             });
 
@@ -359,6 +364,17 @@ $(document).ready(function() {
     var _requestID = 0;
 
 
+    var send = function(channel, data, callback) {
+        if (_connection.readyState === 1) {
+            var message = '{"channel":"' + channel + '", "data":' + data + ',"requestId":"' + _requestID + '"}';
+//            alert("sending:\n" + message);
+            _requestCommand[_requestID] = callback;
+            _connection.send(message);
+            _requestID++;
+        } else {
+            _connection = new WebSocket('ws://localhost:8080/websocket');
+        }
+    };
     _connection.onmessage = function(e) {
         //parase message into JSON
         var dataJSON = $.parseJSON(e.data);
@@ -368,9 +384,7 @@ $(document).ready(function() {
             //if callback function exists, run it
             var callback = _requestCommand[requestId];
             if (callback !== undefined) {
-//                alert("calling back with: " + e.data)
                 callback(dataJSON["data"]);
-                //remove the callback
                 delete _requestCommand[requestId];
             }
         }
@@ -385,23 +399,10 @@ $(document).ready(function() {
     };
 
     _connection.onopen = function(e) {
-        send("query", '{"className":"org.clothocad.model.BasicPart"}', function(data) {
+        send("query", '{"schema":"BasicPart"}', function(data) {
 //            createTestData();
             drawPartsList(data);
         });
-    };
-
-
-    var send = function(channel, data, callback) {
-        if (_connection.readyState === 1) {
-            var message = '{"channel":"' + channel + '", "data":' + data + ',"requestId":"' + _requestID + '"}';
-//            alert("sending:\n" + message);
-            _requestCommand[_requestID] = callback;
-            _connection.send(message);
-            _requestID++;
-        } else {
-            _connection = new WebSocket('ws://localhost:8080/websocket');
-        }
     };
 
 
