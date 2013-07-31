@@ -13,15 +13,15 @@ $(document).ready(function() {
 
 
 
-
-
     /********Functions********/
     //load files list
     var savePart = function(part) {
 //        alert(JSON.stringify(part));
         send("create", JSON.stringify(part));
+        var objId = new ObjectId().toString();
         if(part["schema"]==="BasicPart") {
             //save basic part
+//            send("create", {_id:objId,""});
         } else {
             
         }
@@ -30,13 +30,13 @@ $(document).ready(function() {
         var drawn = {};
         var toAppend = '<table class="table table-bordered table-hover" id="partsList"><thead><tr><th>Name</th><th>Type</th></tr></thead><tbody>';
         $.each(data, function() {
-            if (drawn[this["name"]] === undefined) {
+            if (drawn[this["id"]] === undefined) {
                 if(this["type"] === undefined) {
                     this["type"]="gene";
                 }
-                    toAppend = toAppend + '<tr><td>' + this["name"] + '</td><td>' + this["type"] + '</td></tr>';
-                    _parts[this["name"]] = this;
-                    drawn[this["name"]] = "added";
+                    toAppend = toAppend + '<tr><td val="'+this["id"]+'">' + this["name"] + '</td><td>' + this["type"] + '</td></tr>';
+                    _parts[this["id"]] = this;
+                    drawn[this["id"]] = "added";
             }
         });
         toAppend = toAppend + "</tbody></table>";
@@ -48,18 +48,18 @@ $(document).ready(function() {
         $('tr').dblclick(function() {
             var newValue = editor.getValue();
             var type = $(this).children("td:last").text();
-            var name = $(this).children("td:first").text();
+            var id = $(this).children("td:first").attr("val");
             if (_partTypes[type] === undefined) {
                 _partTypes[type] = "added";
                 newValue = 'PartType ' + type + '(name, sequence);\n' + newValue;
             }
             var sequence = "";
-            if (_parts[name].sequence instanceof String) {
-                sequence = _parts[name].sequence;
+            var name = _parts[id].name
+            if (_parts[id].sequence instanceof String) {
+                sequence = _parts[id].sequence;
             } else {
-                sequence = _parts[name].sequence.sequence;
+                sequence = _parts[id].sequence.sequence;
             }
-            _parts[name].sequence
             newValue = newValue + '\n' + type + ' ' + name + '(' + name + ',' + sequence + ');';
             editor.setValue(newValue);
         });
@@ -76,7 +76,7 @@ $(document).ready(function() {
                     // Note: we also get this event, if persistence is on, and the page is reloaded.
 //                alert("You activated " + node.data.title);
                 },
-                persist: true,
+                persist: false,
                 children: children
             });
             $('#filesArea').dynatree("getTree").reload();
@@ -303,12 +303,12 @@ $(document).ready(function() {
                         $.each(response["results"], function() {
                             if (newParts[this["name"]] !== "added") {
                                 _parts[this["name"]] = this;
-                                toAppend = toAppend + '<tr><td>' + this["name"] + '</td><td>' + this["type"] + '</td><td><button class="btn btn-success savePartButton">Save</button></td></tr>';
+                                toAppend = toAppend + '<tr><td val="'+this["id"]+'">' + this["name"] + '</td><td>' + this["type"] + '</td><td><button class="btn btn-success savePartButton">Save</button></td></tr>';
                                 //handle each component
                                 $.each(this["components"], function() {
                                     if (this["type"] !== undefined && newParts[this["name"]] !== "added") {
                                         _parts[this["name"]] = this;
-                                        toAppend = toAppend + '<tr><td>' + this["name"] + '</td><td>' + this["type"] + '</td><td><button class="btn btn-success savePartButton">Save</button></td></tr>';
+                                        toAppend = toAppend + '<tr><td val="'+this["id"]+'">' + this["name"] + '</td><td>' + this["type"] + '</td><td><button class="btn btn-success savePartButton">Save</button></td></tr>';
                                         newParts[this["name"]] = "added";
                                     }
                                 });
@@ -368,7 +368,7 @@ $(document).ready(function() {
         if (_connection.readyState === 1) {
             var message = '{"channel":"' + channel + '", "data":' + data + ',"requestId":"' + _requestID + '"}';
 //            alert("sending:\n" + message);
-            _requestCommand[_requestID] = callback;
+            _requestCommand[channel+_requestID] = callback;
             _connection.send(message);
             _requestID++;
         } else {
@@ -379,13 +379,14 @@ $(document).ready(function() {
         //parase message into JSON
         var dataJSON = $.parseJSON(e.data);
         //ignore say messages which have not requestId
+        var channel = dataJSON["channel"];
         var requestId = dataJSON["requestId"];
         if (requestId !== null) {
             //if callback function exists, run it
-            var callback = _requestCommand[requestId];
+            var callback = _requestCommand[channel+requestId];
             if (callback !== undefined) {
                 callback(dataJSON["data"]);
-                delete _requestCommand[requestId];
+                delete _requestCommand[channel+requestId];
             }
         }
     };
