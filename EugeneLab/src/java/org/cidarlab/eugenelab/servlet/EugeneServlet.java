@@ -4,11 +4,13 @@ import eugene.EugeneExecutor;
 import eugene.data.genbank.GenbankImporter;
 import eugene.data.sbol.SBOLImporter;
 import eugene.dom.NamedElement;
+import eugene.dom.PropertyValue;
 import eugene.dom.SavableElement;
 import eugene.dom.collection.Collection;
 import eugene.dom.components.Component;
 import eugene.dom.components.Device;
 import eugene.dom.components.Part;
+import eugene.dom.components.Property;
 import eugene.dom.components.types.PartType;
 import eugene.exception.EugeneException;
 import eugene.exception.InvalidEugeneAssignmentException;
@@ -19,11 +21,16 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletConfig;
@@ -36,6 +43,11 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.biojava.bio.BioException;
+import org.biojava.bio.seq.Feature;
+import org.biojava.bio.seq.Sequence;
+import org.biojava.bio.seq.SequenceIterator;
+import org.biojava.bio.seq.io.SeqIOTools;
 import org.cidarlab.weyekin.WeyekinPoster;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -252,6 +264,34 @@ public class EugeneServlet extends HttpServlet {
                 }
                 out.write(result);
             } else if(command.equals("executeGenBank")) {
+                response.setContentType("text/plain");
+                String result;
+                String fileName = request.getParameter("input");
+                fileName = getFileExtension(fileName, true);
+                try {
+                    Component c = importGenbankComponent(fileName);
+                    result = c.toString();
+                } catch(Exception e) {
+                    result = e.toString();
+                }
+                out.write(result);
+                //try {
+                    /*String fileName = request.getParameter("input");
+                    fileName = getFileExtension(fileName, true);
+                    try {
+                        out.write(convertGenbank(fileName));
+                    } catch (Exception e) {
+                        out.write(e.toString());
+                    }*/
+                    /*
+                    Part p = GenbankImporter.importPart(new PartType("RBS"), "B0030");
+                    result = p.toString();
+                } catch (Exception ex) {
+                    Logger.getLogger(EugeneServlet.class.getName()).log(Level.SEVERE, null, ex);
+                    result = ex.toString();
+                }
+                out.write(result);
+                * */
                 
             }else if (command.equals("saveFileContent")) {
                 String fileName = request.getParameter("fileName");
@@ -632,13 +672,45 @@ public class EugeneServlet extends HttpServlet {
         return SBOLImporter.importSBOL(sbolFileName);
     }
     
-    private Part convertGenbank(String genBankFileName, PartType partType) {
-        try {
-            return GenbankImporter.importPart(partType, genBankFileName);
-        } catch (Exception ex) {
-            Logger.getLogger(EugeneServlet.class.getName()).log(Level.SEVERE, null, ex);
+    private static Component importGenbankComponent(String sFileName) throws MalformedURLException, IOException, 
+            NoSuchElementException, BioException, InvalidEugeneAssignmentException {
+        //Website has files embedded in the website so need to find a way to isolate the file from the rest of the website
+        //Currently using direct file upload to test
+	//URL url = new URL("http://www.ncbi.nlm.nih.gov/nuccore/" + sFileName);
+	BufferedReader in = new BufferedReader(new FileReader(sFileName));//new InputStreamReader(url.openStream()));
+	SequenceIterator sequences = SeqIOTools.readGenbank(in);
+        List<Component> parts = new ArrayList<Component>();
+        int i = 0;
+	// Can this lead to multiple devices?
+        while(sequences.hasNext()) {
+            Sequence seq = sequences.nextSequence();
+            Iterator it = seq.features();
+            while(it.hasNext()) {
+                Feature feature = (Feature) it.next();
+                //Feature is essentially the Genbank version of a part
+                PartType partType = new PartType(feature.getType());
+                // Still need a part name
+                String partName = feature.getType() + "_part" + i;
+                Part part = new Part(partType, partName);
+                // Add the sequence to the part
+                Property property = new Property("sequence", "txt");
+                PropertyValue propertyValue = new PropertyValue("sequence", "txt");
+                propertyValue.setTxt(feature.getSequence().seqString());
+                part.setValue(property, propertyValue);
+                parts.add(part);
+                i++;
+            }
+	}
+        if(parts.isEmpty()) {
             return null;
+        } else if(parts.size() == 1) {
+            // File is just a device
+            return parts.get(0);
+        } else {
+            //Will be able to get actual device name when website file upload works
+            return Device.newInstance("DeviceName", parts);
         }
+		
     }
     
     // Takes a device and stores it in Clotho

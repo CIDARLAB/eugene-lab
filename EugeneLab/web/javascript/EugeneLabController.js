@@ -289,7 +289,7 @@ $(document).ready(function() {
                     command = {"input": editor.getValue(), "command":"execute"};
                 } else if(fileType === 'sbol') {
                     command = {"input":fileExtension, "command":"executeSBOL"};
-                } else if(fileType === 'gbk') {
+                } else if(fileType === 'gbk'|| fileType === 'gb') {
                     command = {"input":fileExtension, "command":"executeGenBank"};
                 } else {
                     // @TODO: Add other file types
