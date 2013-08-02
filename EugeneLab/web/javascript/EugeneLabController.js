@@ -67,6 +67,10 @@ $(document).ready(function() {
                         //create new basic parts
                         basicPartId = new ObjectId().toString();
                         var basicSeqId = new ObjectId().toString();
+
+                        _parts[basicPart["name"]] = basicPart;
+                        _partIds[basicPart["name"]] = basicPartId;
+                        
                         send("create", JSON.stringify({
                             schema: "BasicPart",
                             _id: basicPartId,
@@ -88,10 +92,10 @@ $(document).ready(function() {
                             riskGroup: 0,
                             showDetail: true
                         })
-                        );
-                        composition.push(basicPartId);
-                        compositeSequence = compositeSequence + basicPart.sequence;
+                                );
                     }
+                    composition.push(basicPartId);
+                    compositeSequence = compositeSequence + basicPart.sequence;
                 }
 
                 //create composite part
@@ -111,7 +115,7 @@ $(document).ready(function() {
                         isLocked: false
                     },
                     name: part["name"],
-                    composition:composition,
+                    composition: composition,
                     format: "FreeForm",
                     type: "composite",
                     riskGroup: 0,
