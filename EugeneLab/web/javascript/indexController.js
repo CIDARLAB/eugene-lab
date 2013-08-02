@@ -21,10 +21,10 @@ $(document).ready(function() {
     }
     else {
         connection.onopen = function(e) {
-            connection.send('{"channel": "create", "data": {"schema":"BasicPart","name":"mooPart", "sequence":"CCCC"}, "requestId":"6"}');
-            connection.send('{"channel": "create", "data": {"schema":"BasicPart","name":"mooPart2", "sequence":"CCCC"}, "requestId":"7"}');
-            connection.send('{"channel": "create", "data": {"schema":"BasicPart","name":"mooPart3", "sequence":"CCCC"}, "requestId":"8"}');
-            connection.send('{"channel": "query",  "data": {"schema":"BasicPart"},"requestId":"9"}');
+//            connection.send('{"channel": "create", "data": {"schema":"BasicPart","name":"mooPart", "sequence":"CCCC"}, "requestId":"6"}');
+//            connection.send('{"channel": "create", "data": {"schema":"BasicPart","name":"mooPart2", "sequence":"CCCC"}, "requestId":"7"}');
+//            connection.send('{"channel": "create", "data": {"schema":"BasicPart","name":"mooPart3", "sequence":"CCCC"}, "requestId":"8"}');
+//            connection.send('{"channel": "query",  "data": {"schema":"BasicPart"},"requestId":"9"}');
 
 //            connection.close();
         }
