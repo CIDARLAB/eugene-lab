@@ -9,7 +9,7 @@ $(document).ready(function() {
     var _properties = {};
     var _partTypes = {};
     var _parts = {}; //key: name, value: part JSON
-    var _partIDs = {}; //key: name, value: uuid
+    var _partIds = {}; //key: name, value: uuid
 
 
 
@@ -17,37 +17,109 @@ $(document).ready(function() {
 
     /********Functions********/
     //load files list
-    var savePart = function(part) {
-//        alert(JSON.stringify(part));
-        send("create", JSON.stringify(part));
-        var partId = new ObjectId().toString();
+    var savePart = function(part, partId) {
+//        send("create", JSON.stringify(part));
+        if (partId === undefined) {
+            partId = new ObjectId().toString();
+        }
         var seqId = new ObjectId().toString();
         if (part["schema"] === "BasicPart") {
             //save basic part
-            send("create", {
-                schema: "BasicPart",
-                _id: partId,
-                author: "51e9579344ae846673a51b0f", //this probably shouldnt be hard coded later...
-                shortDescription: this["pigeon"],
-                sequence: {
-                    _id: seqId,
-                    isRNA: false,
-                    isSingleStranded: false,
-                    sequence: part["sequence"],
-                    isDegenerate: false,
-                    isLinear: false,
-                    isCircular: false,
-                    isLocked: false
-                },
-                name: part["name"],
-                format: "FreeForm",
-                type: this["type"],
-                riskGroup: 0,
-                "$$hashKey": partId,
-                showDetail: true
-            });
+            if (_partIds[part["name"]] === undefined) {
+                _parts[part["name"]] = part;
+                _partIds[part["name"]] = partId;
+                send("create", JSON.stringify({
+                    schema: "BasicPart",
+                    _id: partId,
+                    author: "51e9579344ae846673a51b0f", //this probably shouldnt be hard coded later...
+                    shortDescription: part["pigeon"],
+                    sequence: {
+                        _id: seqId,
+                        isRNA: false,
+                        isSingleStranded: false,
+                        sequence: part["sequence"],
+                        isDegenerate: false,
+                        isLinear: false,
+                        isCircular: false,
+                        isLocked: false
+                    },
+                    name: part["name"],
+                    format: "FreeForm",
+                    type: this["type"],
+                    riskGroup: 0,
+                    showDetail: true
+                }
+                ));
+            }
         } else if (part["schema"] === "CompositePart") {
+            if (_partIds[part["name"]] === undefined) {
+                //create new part if it doesn't exist already
+                _parts[part["name"]] = part;
+                _partIds[part["name"]] = partId;
 
+                //gather the composition and sequence of the composite part
+                var composition = []
+                var compositeSequence = "";
+                for (var i = 0; i < part["components"].length; i++) {
+                    var basicPart = part["components"][i];
+                    var basicPartId = _partIds[basicPart.name];
+                    if (basicPartId === undefined) {
+                        //create new basic parts
+                        basicPartId = new ObjectId().toString();
+                        var basicSeqId = new ObjectId().toString();
+                        send("create", JSON.stringify({
+                            schema: "BasicPart",
+                            _id: basicPartId,
+                            author: "51e9579344ae846673a51b0f", //this probably shouldnt be hard coded later...
+                            shortDescription: basicPart["pigeon"],
+                            sequence: {
+                                _id: basicSeqId,
+                                isRNA: false,
+                                isSingleStranded: false,
+                                sequence: basicPart["sequence"],
+                                isDegenerate: false,
+                                isLinear: false,
+                                isCircular: false,
+                                isLocked: false
+                            },
+                            name: basicPart["name"],
+                            format: "FreeForm",
+                            type: basicPart["type"],
+                            riskGroup: 0,
+                            showDetail: true
+                        })
+                        );
+                        composition.push(basicPartId);
+                        compositeSequence = compositeSequence + basicPart.sequence;
+                    }
+                }
+
+                //create composite part
+                send("create", JSON.stringify({
+                    schema: "CompositePart",
+                    _id: partId,
+                    author: "51e9579344ae846673a51b0f", //this probably shouldnt be hard coded later...
+                    shortDescription: this["pigeon"],
+                    sequence: {
+                        _id: seqId,
+                        isRNA: false,
+                        isSingleStranded: false,
+                        sequence: compositeSequence,
+                        isDegenerate: false,
+                        isLinear: false,
+                        isCircular: false,
+                        isLocked: false
+                    },
+                    name: part["name"],
+                    composition:composition,
+                    format: "FreeForm",
+                    type: "composite",
+                    riskGroup: 0,
+                    showDetail: true
+                }
+                ));
+
+            }
         } else {
 //            probably not a part at all
         }
@@ -63,7 +135,7 @@ $(document).ready(function() {
                 }
                 toAppend = toAppend + '<tr><td>' + this["name"] + '</td><td>' + this["type"] + '</td></tr>';
                 _parts[this["name"]] = this;
-                _partIDs[this["name"]] = this['_id'];
+                _partIds[this["name"]] = this['id'];
                 drawn[this["name"]] = "added";
             }
         });
@@ -82,7 +154,7 @@ $(document).ready(function() {
                 newValue = 'PartType ' + type + '(name, sequence);\n' + newValue;
             }
             var sequence = "";
-            if (typeof _parts[name].sequence ==="string") {
+            if (typeof _parts[name].sequence === "string") {
                 sequence = _parts[name].sequence;
             } else {
                 sequence = _parts[name].sequence.sequence;
