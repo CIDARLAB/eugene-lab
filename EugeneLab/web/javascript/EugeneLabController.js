@@ -8,7 +8,9 @@ $(document).ready(function() {
     var deviceCount = 0;
     var _properties = {};
     var _partTypes = {};
-    var _parts = [];
+    var _parts = {}; //key: name, value: part JSON
+    var _partIDs = {}; //key: name, value: uuid
+
 
 
 
@@ -18,25 +20,51 @@ $(document).ready(function() {
     var savePart = function(part) {
 //        alert(JSON.stringify(part));
         send("create", JSON.stringify(part));
-        var objId = new ObjectId().toString();
-        if(part["schema"]==="BasicPart") {
+        var partId = new ObjectId().toString();
+        var seqId = new ObjectId().toString();
+        if (part["schema"] === "BasicPart") {
             //save basic part
-//            send("create", {_id:objId,""});
+            send("create", {
+                schema: "BasicPart",
+                _id: partId,
+                author: "51e9579344ae846673a51b0f", //this probably shouldnt be hard coded later...
+                shortDescription: this["pigeon"],
+                sequence: {
+                    _id: seqId,
+                    isRNA: false,
+                    isSingleStranded: false,
+                    sequence: part["sequence"],
+                    isDegenerate: false,
+                    isLinear: false,
+                    isCircular: false,
+                    isLocked: false
+                },
+                name: part["name"],
+                format: "FreeForm",
+                type: this["type"],
+                riskGroup: 0,
+                "$$hashKey": partId,
+                showDetail: true
+            });
+        } else if (part["schema"] === "CompositePart") {
+
         } else {
-            
+//            probably not a part at all
         }
     };
+
     var drawPartsList = function(data) {
         var drawn = {};
         var toAppend = '<table class="table table-bordered table-hover" id="partsList"><thead><tr><th>Name</th><th>Type</th></tr></thead><tbody>';
         $.each(data, function() {
-            if (drawn[this["id"]] === undefined) {
-                if(this["type"] === undefined) {
-                    this["type"]="gene";
+            if (drawn[this["name"]] === undefined) {
+                if (this["type"] === undefined) {
+                    this["type"] = "gene";
                 }
-                    toAppend = toAppend + '<tr><td val="'+this["id"]+'">' + this["name"] + '</td><td>' + this["type"] + '</td></tr>';
-                    _parts[this["id"]] = this;
-                    drawn[this["id"]] = "added";
+                toAppend = toAppend + '<tr><td>' + this["name"] + '</td><td>' + this["type"] + '</td></tr>';
+                _parts[this["name"]] = this;
+                _partIDs[this["name"]] = this['_id'];
+                drawn[this["name"]] = "added";
             }
         });
         toAppend = toAppend + "</tbody></table>";
@@ -48,17 +76,16 @@ $(document).ready(function() {
         $('tr').dblclick(function() {
             var newValue = editor.getValue();
             var type = $(this).children("td:last").text();
-            var id = $(this).children("td:first").attr("val");
+            var name = $(this).children("td:first").text();
             if (_partTypes[type] === undefined) {
                 _partTypes[type] = "added";
                 newValue = 'PartType ' + type + '(name, sequence);\n' + newValue;
             }
             var sequence = "";
-            var name = _parts[id].name
-            if (_parts[id].sequence instanceof String) {
-                sequence = _parts[id].sequence;
+            if (typeof _parts[name].sequence ==="string") {
+                sequence = _parts[name].sequence;
             } else {
-                sequence = _parts[id].sequence.sequence;
+                sequence = _parts[name].sequence.sequence;
             }
             newValue = newValue + '\n' + type + ' ' + name + '(' + name + ',' + sequence + ');';
             editor.setValue(newValue);
@@ -303,12 +330,12 @@ $(document).ready(function() {
                         $.each(response["results"], function() {
                             if (newParts[this["name"]] !== "added") {
                                 _parts[this["name"]] = this;
-                                toAppend = toAppend + '<tr><td val="'+this["id"]+'">' + this["name"] + '</td><td>' + this["type"] + '</td><td><button class="btn btn-success savePartButton">Save</button></td></tr>';
+                                toAppend = toAppend + '<tr><td>' + this["name"] + '</td><td>' + this["type"] + '</td><td><button class="btn btn-success savePartButton">Save</button></td></tr>';
                                 //handle each component
                                 $.each(this["components"], function() {
                                     if (this["type"] !== undefined && newParts[this["name"]] !== "added") {
                                         _parts[this["name"]] = this;
-                                        toAppend = toAppend + '<tr><td val="'+this["id"]+'">' + this["name"] + '</td><td>' + this["type"] + '</td><td><button class="btn btn-success savePartButton">Save</button></td></tr>';
+                                        toAppend = toAppend + '<tr><td>' + this["name"] + '</td><td>' + this["type"] + '</td><td><button class="btn btn-success savePartButton">Save</button></td></tr>';
                                         newParts[this["name"]] = "added";
                                     }
                                 });
@@ -367,8 +394,7 @@ $(document).ready(function() {
     var send = function(channel, data, callback) {
         if (_connection.readyState === 1) {
             var message = '{"channel":"' + channel + '", "data":' + data + ',"requestId":"' + _requestID + '"}';
-//            alert("sending:\n" + message);
-            _requestCommand[channel+_requestID] = callback;
+            _requestCommand[channel + _requestID] = callback;
             _connection.send(message);
             _requestID++;
         } else {
@@ -383,10 +409,10 @@ $(document).ready(function() {
         var requestId = dataJSON["requestId"];
         if (requestId !== null) {
             //if callback function exists, run it
-            var callback = _requestCommand[channel+requestId];
+            var callback = _requestCommand[channel + requestId];
             if (callback !== undefined) {
                 callback(dataJSON["data"]);
-                delete _requestCommand[channel+requestId];
+                delete _requestCommand[channel + requestId];
             }
         }
     };
