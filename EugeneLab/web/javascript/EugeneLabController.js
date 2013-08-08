@@ -103,7 +103,7 @@ $(document).ready(function() {
                     schema: "CompositePart",
                     _id: partId,
                     author: "51e9579344ae846673a51b0f", //this probably shouldnt be hard coded later...
-                    shortDescription: this["pigeon"],
+                    shortDescription: part["pigeon"],
                     sequence: {
                         _id: seqId,
                         isRNA: false,
