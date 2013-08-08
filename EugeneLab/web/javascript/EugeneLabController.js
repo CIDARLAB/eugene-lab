@@ -45,7 +45,7 @@ $(document).ready(function() {
                     },
                     name: part["name"],
                     format: "FreeForm",
-                    type: this["type"],
+                    type: part["type"],
                     riskGroup: 0,
                     showDetail: true
                 }
