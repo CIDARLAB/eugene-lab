@@ -1,4 +1,4 @@
-/* Gets a list of images from the server and adds them to the imageList
+ /* Gets a list of images from the server and adds them to the imageList
  * Also adds a unique id to each part, viewable when clicked
  */
 
@@ -186,6 +186,43 @@ $(document).ready(function() {
             $('#filesArea').dynatree("getTree").reload();
         });
     };
+    
+    var getActiveNode = function() {
+        return $("#filesArea").dynatree("getActiveNode");
+    };
+    
+    // Return the active node's file extension
+    var getActiveNodeExtension = function() {
+        var node = getActiveNode();
+        var nodeName = node.data.title;
+            var parent = node.getParent();
+            while (parent.data.title !== null) {
+                nodeName = parent.data.title + "/" + nodeName;
+                parent = parent.getParent();
+            }
+        if (node.data.isFolder) {
+            nodeName += "/";
+        }
+        return nodeName;   
+    };
+    
+    var addNewFolder = function(newFolderName) {
+        var activeFolder = getActiveNodeExtension();
+        var newFolderExtension = activeFolder + newFolderName + "/";
+        var command = {"command": "addNewFolder", "extension": newFolderExtension };
+        $.post("EugeneServlet", command, function(response) {
+            var isSuccessful = response["isSuccessful"];
+            alert(JSON.stringify(response));
+            if(isSuccessful) {
+                getActiveNode().addChild({
+                    title: newFolderName,
+                    isFolder: true
+                });
+            } else {
+                alert("Folder name already exists");
+            }
+        });   
+    };
 
     //save files
     var saveFile = function(newFileName) {
@@ -203,7 +240,40 @@ $(document).ready(function() {
             $('#newFileNameInput').val("");
         });
     };
+    
+    var getFileType = function() {
+        var fileName = $('#fileName').text();
+        var index = fileName.lastIndexOf('.');
+        var fileType = fileName.substring(index + 1);
+        return fileType;
+             
+    };
+    
+    
+    var currentFileExtension;
+    var setCurrentFileExtension = function(fileExtension) {
+        currentFileExtension = fileExtension;
+    };
+    var getCurrentFileExtension = function() {
+        return currentFileExtension;
+    };
+    
+    var loadFile = function() {
+        var node = getActiveNode();
+        if (node.data.isFolder) {
+            //do nothing i guess...
+        } else {
+            $('#fileName').text(node.data.title);
+            var fileName = getActiveNodeExtension();
+            setCurrentFileExtension(fileName);
+            $.get("EugeneServlet", {"command": "getFileContent", "fileName": fileName}, function(response) {
+                editor.setValue(response);
 
+            });
+        }
+    };
+    
+    
 
     //Event Handlers
     $('#refreshButton').click(function() {
