@@ -162,7 +162,7 @@ $(document).ready(function() {
             } else {
                 sequence = _parts[name].sequence.sequence;
             }
-            var newLine ='\n' + type + ' ' + name + '(.Name("' + name + '"),.Sequence("' + sequence + '"));';
+            var newLine =type + ' ' + name + '(.Name("' + name + '"),.Sequence("' + sequence + '"));\n';
             var line = editor.getCursor("start")["line"];
             var currentLine = editor.getLine(line);
             editor.setLine(line, newLine+currentLine);
