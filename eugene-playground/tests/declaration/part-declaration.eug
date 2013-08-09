@@ -1,0 +1,82 @@
+include "./tests/declaration/part-type-declaration.eug"
+
+/** use dynamic naming **/
+for(num i=1; i<=100; i++) {
+	P1 ** "p1_"+i ** (
+		.prop1("p1_"+i+"_prop1"));
+	P2 ** "p2_"+i ** (
+		.prop1("p2_"+i+"_prop1"),
+		.prop2("p2_"+i+"_prop2"));
+	P3 ** "p3_"+i ** (
+		.prop1("p3_"+i+"_prop1"),
+		.prop2("p3_"+i+"_prop2"),
+		.prop3("p3_"+i+"_prop3"));
+	P4 ** "p4_"+i ** (
+		.prop1("p1_"+i+"_prop1"),
+		.prop2("p4_"+i+"_prop2"),
+		.prop3("p4_"+i+"_prop3"),
+		.prop4("p4_"+i+"_prop4"));
+	P5 ** "p5_"+i ** (
+		.prop1("p1_"+i+"_prop1"),
+		.prop2("p5_"+i+"_prop2"),
+		.prop3("p5_"+i+"_prop3"),
+		.prop4("p5_"+i+"_prop4"),
+		.prop5("p5_"+i+"_prop5"));
+	P6 ** "p6_"+i ** (
+		.prop1("p1_"+i+"_prop1"),
+		.prop2("p6_"+i+"_prop2"),
+		.prop3("p6_"+i+"_prop3"),
+		.prop4("p6_"+i+"_prop4"),
+		.prop5("p6_"+i+"_prop5"),
+		.prop6("p6_"+i+"_prop6"));
+	P7 ** "p7_"+i ** (
+		.prop1("p1_"+i+"_prop1"),
+		.prop2("p7_"+i+"_prop2"),
+		.prop3("p7_"+i+"_prop3"),
+		.prop4("p7_"+i+"_prop5"),
+		.prop5("p7_"+i+"_prop5"),
+		.prop6("p7_"+i+"_prop6"),
+		.prop7("p7_"+i+"_prop7"));
+	P8 ** "p8_"+i ** (
+		.prop1("p1_"+i+"_prop1"),
+		.prop2("p8_"+i+"_prop2"),
+		.prop3("p8_"+i+"_prop3"),
+		.prop4("p8_"+i+"_prop4"),
+		.prop5("p8_"+i+"_prop5"),
+		.prop6("p8_"+i+"_prop6"),
+		.prop7("p8_"+i+"_prop7"),
+		.prop8("p8_"+i+"_prop8"));
+	P9 ** "p9_"+i ** (
+		.prop1("p1_"+i+"_prop1"),
+		.prop2("p9_"+i+"_prop2"),
+		.prop3("p9_"+i+"_prop3"),
+		.prop4("p9_"+i+"_prop4"),
+		.prop5("p9_"+i+"_prop5"),
+		.prop6("p9_"+i+"_prop6"),
+		.prop7("p9_"+i+"_prop7"),
+		.prop8("p9_"+i+"_prop8"),
+		.prop9("p9_"+i+"_prop9"));
+	P10 ** "p10_"+i ** (
+		.prop1("p10_"+i+"_prop1"),
+		.prop2("p10_"+i+"_prop2"),
+		.prop3("p10_"+i+"_prop3"),
+		.prop4("p10_"+i+"_prop4"),
+		.prop5("p10_"+i+"_prop5"),
+		.prop6("p10_"+i+"_prop6"),
+		.prop7("p10_"+i+"_prop7"),
+		.prop8("p10_"+i+"_prop8"),
+		.prop9("p10_"+i+"_prop9"),
+		.prop10("p10_"+i+"_prop10"));
+}
+	
+/* some test outputs */
+println(p1_10);	
+println(p2_20);
+println(p3_30);
+println(p4_40);
+println(p5_50);
+println(p6_60);
+println(p7_70);
+println(p8_80);
+println(p9_90);
+println(p10_100);

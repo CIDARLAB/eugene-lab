@@ -1,0 +1,211 @@
+include "./demos/priority-encoder/design-space.h";
+
+/** ABSTRACT DEVICES **/
+/* An InducibleCassette receives the input signals and starts with two inducible promoters */
+Device InducibleCassette (InduciblePromoter, InduciblePromoter, RBS, Repressor, Terminator);
+
+/* A MixedCassette starts with a repressible and an inducible promoter */
+Device MixedCassette(RepressiblePromoter, InduciblePromoter, RBS, Repressor, Terminator);
+
+/* A RepressibleCassette starts with two repressible promoters */
+Device RepressibleCassette (RepressiblePromoter, RepressiblePromoter, RBS, Reporter, Terminator);
+
+/* A ReportingCassette starts with a repressible promoter and reports the output signal */
+Device ReportingCassette (RepressiblePromoter, RBS, Reporter, Terminator);
+
+
+
+/* now, lets compose the appropriate cassettes for the out1 device */
+Device Out1 (InducibleCassette, MixedCassette, ReportingCassette);
+
+/* now, lets compose the appropriate cassettes for the out0 device */
+Device Out0 (MixedCassette, InducibleCassette, RepressibleCassette, ReportingCassette);
+
+Device PriorityEncoder(Out1, Out0);
+
+
+
+Device[] lstPriorityEncoders = product(PriorityEncoder);
+
+
+/***
+//Note();
+
+//Rules on the Out0 Device
+// Rules regarding the Out0 and Out1 Devices' relations
+
+// now, let's generate some functioning priority encoders
+
+Device[] lstInducibleCassettes = product(InducibleCassette);
+Device[] lstMixedCassettes = product(MixedCassette);
+Device[] lstRepressibleCassettes = product(RepressibleCassette);
+Device[] lstReportingCassettes = product(ReportingCassette);
+
+function Device[] generateValidOut1Devices(Device[] lstInducibleCassettes, Device[] lstMixedCassettes, Device[] lstReportingCassettes) {
+    println("[generateValidOut1Devices]");
+
+    println("*** step I ***");
+    
+	// Sorting out the lstInducibleCassettes.
+	// An InducibleCassette device is only valid, if the first inducible promoter is different to the second inducible promoter
+	// we do not define any rule here... 
+	num nBeforeSize = lstInducibleCassettes.size();
+    println("size() -> ", nBeforeSize);
+
+	Device[] lstTmp;
+	for(num i=0; i<lstInducibleCassettes.size(); i++) {
+	    if(lstInducibleCassettes[i][0].Name != lstInducibleCassettes[i][1].Name) {
+	        lstTmp.add(lstInducibleCassettes[i]);
+	    }
+	}
+	lstInducibleCassettes = lstTmp;
+
+	num nAfterSize = lstInducibleCassettes.size();	
+    println("size() -> ", nAfterSize);
+    
+    println("*** step II ***");
+	// cartesian product of lstInducibleCassettes and lstMixedCassettes
+	
+	Device[] lst = assemble("tmp_out1", lstInducibleCassettes, lstMixedCassettes);
+	nBeforeSize = lst.size();
+    println("size() -> ", nBeforeSize);
+	
+	Device[] lstTmp02;
+	// now, sort the invalid devices out
+	// a device is valid, if the represses-relationship is satisfied
+	for(num i=0; i<lst.size(); i++) {
+	    if(lst[i][3].Represses == lst[i][5].Name) {
+	        lstTmp02.add(lst[i]);
+	    }  
+	}
+	lst = lstTmp02;
+
+	nAfterSize = lst.size();	
+    println("size() -> ", nAfterSize);
+
+
+    println("*** step III ***");
+	// now, assemble the valid inducible/mixed devices with the reporting devices
+	lst = assemble ("out1_device", lst, lstReportingCassettes);
+	nBeforeSize = lst.size();
+    println("size() -> ", nBeforeSize);
+
+	Device[] lstTmp03;
+	for(num i=0; i<lst.size(); i++) {
+	    if(lst[i][8].Represses == lst[i][10].Name) {
+	        lstTmp03.add(lst[i]);
+	    }    
+	}
+	lst = lstTmp03;
+
+	nAfterSize = lst.size();	
+    println("size() -> ", nAfterSize);
+
+	return lst;
+}
+println("*** generateValidOut1Devices() - start ***");
+Device[] lstOut1 = generateValidOut1Devices(lstInducibleCassettes, lstMixedCassettes, lstReportingCassettes);
+println("lstOut1.size(): ", lstOut1.size());
+println("*** generateValidOut1Devices() - Done ***");
+
+println("*** assemble() - start ***");
+Device[] lstOut1 = assemble("out1", lstInducibleCassettes, lstMixedCassettes, lstReportingCassettes);
+println("lstOut1.size(): ", lstOut1.size());
+
+Device[] lstValidOut1;
+for(num i=0; i<lstOut1.size(); i++) {
+    Device out1 = lstOut1[i];
+    
+    // Rules on the Out1 Device:
+    // - the inducible promoters should be different
+
+    Rule In2_different_to_In1(out1[0].Name != out1[1].Name);
+
+    // - the Repressor of the first cassette should repress the RepressiblePromoter of the second cassette
+    Rule Repress(out1[3].Represses == out1[5].Name);
+
+    // - the Inducible Promoter of the second cassette should always be induced by 0
+    // TODO ???
+
+    // - the Repressor of the second cassette should repress the RepressiblePromoter of the third cassette
+    Rule Repress_Report(out1[8].Represses == out1[10].Name);
+
+    // - different RBSs
+    Rule different_RBS01(out1[2].Name != out1[7].Name);
+    Rule different_RBS02(out1[7].Name != out1[11].Name);
+    Rule different_RBS03(out1[2].Name != out1[11].Name);
+    
+    if(In2_different_to_In1 AND Repress AND Repress_Report AND 
+       different_RBS01 AND different_RBS02 AND different_RBS03) {    
+        println(out1);
+        lstValidOut1.add(out1);
+    }
+}
+
+println("*** assemble() - done ***");
+
+
+
+//Device[] lstOut0 = assemble("out0", lstMixedCassettes, lstInducibleCassettes, lstRepressibleCassettes, lstReportingCassettes);
+//println("*** Done - Out0 ***");
+
+
+Device[] lstOut0 = assemble("out0", lstMixedCassettes, lstInducibleCassettes, lstRepressibleCassettes, lstReportingCassettes);
+
+
+
+
+println("size of lstOut1 -> ", lst0ut1.size());
+println("size of lstOut0 -> ", lst0ut0.size());
+
+
+
+print("****");
+
+Device[] lstOut0_Tmp01 = assemble("tmp-01", lstMixedCassettes, lstInducibleCassettes);
+//print(lstTmp01);
+Device[] lstOut0_Tmp02 = assemble("tmp-02", lstOut0_Tmp01, lstRepressibleCassettes);
+//Device[] lstOut0 = assemble("out0-device", lstOut0_Tmp02, lstReportingCassettes);
+
+//Device[] lstOut0 = assemble("out0-device", lstOut0_Tmp01, lstOut0_Tmp02);
+// -> runs into memory problems!!
+
+
+// lstOut1 contains all possible devices for out1
+Device[] lstOut1 = assemble("out1-device", lstInducibleCassettes, lstMixedCassettes, lstReportingCassettes);
+num N=2000;
+if(lstOut1.size()<N) {
+    N = lstOut1.size();
+}
+
+Device[] lstValidOut1;
+for(num i=0; i<N; i++) {
+    boolean b = evaluateOut1(lstOut1[i]);
+    if(b) {
+        lstValidOut1.add(lstOut1[i]);
+    }
+}
+
+for(num i=0; i<lstValidOut1.size(); i++) {
+    print(lstValidOut1[i]);
+}
+
+
+Device[] lstOut0 = assemble(lstMixedCassettes, lstInducibleCassettes, lstRepressibleCassettes, lstReportingCassettes);
+
+function evaluateOut0(Device d) {
+    print("[evaluateOut0]");
+}
+
+function evaluatePriorityEncoder(Device d) {
+    // OUT0 and OUT1 should contain different Reporters
+    Rule differentReporters(ReportingCassette[2].Name != ReportingCassette[2].Name);
+}
+
+//num x = lstInducibleCassettes.size()*lstMixedCassettes.size()*lstReportingCassettes.size();
+//print(" number of out1 devices -> ", x);
+
+
+*****/
+
+println("**** DONE ****");

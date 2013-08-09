@@ -1,0 +1,55 @@
+include "./tests/declaration/device-declaration.eug"
+
+/***
+println("**** unaryR ****");
+Rule unaryR(
+	CONTAINS P1
+);
+
+println("**** binaryR ****");
+Rule binaryR(
+	D CONTAINS P1
+);
+
+println("**** compR ****");
+Rule compR(
+    D CONTAINS P1 
+    AND
+    D CONTAINS P2
+);
+***/
+
+println("**** exprR ****");
+Rule exprR(
+    D.P1.prop1 + D.P2.prop1 > 15
+);
+
+/**
+println("**** compExprR ****");
+Rule compExprR(
+    D.P1.prop1 + D.P2.prop1 > 15 
+    AND
+    D.P1.prop1 - D.P2.prop1 > 15
+);
+**/
+
+/**
+println("**** precedenceR ****");
+Rule precedenceR(
+	(
+		P1 AFTER P2
+	OR
+		P2 AFTER P1
+	)
+	AND
+		P1 NOTEQUALS P2
+);
+**/
+
+/**
+println("**** onDeviceR ****");
+Rule onDeviceR(
+	ON D:
+		P1 AFTER P2
+);
+**/

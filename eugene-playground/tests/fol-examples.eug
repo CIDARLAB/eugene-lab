@@ -1,0 +1,23 @@
+PartType a;
+PartType b;
+
+// b must be the first element in the set
+Rule R(
+    CONTAINS b
+    AND
+    FORALL a: a AFTER b
+);
+
+// every a must be right next to each b
+Rule R(
+    FORALL a EXISTS b: 
+        a NEXTTO b
+        AND
+        a AFTER b
+);
+        
+// every a must be after every b
+Rule R(
+   FORALL a, b : a AFTER b
+);        
+

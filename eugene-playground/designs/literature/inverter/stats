@@ -1,0 +1,12 @@
+design space:
+5 Promoters
+3 RBSs
+5 Repressors
+2 Reporters
+2 Terminators
+
+size: 8
+possible designs: 9000
+rules: 7
+valid designs: 80
+run time: 0.038514 sec

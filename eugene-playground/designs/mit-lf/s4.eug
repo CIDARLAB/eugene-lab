@@ -1,0 +1,23 @@
+Property Name(txt);
+Part Stata_Part(Name);
+
+Stata_Part partP1_Tps_Of_45626("partP1_Tps_Of_45626");
+Stata_Part partP1_Tps_Of_45624("partP1_Tps_Of_45624");
+Stata_Part partP3_Tps_Or_46348("partP3_Tps_Or_46348");
+
+
+Rule R0 ( 
+		(partP1_Tps_Of_45626 BEFORE partP1_Tps_Of_45624) 
+			AND 
+		(partP1_Tps_Of_45626 NEXTTO partP1_Tps_Of_45624) 
+);
+
+Device Design(Stata_Part, Stata_Part, Stata_Part);
+
+Device[] StataDesign = product(Design, strict);
+//for (num i=0; i<StataDesign.size(); i++) {
+//    for (num k=0; k<StataDesign[i].size(); k++) {
+//        print(StataDesign[i][k].Name, " ");
+//    }      
+//    println();  
+//}        

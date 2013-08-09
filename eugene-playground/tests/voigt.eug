@@ -1,0 +1,21 @@
+
+// create some parts
+for(num i=1; i<=1000; i++) {
+	ConstPr ** "const_pr"+i ** ();
+	RepPr ** "rep_pr"+i ** ();
+	RBS ** "rbs"+i ** ();
+	Repressor ** "repressor"+i ** ();
+	Reporter ** "reporter"+i ** ();
+	Terminator ** "terminator"+i ** ();
+}
+println("*** PARTS CREATED ***");
+
+Device TU1 (ConstPr, RBS, Repressor, Terminator);
+Device TU2 (RepPr, RBS, Repressor, Terminator);
+Device TU3 (RepPr, RBS, Reporter, Terminator);
+Device TU4 (RepPr, RBS, Reporter, Terminator);
+
+Device Inverter(TU1, TU2, TU3, TU4);
+
+
+product(Inverter);

@@ -1,0 +1,71 @@
+/* 
+    sbhatia 07192013
+    voigt stata library constrained design space
+    
+*/
+
+// Define some collections of parts.
+// Negative sign means the part sequence if reverse-complemented.
+Collection S01 = {P1, P2, P3};
+Collection S05 = {-T1};
+Collection S31 = {P0, P1, P2, P3};
+Collection S12 = {cdsU1, cdsU2, cdsS1, cdsS2, cdsV1, cdsV2, cdsW1, cdsW2, cdsZ1, cdsZ2, cdsM1, cdsM2};
+Collection S23 = {T3, T1, T0};
+Collection S24 = {T1};
+Collection S45 = {-T1};
+Collection S57 = {-cdsU1, -cdsU2, -cdsS1, -cdsS2, -cdsV1, -cdsV2, -cdsW1, -cdsW2, -cdsZ1, -cdsZ2, -cdsM1, -cdsM2};
+Collection S76 = {-P0, -P1, -P2, -P3};
+Collection S65 = {-T3, -T1, -T0};
+Collection S78 = {-P1, -P2, -P3};
+Collection S81 = {P1, P2, P3};
+
+Collection cdsU = {cdsU1, cdsU2, -cdsU1, -cdsU2};
+Collection cdsV = {cdsV1, cdsV2, -cdsV1, -cdsV2};
+Collection cdsS = {cdsS1, cdsS2, -cdsS1, -cdsS2};
+Collection cdsW = {cdsW1, cdsW2, -cdsW1, -cdsW2};
+Collection cdsZ = {cdsZ1, cdsZ2, -cdsZ1, -cdsZ2};
+Collection cdsM = {cdsM1, cdsM2, -cdsM1, -cdsM2};
+
+// Take union of all the parts.
+Collection All = S01 + S05 + S31 + S12 + S23 + S24 + S45 + S57 + S76 + S65 + S78 + S81;
+
+// Define the space of all transcriptionall valid designs as per Smanski's design architecture.
+DesignSpace allTranscriptionallyValidSpace = {
+
+    START S01, S05;
+    END S24, S78;
+
+    S01 to S12;
+    S05 to S57;
+    S12 to S23, S24;
+    S23 to S31;
+    S31 to S12;
+    S24 to S45;
+    S45 to S57;
+    S57 to S76, S78;
+    S76 to S65;
+    S65 to S57;
+    S78 to S81;
+    S81 to S12;
+
+};
+
+// Define the Rule: Design must contain exactly one copy of a U CDS.
+Collection AllButU_1 = All - cdsU;
+Collection AllButU_2 = All - cdsU;
+
+DesignSpace OneCopyOfU = {
+
+    START AllButU_1, cdsU;
+    END AllButU_2;
+
+    AllButU_1 to AllButU_1;
+    AllButU_1 to cdsU;
+    AllButU_2 to AllButU_2;
+
+};
+
+DesignSpace OneUValid = allTranscriptionallyValid AND OneCopyOfU;
+
+// Sample 100 designs at random from OneUValid space.
+OneUValid.sample(100);

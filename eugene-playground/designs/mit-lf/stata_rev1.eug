@@ -1,0 +1,346 @@
+include "./designs/mit-lf/stata_parts.h"
+
+Device One_Gene_Operon (
+    Promoter, 
+    Gene, 
+    Terminator
+);
+
+Device Two_Gene_Operon (
+    Promoter,
+    Gene, 
+    TerminatorInternal,
+    PromoterInternal,
+    Gene,
+    Terminator
+);
+
+Device Three_Gene_Operon (
+    Promoter,
+    Gene, 
+    TerminatorInternal,
+    PromoterInternal,
+    Gene, 
+    TerminatorInternal,
+    PromoterInternal,
+    Gene,
+    Terminator
+);
+
+Device Four_Gene_Operon (
+    Promoter,
+    Gene, 
+    TerminatorInternal,
+    PromoterInternal,
+    Gene, 
+    TerminatorInternal,
+    PromoterInternal,
+    Gene, 
+    TerminatorInternal,
+    PromoterInternal,
+    Gene,
+    Terminator
+);
+
+
+Device Five_Gene_Operon (
+    Promoter,
+    Gene, 
+    TerminatorInternal,
+    PromoterInternal,
+    Gene, 
+    TerminatorInternal,
+    PromoterInternal,
+    Gene, 
+    TerminatorInternal,
+    PromoterInternal,
+    Gene, 
+    TerminatorInternal,
+    PromoterInternal,
+    Gene,
+    Terminator
+);
+
+Device Six_Gene_Operon (
+    Promoter,
+    Gene, 
+    TerminatorInternal,
+    PromoterInternal,
+    Gene, 
+    TerminatorInternal,
+    PromoterInternal,
+    Gene, 
+    TerminatorInternal,
+    PromoterInternal,
+    Gene, 
+    TerminatorInternal,
+    PromoterInternal,
+    Gene, 
+    TerminatorInternal,
+    PromoterInternal,
+    Gene,
+    Terminator
+);
+
+
+
+Device One_Gene_Operon_R (
+    Terminator,
+    Gene, 
+    Promoter
+);
+
+Device Two_Gene_Operon_R (
+    Terminator,
+    Gene,
+    PromoterInternal,
+    TerminatorInternal,
+    Gene, 
+    Promoter
+);
+
+Device Three_Gene_Operon_R (
+    Terminator,
+    Gene,
+    PromoterInternal,
+    TerminatorInternal,
+    Gene,
+    PromoterInternal,
+    TerminatorInternal,
+    Gene, 
+    Promoter
+);
+
+Device Four_Gene_Operon_R (
+    Terminator,
+    Gene,
+    PromoterInternal,
+    TerminatorInternal,
+    Gene,
+    PromoterInternal,
+    TerminatorInternal,
+    Gene,
+    PromoterInternal,
+    TerminatorInternal,
+    Gene, 
+    Promoter
+);
+
+
+Device Five_Gene_Operon_R (
+    Terminator,
+    Gene,
+    PromoterInternal,
+    TerminatorInternal,
+    Gene,
+    PromoterInternal,
+    TerminatorInternal,
+    Gene,
+    PromoterInternal,
+    TerminatorInternal,
+    Gene,
+    PromoterInternal,
+    TerminatorInternal,
+    Gene, 
+    Promoter
+);
+
+Device Six_Gene_Operon_R (
+    Terminator,
+    Gene,
+    PromoterInternal,
+    TerminatorInternal,
+    Gene,
+    PromoterInternal,
+    TerminatorInternal,
+    Gene,
+    PromoterInternal,
+    TerminatorInternal,
+    Gene,
+    PromoterInternal,
+    TerminatorInternal,
+    Gene,
+    PromoterInternal,
+    TerminatorInternal,
+    Gene, 
+    Promoter
+);
+
+
+/** RULES ***/
+
+        Rule R_U1 (CONTAINS U1);
+        Rule R_U2 (CONTAINS U2);
+        Rule R_NOT_U1 (NOT R_U1);
+        Rule R_NOT_U2 (NOT R_U2);
+        Rule R_U  ( (R_U1 AND R_NOT_U2) OR (R_U2 AND R_NOT_U1) ) ;
+
+        Rule R_S1 (CONTAINS S1);
+        Rule R_S2 (CONTAINS S2);
+        Rule R_NOT_S1 (NOT R_S1);
+        Rule R_NOT_S2 (NOT R_S2);
+        Rule R_S  ( (R_S1 AND R_NOT_S2) OR (R_S2 AND R_NOT_S1) ) ;
+
+        Rule R_V1 (CONTAINS V1);
+        Rule R_V2 (CONTAINS V2);
+        Rule R_NOT_V1 (NOT R_V1);
+        Rule R_NOT_V2 (NOT R_V2);
+        Rule R_V  ( (R_V1 AND R_NOT_V2) OR (R_V2 AND R_NOT_V1) ) ;
+ 
+        Rule R_W1 (CONTAINS W1);
+        Rule R_W2 (CONTAINS W2);
+        Rule R_NOT_W1 (NOT R_W1);
+        Rule R_NOT_W2 (NOT R_W2);
+        Rule R_W  ( (R_W1 AND R_NOT_W2) OR (R_W2 AND R_NOT_W1) ) ;
+
+        Rule R_Z1 (CONTAINS Z1);
+        Rule R_Z2 (CONTAINS Z2);
+        Rule R_NOT_Z1 (NOT R_Z1);
+        Rule R_NOT_Z2 (NOT R_Z2);
+        Rule R_Z  ( (R_Z1 AND R_NOT_Z2) OR (R_Z2 AND R_NOT_Z1) ) ;
+
+        Rule R_M1 (CONTAINS M1);
+        Rule R_M2 (CONTAINS M2);
+        Rule R_NOT_M1 (NOT R_M1);
+        Rule R_NOT_M2 (NOT R_M2);
+        Rule R_M  ( (R_M1 AND R_NOT_M2) OR (R_M2 AND R_NOT_M1) ) ;
+ 
+        // Contents
+        Rule CONTAINS_USVWZM (R_U AND R_S AND R_V AND R_W AND R_Z AND R_M);
+
+        Rule R_U1_BEFORE_W1 (U1 BEFORE W1);
+        Rule R_U2_BEFORE_W1 (U2 BEFORE W1);
+        Rule R_U1_BEFORE_W2 (U1 BEFORE W2);
+        Rule R_U2_BEFORE_W2 (U2 BEFORE W2);
+        Rule R_U_BEFORE_W (R_U1_BEFORE_W1 AND R_U2_BEFORE_W1 AND R_U1_BEFORE_W2 AND R_U2_BEFORE_W2);
+
+        Rule R_S1_BEFORE_W1 (S1 BEFORE W1);
+        Rule R_S2_BEFORE_W1 (S2 BEFORE W1);
+        Rule R_S1_BEFORE_W2 (S1 BEFORE W2);
+        Rule R_S2_BEFORE_W2 (S2 BEFORE W2);
+        Rule R_S_BEFORE_W (R_S1_BEFORE_W1 AND R_S2_BEFORE_W1 AND R_S1_BEFORE_W2 AND R_S2_BEFORE_W2);
+
+        Rule R_V1_BEFORE_W1 (V1 BEFORE W1);
+        Rule R_V2_BEFORE_W1 (V2 BEFORE W1);
+        Rule R_V1_BEFORE_W2 (V1 BEFORE W2);
+        Rule R_V2_BEFORE_W2 (V2 BEFORE W2);
+        Rule R_V_BEFORE_W (R_V1_BEFORE_W1 AND R_V2_BEFORE_W1 AND R_V1_BEFORE_W2 AND R_V2_BEFORE_W2);
+
+
+        Rule R_U1_BEFORE_Z1 (U1 BEFORE Z1);
+        Rule R_U2_BEFORE_Z1 (U2 BEFORE Z1);
+        Rule R_U1_BEFORE_Z2 (U1 BEFORE Z2);
+        Rule R_U2_BEFORE_Z2 (U2 BEFORE Z2);
+        Rule R_U_BEFORE_Z (R_U1_BEFORE_Z1 AND R_U2_BEFORE_Z1 AND R_U1_BEFORE_Z2 AND R_U2_BEFORE_Z2);
+
+        Rule R_S1_BEFORE_Z1 (S1 BEFORE Z1);
+        Rule R_S2_BEFORE_Z1 (S2 BEFORE Z1);
+        Rule R_S1_BEFORE_Z2 (S1 BEFORE Z2);
+        Rule R_S2_BEFORE_Z2 (S2 BEFORE Z2);
+        Rule R_S_BEFORE_Z (R_S1_BEFORE_Z1 AND R_S2_BEFORE_Z1 AND R_S1_BEFORE_Z2 AND R_S2_BEFORE_Z2);
+
+        Rule R_V1_BEFORE_Z1 (V1 BEFORE Z1);
+        Rule R_V2_BEFORE_Z1 (V2 BEFORE Z1);
+        Rule R_V1_BEFORE_Z2 (V1 BEFORE Z2);
+        Rule R_V2_BEFORE_Z2 (V2 BEFORE Z2);
+        Rule R_V_BEFORE_Z (R_V1_BEFORE_Z1 AND R_V2_BEFORE_Z1 AND R_V1_BEFORE_Z2 AND R_V2_BEFORE_Z2);
+
+
+        Rule R_U1_BEFORE_M1 (U1 BEFORE M1);
+        Rule R_U2_BEFORE_M1 (U2 BEFORE M1);
+        Rule R_U1_BEFORE_M2 (U1 BEFORE M2);
+        Rule R_U2_BEFORE_M2 (U2 BEFORE M2);
+        Rule R_U_BEFORE_M (R_U1_BEFORE_M1 AND R_U2_BEFORE_M1 AND R_U1_BEFORE_M2 AND R_U2_BEFORE_M2);
+
+        Rule R_S1_BEFORE_M1 (S1 BEFORE M1);
+        Rule R_S2_BEFORE_M1 (S2 BEFORE M1);
+        Rule R_S1_BEFORE_M2 (S1 BEFORE M2);
+        Rule R_S2_BEFORE_M2 (S2 BEFORE M2);
+        Rule R_S_BEFORE_M (R_S1_BEFORE_M1 AND R_S2_BEFORE_M1 AND R_S1_BEFORE_M2 AND R_S2_BEFORE_M2);
+
+        Rule R_V1_BEFORE_M1 (V1 BEFORE M1);
+        Rule R_V2_BEFORE_M1 (V2 BEFORE M1);
+        Rule R_V1_BEFORE_M2 (V1 BEFORE M2);
+        Rule R_V2_BEFORE_M2 (V2 BEFORE M2);
+        Rule R_V_BEFORE_M (R_V1_BEFORE_M1 AND R_V2_BEFORE_M1 AND R_V1_BEFORE_M2 AND R_V2_BEFORE_M2);
+
+        Rule U_BEFORE_WZM (R_U_BEFORE_W AND R_U_BEFORE_Z AND R_U_BEFORE_M);
+        Rule S_BEFORE_WZM (R_S_BEFORE_W AND R_S_BEFORE_Z AND R_S_BEFORE_M);
+        Rule V_BEFORE_WZM (R_V_BEFORE_W AND R_V_BEFORE_Z AND R_V_BEFORE_M);
+
+        // Order
+        Rule USV_BEFORE_WZM (U_BEFORE_WZM AND S_BEFORE_WZM AND V_BEFORE_WZM);
+
+        Rule R_U1_1 (U1 MORETHAN 1);
+        Rule NOT_R_U1_1 (NOT R_U1_1);
+        Rule R_U2_1 (U2 MORETHAN 1);
+        Rule NOT_R_U2_1 (NOT R_U2_1);
+        Rule R_U_1 (NOT_R_U1_1 AND NOT_R_U2_1);
+        
+        Rule R_S1_1 (S1 MORETHAN 1);
+        Rule NOT_R_S1_1 (NOT R_S1_1);
+        Rule R_S2_1 (S2 MORETHAN 1);
+        Rule NOT_R_S2_1 (NOT R_S2_1);
+        Rule R_S_1 (NOT_R_S1_1 AND NOT_R_S2_1);
+
+        Rule R_V1_1 (V1 MORETHAN 1);
+        Rule NOT_R_V1_1 (NOT R_V1_1);
+        Rule R_V2_1 (V2 MORETHAN 1);
+        Rule NOT_R_V2_1 (NOT R_V2_1);
+        Rule R_V_1 (NOT_R_V1_1 AND NOT_R_V2_1);
+
+        Rule R_W1_1 (W1 MORETHAN 1);
+        Rule NOT_R_W1_1 (NOT R_W1_1);
+        Rule R_W2_1 (W2 MORETHAN 1);
+        Rule NOT_R_W2_1 (NOT R_W2_1);
+        Rule R_W_1 (NOT_R_W1_1 AND NOT_R_W2_1);
+
+        Rule R_Z1_1 (Z1 MORETHAN 1);
+        Rule NOT_R_Z1_1 (NOT R_Z1_1);
+        Rule R_Z2_1 (Z2 MORETHAN 1);
+        Rule NOT_R_Z2_1 (NOT R_Z2_1);
+        Rule R_Z_1 (NOT_R_Z1_1 AND NOT_R_Z2_1);
+
+        Rule R_M1_1 (M1 MORETHAN 1);
+        Rule NOT_R_M1_1 (NOT R_M1_1);
+        Rule R_M2_1 (M2 MORETHAN 1);
+        Rule NOT_R_M2_1 (NOT R_M2_1);
+        Rule R_M_1 (NOT_R_M1_1 AND NOT_R_M2_1);
+
+        // Number
+        Rule R_USVWZM_1 (R_U_1 AND R_S_1 AND R_V_1 AND R_W_1 AND R_Z_1 AND R_M_1);
+
+
+Device[] lstOperonDevices = [
+	One_Gene_Operon, 
+	Two_Gene_Operon, 
+	Three_Gene_Operon, 
+	Four_Gene_Operon, 
+	Five_Gene_Operon, 
+	Six_Gene_Operon,
+	One_Gene_Operon_R, 
+	Two_Gene_Operon_R, 
+	Three_Gene_Operon_R, 
+	Four_Gene_Operon_R, 
+	Five_Gene_Operon_R, 
+	Six_Gene_Operon_R 
+];
+
+//Device bigD(Six_Gene_Operon, Six_Gene_Operon, Six_Gene_Operon);
+//product(bigD, 2000);
+
+//println(lstOperonDevices, " -> ", lstOperonDevices.size());
+
+for(num j=0; j<lstOperonDevices.size(); j++) {
+	for(num i=0; i<lstOperonDevices.size(); i++) {
+    	Device d (lstOperonDevices[j], lstOperonDevices[i]);
+    	//println(d);
+    	//Rule rule_d1 (ON d1 : R_USVWZM_1 AND USV_BEFORE_WZM AND CONTAINS_USVWZM);
+    	Rule rule_d (ON d: USV_BEFORE_WZM AND CONTAINS_USVWZM);
+    
+	    Device[] goodDevices = product(d, 200);
+    	for(num k=0; k<goodDevices.size(); k++) {
+        	println(goodDevices[k]);
+    	}
+	}
+}

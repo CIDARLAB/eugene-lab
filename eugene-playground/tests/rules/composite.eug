@@ -1,0 +1,22 @@
+PartType StataPart();
+
+for(num i=1; i<=5; i++) {
+    StataPart ** "stata-"+i ** ();
+}
+
+Device StataDevice(
+	StataPart, StataPart, StataPart, StataPart, StataPart,
+	StataPart, StataPart, StataPart, StataPart, StataPart);
+	
+Rule r1(stata-1 BEFORE stata-2); 
+Rule r2(stata-2 BEFORE stata-3); 
+Rule r3(stata-3 BEFORE stata-4); 
+Rule r4(stata-4 BEFORE stata-5); 
+
+Rule compRule1 (r1 AND r2);
+Rule compRule2 (r3 AND r4);
+Rule compRule (compRule1 AND compRule2);
+
+product(StataDevice);
+
+//println(compRule);

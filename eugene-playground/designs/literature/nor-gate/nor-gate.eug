@@ -1,0 +1,27 @@
+include "./designs/design-space.h"
+
+/*** NOR-GATE DEVICES ***/
+
+Device NorGate01(Promoter, Promoter, RBS, Repressor, Terminator);
+Device NorGate02(Promoter, RBS, Reporter, Terminator);
+Device NorGate = NorGate01 + NorGate02;
+
+
+/*** RULES ***/
+Rule r(
+    ON NorGate:
+    	NorGate[0].PromoterType EQUALS "Inducible" AND
+    	NorGate[1].PromoterType EQUALS "Inducible" AND
+    	NorGate[0] NOTEQUALS NorGate[1] AND   // different inducible promoters
+    	NorGate[2] NOTEQUALS NorGate[6] AND   // different RBSs 
+    	NorGate[3].Represses EQUALS NorGate[5].Name AND   // represses relationship
+    	NorGate[5].PromoterType EQUALS "Repressible" AND
+    	NorGate[4] NOTEQUALS NorGate[8]   // different terminators
+    );
+
+
+/*** PRODUCE ALL VALID NOR-GATE DEVICES ***/
+Device[] lst = product(NorGate, strict);
+println(lst.size(), " NOR gates created");
+
+

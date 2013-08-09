@@ -1,0 +1,48 @@
+//Part Types
+PartType RepPromoter();
+PartType ConstPromoter();
+PartType RBS ();
+PartType Repressor ();
+PartType Reporter ();
+PartType Inducer ();
+PartType Terminator ();
+PartType SmallMolecule ();
+
+// create some parts
+for(num i=1; i<=10; i++) {
+	ConstPromoter ** "const_pr"+i ** ();
+	RepPromoter ** "rep_pr"+i ** ();
+	RBS ** "rbs"+i ** ();
+	Repressor ** "repressor"+i ** ();
+	Reporter ** "reporter"+i ** ();
+	Terminator ** "terminator"+i ** ();
+}
+println("*** PARTS CREATED ***");
+
+Device TU1 (ConstPromoter, RBS, Repressor, Terminator);
+Device TU2 (RepPromoter, RBS, Repressor, Terminator);
+Device TU3 (RepPromoter, RBS, Reporter, Terminator);
+Device TU4 (RepPromoter, RBS, Reporter, Terminator);
+
+Device Inverter(TU1, TU2, TU3, TU4);
+
+/* let's define some rules */
+Rule r1(STARTSWITH const_pr1 OR STARTSWITH const_pr2);
+Rule r2(ENDSWITH terminator9 OR ENDSWITH terminator10);
+
+Rule r3(rep_pr1 NEXTTO rbs1);
+Rule r4(rep_pr2 NEXTTO rbs2);
+Rule r5(rep_pr3 NEXTTO rbs3);
+
+Rule r6(terminator8 AFTER terminator7);
+Rule r7(terminator7 AFTER terminator6);
+Rule r6(terminator6 AFTER terminator5);
+
+Rule r8(reporter1 BEFORE reporter2);
+Rule r9(reporter2 BEFORE reporter3);
+
+Rule r10(rbs1 NEXTTO repressor1);
+Rule r11(rbs2 NEXTTO repressor2);
+Rule r12(rbs3 NEXTTO repressor3);
+
+product(Inverter, strict);

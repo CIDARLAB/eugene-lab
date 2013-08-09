@@ -1,0 +1,85 @@
+Property seq(txt);
+Property name(txt);
+Property regulator(txt);
+Property type(txt);
+Property maxLow(num);
+Property minHigh(num);
+Property copyCount(num);
+
+
+Part Promoter(name, type, regulator, minHigh, maxLow, seq);
+Part miRNA(name, seq);
+Part CDS(name, seq);
+Part miRNASite(name, seq, regulator);
+
+
+Promoter  pLac("pLac", "R", "LacI", 20, 0, "HAHA");
+miRNA     m1("m1", "MAMA");
+CDS       s1("s1", "SISI");
+miRNASite ms1("m1", "MAMA", m1);
+miRNASite ms2("m2", "PAPA", m1);
+//miRNASite ms3("m3", "KAKA", m1);
+
+
+Device miRNA2x(miRNASite, miRNASite);
+Device miRNA4x(ms1, ms1, miRNA2x);
+Device OutputmRNA(CDS, miRNA4x);
+
+Device [] d = product(OutputmRNA);
+
+function boolean allSameLame (Device d, Part p) {
+
+    boolean ret;
+    ret = true;
+    for (num i=2; i<5; i++) {
+        if (d[i] != d[i-1]) {
+            ret = false;
+        }
+    }
+    
+    return ret;
+}
+
+function boolean allSame (Device d, Part p) {
+
+    boolean ret;
+
+    Rule r (ON d: p MORETHAN 3);
+    
+    if (r) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+
+// rule test function
+function boolean ruleTest (Device d, Part p, Part q) {
+    Rule r1 (d CONTAINS p);
+    Rule r2 (NOT (d CONTAINS q));
+    Rule r3 (r1 AND r2);
+    if (r3) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+boolean a,b,c;
+Device[] functioningDevices;
+for(num i=0; i<d.size(); i++) {
+    //a = ruleTest(d[i], ms1, ms2);
+    //b = allSame(d[i], ms1);
+    c = allSameLame(d[i], ms1);
+    
+    if(/** a AND b AND **/ c) {
+        functioningDevices.add(d[i]);        
+    }
+    
+}
+
+print("*** FUNCTIONING DEVICES ***");
+for(num i=0;i<functioningDevices.size();i++) {
+    print(functioningDevices[i]);
+}

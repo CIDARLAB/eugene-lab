@@ -1,0 +1,36 @@
+include "./tests/rules/design-space.h"
+
+/**
+Device D(P1);
+Rule r1(
+	ON D:
+		D ENDSWITH p1_1);
+ **/
+
+/**
+Device D(P1);
+Rule r1(
+	ON D:
+		NOT (D ENDSWITH p1_1));
+**/
+
+/**
+Device D(P1, P2);
+Rule r1(
+	ON D:
+		D ENDSWITH p2_2);
+ **/
+
+
+Device D1(P1, P2, P3);
+Device D2(P3, P4, P5);
+Device D (D1, D2);
+Rule r1(
+	ON D:
+		D ENDSWITH p5_1);
+  
+Device[] lst = product(D, strict);
+for(num i=0; i<lst.size(); i++) {
+	println(lst[i]);
+}
+		
