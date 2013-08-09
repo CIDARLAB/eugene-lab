@@ -225,8 +225,8 @@ CodeMirror.defineMode("eugene", function(config, parserConfig) {
     CodeMirror.defineMIME("eugene", {
         name: "eugene",
         keywords: words("boolean num txt PartType Property Rule Device include " +
-                "else for if " +
-                "return while"),
+                "else for if return while"
+                +" ON CONTAINS AFTER BEFORE STARTSWITH EQUALS ENDSWITH WITH THEN NEXTTO MORETHAN"),
         blockKeywords: words("else for if while"),
         atoms: words("true false null undefined"),
         hooks: {
