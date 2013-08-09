@@ -150,12 +150,11 @@ $(document).ready(function() {
             "bScrollCollapse": true
         });
         $('tr').dblclick(function() {
-            var newValue = editor.getValue();
             var type = $(this).children("td:last").text();
             var name = $(this).children("td:first").text();
             if (_partTypes[type] === undefined) {
                 _partTypes[type] = "added";
-                newValue = 'PartType ' + type + '(name, sequence);\n' + newValue;
+                newLine = 'PartType ' + type + '(Name, Sequence);\n' + newLine;
             }
             var sequence = "";
             if (typeof _parts[name].sequence === "string") {
@@ -163,8 +162,10 @@ $(document).ready(function() {
             } else {
                 sequence = _parts[name].sequence.sequence;
             }
-            newValue = newValue + '\n' + type + ' ' + name + '(' + name + ',' + sequence + ');';
-            editor.setValue(newValue);
+            var newLine ='\n' + type + ' ' + name + '(.Name("' + name + '"),.Sequence("' + sequence + '"));';
+            var line = editor.getCursor("start")["line"];
+            var currentLine = editor.getLine(line);
+            editor.setLine(line, newLine+currentLine);
         });
     };
 
@@ -494,7 +495,7 @@ $(document).ready(function() {
     };
 
     _connection.onerror = function(e) {
-        alert("F**K");
+        alert("connection error: is clotho running?");
     };
 
     _connection.onclose = function() {
@@ -503,27 +504,9 @@ $(document).ready(function() {
 
     _connection.onopen = function(e) {
         send("query", '{"schema":"BasicPart"}', function(data) {
-//            createTestData();
             drawPartsList(data);
         });
     };
-
-
-
-    var createTestData = function() {
-        var data = '{"schema": "BasicPart", "name": "tester1", "sequence": "aaaaaaaaaaaaaaaaaa", "type":"promoter"}';
-        send("create", data);
-        var data = '{"schema": "BasicPart", "name": "tester2", "sequence": "tttttttttttttttttt", "type":"rbs"}';
-        send("create", data);
-        var data = '{"schema": "BasicPart", "name": "tester3", "sequence": "cccccccccccccccccc", "type":"gene"}';
-        send("create", data);
-        var data = '{"schema": "BasicPart", "name": "tester4", "sequence": "gggggggggggggggggg", "type":"terminator"}';
-        send("create", data);
-    };
-
-
-
-
 
 
     //functions to run on page load
@@ -552,7 +535,7 @@ $(document).ready(function() {
                 var type = $(this).attr('id');
                 if (_partTypes[type] === undefined) {
                     _partTypes[type] = "added";
-                    newValue = 'PartType ' + type + '(name, sequence);\n' + newValue;
+                    newValue = 'PartType ' + type + '(Name, Sequence);\n' + newValue;
                 }
                 editor.setValue(newValue);
             });
