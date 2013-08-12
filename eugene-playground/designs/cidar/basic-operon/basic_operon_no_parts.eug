@@ -1,0 +1,138 @@
+/* Nif HDKY Data Set 1 Parts */
+
+// sbhatia 07052012 (swapnilb@bu.edu)
+
+Property Name(txt);
+Property Strength(num);
+Property UUID(txt);
+Property Type(txt);
+Property Color(num);
+
+Part Promoter(UUID, Name, Strength, Type, Color);
+Part RBS(UUID, Name, Strength, Type, Color);
+Part Term(UUID, Name, Type, Color);
+Part Spacer(UUID, Name, Type, Color);
+Part CDS(UUID, Name, Type, Color);
+
+// PARTS library begin
+// Put your parts here
+// PARTS library end 
+
+
+// Devices needed to specify my ``basic'' rules.
+
+Device RC (
+    RBS, CDS
+);
+Device RCTSP (
+    RBS, CDS, Term, Spacer, Promoter
+);
+Device RCTP (
+    RBS, CDS, Term, Promoter
+);
+Device SRC (
+    Spacer, RBS, CDS
+);
+Device SRCTP (
+    Spacer, RBS, CDS, Term, Promoter
+);
+Device RCT (
+    RBS, CDS, Term
+);
+Device SRCT (
+    Spacer, RBS, CDS, Term
+);
+
+
+
+// Conjecture: this is ``equivalent'' to the regular expression: 
+// P (RC|RCTP|SRC|SRCTP)* (RCT|SRCT)
+
+function boolean checkBasicRules(Device d) {
+
+    Rule r1 (d STARTSWITH Promoter);
+    Rule r2 (d ENDSWITH RCT);
+    Rule r3 (d ENDSWITH SRCT);
+        Rule r4 (r2 OR r3);
+    Rule r5 (ON d: NOT RCT MORETHAN 1);
+    Rule r6 (ON d: NOT SRCT MORETHAN 1);
+
+    Rule r7 (r4 AND r5 AND r6);
+
+    if (r7) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+// Example: Exactly four genes in an operon.
+// Two come from the rules, 
+// one more from the terminator device SRCT or RCT
+// which every device must contain.
+
+function boolean checkOperonRules(Device d) {
+
+    Rule r1 (ON d: SRC MORETHAN 1);
+    Rule r2 (ON d: RC MORETHAN 1);
+        Rule r3 (r1 OR r2);
+    Rule r4 (ON d: NOT SRC MORETHAN 2);
+    Rule r5 (ON d: NOT RC MORETHAN 2);
+        Rule r6 (r4 AND r5);
+
+    Rule r7 (r3 AND r6);
+
+    if (r7) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+
+// Prints device in Pigeon compatible form for autogeneration of pictures
+function printDev(Device d) {
+    num j = 0;
+    print();
+    for (num m=0; m<d.size(); m++) {
+        if (d[m].Color > 0) {
+            print(d[m].Type, " ", d[m].Name, " ", d[m].Color, " nl");
+        } else {
+            print(d[m].Type, " ", d[m].Name, " nl");
+        }
+    }
+}
+
+
+// Example device, which we can use to test the rules.
+// Abstract device whose components we permute --- order doesn't matter.
+// The rules ensure that only those permutations survive that satisfy the rules.
+
+Device ExampleDevice (
+    Promoter, RCTSP, SRC, SRC, SRCT
+);
+
+Device [] FirstDevices;
+Device [] d1;
+boolean b, o;
+
+// Generate a 1000 permutations of your abstract device
+// and check which ones satisfy your rules
+
+for (num i=0; i<1000; i++) {
+
+    FirstDevices = permute(ExampleDevice, 1, strict);
+    // b = true;
+    b = checkBasicRules(FirstDevices[i]);
+    // o = true;
+    o = checkOperonRules(FirstDevices[i]);
+
+    // If an abstract device satisfies the rules, fill it with concrete parts
+    // and print the concrete devices
+    if (b AND o) {
+        d1 = product(FirstDevices[i]);
+        for (num k=0; k<d1.size(); k++) {
+            printDev(d1[k]);
+        }
+    }
+}

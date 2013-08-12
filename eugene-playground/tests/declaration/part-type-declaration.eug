@@ -1,0 +1,12 @@
+include "./tests/declaration/property-declaration.eug"
+
+PartType P1(prop1);
+PartType P2(prop1, prop2);
+PartType P3(prop1, prop2, prop3);
+PartType P4(prop1, prop2, prop3, prop4);
+PartType P5(prop1, prop2, prop3, prop4, prop5);
+PartType P6(prop1, prop2, prop3, prop4, prop5, prop6);
+PartType P7(prop1, prop2, prop3, prop4, prop5, prop6, prop7);
+PartType P8(prop1, prop2, prop3, prop4, prop5, prop6, prop7, prop8);
+PartType P9(prop1, prop2, prop3, prop4, prop5, prop6, prop7, prop8, prop9);
+PartType P10(prop1, prop2, prop3, prop4, prop5, prop6, prop7, prop8, prop9, prop10);

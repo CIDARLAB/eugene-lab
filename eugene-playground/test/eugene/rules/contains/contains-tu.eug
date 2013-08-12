@@ -1,0 +1,70 @@
+PartType Promoter;
+PartType RBS;
+PartType Gene;
+PartType Terminator;
+
+Promoter promoter1;
+Promoter promoter2;
+Promoter promoter3;
+Promoter promoter4;
+
+RBS rbs1;
+RBS rbs2;
+RBS rbs3;
+
+Gene gene1;
+Gene gene2;
+Gene gene3;
+Gene gene4;
+Gene gene5;
+
+Terminator terminator1;
+Terminator terminator2;
+Terminator terminator3;
+
+Device TU(Promoter, RBS, Gene, Terminator);
+
+/*
+ * k=0 ... 180
+ */
+Device[] lst = product(TU);
+println(lst.size());
+
+/*
+ * k=1 ... 45
+ */
+Rule r1(CONTAINS promoter1);
+lst = product(TU, strict);
+println(lst.size());
+
+
+/*
+ * k=2 ... 15
+ */
+Rule r2(CONTAINS rbs1);
+lst = product(TU, strict);
+println(lst.size());
+
+/*
+ * k=3 ... 3
+ */
+Rule r3(CONTAINS gene1);
+lst = product(TU, strict);
+println(lst.size());
+
+/*
+ * k=4 ... 1
+ */
+Rule r4(CONTAINS terminator1);
+lst = product(TU, strict);
+println(lst.size());
+
+/*
+ * k=5 ... 0
+ */
+Rule r5(CONTAINS terminator2);
+lst = product(TU, strict);
+println(lst.size());
+
+
+

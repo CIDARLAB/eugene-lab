@@ -1,0 +1,184 @@
+/* Nif HDKY Data Set 1 */
+
+Property Name(txt);
+Property Strength(num);
+Property UUID(txt);
+Property Type(txt);
+Property Color(num);
+
+Part Promoter(UUID, Name, Strength, Type, Color);
+Part RBS(UUID, Name, Strength, Type, Color);
+Part Term(UUID, Name, Type, Color);
+Part Spacer(UUID, Name, Type, Color);
+Part CDS(UUID, Name, Type, Color);
+
+Promoter T7("0000", "T7", 0.38, "p", 5);
+Promoter P6("0001", "P6", 0.162, "p", 4);
+Promoter P4("0002", "P4", 0.089, "p", 3);
+//Promoter P5("0003", "P5", 0.056, "p", 2);
+//Promoter P2("0004", "P2", 0.019, "p", 1);
+
+// RBS 0 value from Data set 1
+RBS R0("0005", "RBS0", 42010.79, "r", 3);
+RBS R1("0006", "RBS1", 39802.15, "r", 1);
+RBS R2("0007", "RBS2", 52612.24, "r", 5);
+//RBS R3("0008", "RBS3", 52612.24, "r", 5); // Strange: Str(RBS2) == Str(RBS3)?
+//RBS R4("0009", "RBS4", 52612.24, "r", 5); // Strange: Str(RBS2) == Str(RBS4)?
+//RBS R5("000a", "RBS5", 52612.24, "r", 5); // Strange: Str(RBS2) == Str(RBS5)?
+//RBS R6("000b", "RBS6", 52612.24, "r", 5); // Strange: Str(RBS2) == Str(RBS6)?
+//RBS OriginalRBS("000c", "OriginalRBS", 0, "r", 0);
+
+CDS H("000c", "H", "c", 2);
+CDS D("000d", "D", "c", 4);
+CDS K("000e", "K", "c", 6);
+CDS Y("000f", "Y", "c", 8);
+
+Term OriginalTerminator("0010", "OriginalTerminator", "t", 6);
+Term T23("0011", "T23", "t", 6);
+Term TB("0012", "TB", "t", 6);
+
+Spacer S1("0013", "S1", "s", 0);
+Spacer OriginalSpacer("0013", "OriginalSpacer", "s", 0);
+
+
+// reverse parts
+
+//Promoter T7r("0000", "T7", 0.38, "<p", 5);
+//Promoter P6r("0001", "P6", 0.162, "<p", 4);
+//Promoter P4r("0002", "P4", 0.089, "<p", 3);
+Promoter P5r("0003", "P5", 0.056, "<p", 2);
+Promoter P2r("0004", "P2", 0.019, "<p", 1);
+
+
+CDS Hr("000c", "H", "<c", 2);
+CDS Dr("000d", "D", "<c", 4);
+CDS Kr("000e", "K", "<c", 6);
+CDS Yr("000f", "Y", "<c", 8);
+
+// PARTS library end 
+
+
+Device FirstDataSetDev (
+    Promoter, 
+        RBS, CDS, 
+    T23, 
+    S1, 
+    Promoter,
+        OriginalSpacer, RBS, CDS, 
+        OriginalSpacer, RBS, CDS,
+        OriginalSpacer, RBS, CDS,
+    OriginalTerminator
+);
+
+
+
+
+
+Device RC (
+    RBS, CDS
+);
+
+Device RCTSP (
+    RBS, CDS, Term, Spacer, Promoter
+);
+Device RCTP (
+    RBS, CDS, Term, Promoter
+);
+Device SRC (
+    Spacer, RBS, CDS
+);
+Device SRCTP (
+    RBS, CDS, Term, Promoter
+);
+Device RCT (
+    RBS, CDS, Term
+);
+Device SRCT (
+    Spacer, RBS, CDS, Term
+);
+
+Device FirstDataSetDev2 (
+    Promoter, RCTSP, SRC, SRC, SRCT
+);
+
+
+// Conjecture: this is ``equivalent'' to the regular expression: 
+// P (RC|RCTP|SRC|SRCTP)* (RCT|SRCT)
+
+function boolean checkBasicRules(Device d) {
+
+    print("[checkBasicRules] d -> ",d);
+    
+    Rule r1 (d STARTSWITH Promoter);
+    Rule r2 (d ENDSWITH RCT);
+    Rule r3 (d ENDSWITH SRCT);
+    Rule r4 (r2 OR r3);
+    Rule r5 (ON d: NOT RCT MORETHAN 1);
+    Rule r6 (ON d: NOT SRCT MORETHAN 1);
+
+    Rule r7 (r1 AND (r2 OR r3) AND r5 AND r6);
+    
+    if (r7) {
+        return true;
+    }
+    return false;
+}
+
+
+// Example: Exactly four genes in an operon.
+// Two come from the rules, 
+// one more from the terminator device SRCT or RCT
+// which every device must contain.
+
+function boolean checkOperonRules(Device d) {
+
+    Rule r1 (ON d: SRC MORETHAN 1);
+    Rule r2 (ON d: RC MORETHAN 1);
+    Rule r3 (r1 OR r2);
+    Rule r4 (ON d: NOT SRC MORETHAN 2);
+    Rule r5 (ON d: NOT RC MORETHAN 2);
+    Rule r6 (r4 AND r5);
+
+    Rule r7 (r3 AND r6);
+
+    if (r7) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+
+
+Device[] correctDevs;
+
+function printDev(Device d) {
+    num j = 0;
+    print();
+    for (num m=0; m<d.size(); m++) {
+        if (d[m].Color > 0) {
+            print(d[m].Type, " ", d[m].Name, " ", d[m].Color, " nl");
+        } else {
+            print(d[m].Type, " ", d[m].Name, " nl");
+        }
+    }
+}
+
+
+//for (num i=0; i<1; i++) {
+    Device[] FirstDevices  = permute(FirstDataSetDev, 10, strict);
+    //FirstDevices.add(FirstDataSetDev2);
+    
+    for(num j=0; j<FirstDevices.size(); j++) {
+        boolean b = checkBasicRules(FirstDevices[j]);
+        if (b) {
+            print ("Hi", FirstDevices[0]);
+            Device d1 = product(FirstDevices[0], 10, strict);
+            //print ("# Products : ", d1.size());
+            for (num k=0; k<d1.size(); k++) {
+                printDev(d1[k]);
+            }
+        }
+    }
+//    }
+//}

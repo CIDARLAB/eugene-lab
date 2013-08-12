@@ -1,0 +1,85 @@
+include "./tests/design-space.h"
+
+/*
+                             A                                ... depth=0
+               /             |            \                   
+          B1                 B2               B3              ... depth=1
+     /    / \   \       /   /   \  \     /   /  \   \ 
+    C11 C12 C13 C14    C21 C22 C23 C24  C31 C32 C33 C34       ... depth=2
+ P1, P2, P3, P4, P5                                           ... depth=3
+ */
+
+Device C11(P1, P2, P3, P4, P5);
+Device C12(P1, P2, P3, P4, P5);
+Device C13(P1, P2, P3, P4, P5);
+Device C14(P1, P2, P3, P4, P5);
+ 
+Device C21(P1, P2, P3, P4, P5);
+Device C22(P1, P2, P3, P4, P5);
+Device C23(P1, P2, P3, P4, P5);
+Device C24(P1, P2, P3, P4, P5);
+
+Device C31(P1, P2, P3, P4, P5);
+Device C32(P1, P2, P3, P4, P5);
+Device C33(P1, P2, P3, P4, P5);
+Device C34(P1, P2, P3, P4, P5);
+
+Device B1(C11, C12, C13, C14);
+Device B2(C21, C22, C23, C24);
+Device B3(C31, C32, C33, C34);
+
+Device A(B1, B2, B3);
+
+/** maxDepth() **/
+/***
+println(A.maxDepth());
+
+println(B1.maxDepth());
+println(B2.maxDepth());
+println(B3.maxDepth());
+
+println(C11.maxDepth());
+println(C12.maxDepth());
+println(C13.maxDepth());
+println(C14.maxDepth());
+
+println(C21.maxDepth());
+println(C22.maxDepth());
+println(C23.maxDepth());
+println(C24.maxDepth());
+
+println(C31.maxDepth());
+println(C32.maxDepth());
+println(C33.maxDepth());
+println(C34.maxDepth());
+***/
+
+/** now, let's build even bigger devices **/
+Device X(-A, -A, -A);
+Device Y(X,A,X);
+Device Z(X,Y);
+Device U(Z);
+
+//println(X.maxDepth());
+//println(Y.maxDepth());
+//println(Z.maxDepth());
+//println(U.maxDepth());
+
+
+/* now, let's print the devices of each level **/
+/**
+println(U.depth(0));
+println(U.depth(1));
+println(U.depth(2));
+println(U.depth(3));
+println(U.depth(4));
+println(U.depth(5));
+println(U.depth(6));
+println(U.depth(7));
+**/
+
+num n = U.maxDepth();
+println (n);
+for(num i=0; i<n; i++) {
+	println(U.depth(i));
+}

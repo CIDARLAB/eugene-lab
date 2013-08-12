@@ -1,0 +1,47 @@
+/*
+Douglas Densmore
+Eugene Code for Refactored System
+3/9/11
+*/
+
+include "./case-study/nitrogen-fixation/design-space.h";
+//include "./case-study/nitrogen-fixation/functions.h";
+
+Device Controller = Promoter + Promoter + RBS + Gene + Terminator +
+	Promoter + RBS + Gene + RBS + Gene + Terminator +
+	Origin + ResistanceMarker +
+	Terminator + Terminator + Gene + Promoter + 
+	Promoter + Spacer + RBS + DegradationTag + Gene + Terminator +
+	Origin + ResistanceMarker;
+	
+//println(Controller);
+	
+Device[] lstControllers = product(Controller);
+//println(lstControllers);	
+
+
+/***
+Device Controller(Terminator, Promoter, Promoter, RBS, Gene, Terminator, Promoter)
+
+Device Backbone(BBa_G00001, BBa_B0042, BBa_B0054, BBa_G00102, BBa_B0062, BBa_I50042, BBa_P1004, BBa_B0053, BBa_G00101, BBa_B0055, BBa_B0042);
+
+txt backboneSeq = "";
+for(num i=0; i<Backbone.size(); i++) {
+    backboneSeq = backboneSeq + Backbone[i][0];
+}
+print (backboneSeq);
+
+Device RefactoredSystem(T7_promoter_WT, nifH_rbs, nifH, insulator_1, nifD_rbs, nifD, insulator_2, nifK_rbs, nifK, insulator_3, nifY_rbs, nifY, insulator_4, nifE_rbs, nifE, insulator_5, infN_rbs, nifN, nifJ_rbs, nifJ, T7_terminator_25, insulator_6, T7_promoter_mut_2, insulator_7, nifB_rbs, nifB, insulator_8, nifQ_rbs, nifQ, T7_terminator_1, insulator_9, T7_promoter_mut_3, nifF_rbs, nifF, T7_terminator_1, insulator_10, T7_promoter_mut_2, insulator_11, nifU_rbs, nifU, insulator_12, nifS_rbs, nifS, insulator_13, nifV_rbs, nifV, insulator_14, nifW_rbs, nifW, insulator_15, nifZ_rbs,  nifZ, insulator_16, nifM_rbs, nifM,  T7_terminator_WT, Backbone); 
+txt sysSeq = "";
+for(num i=0; i<56; i++) {
+    sysSeq = sysSeq + RefactoredSystem[i][0];
+}
+sysSeq = sysSeq + backboneSeq;
+
+print(sysSeq);
+
+//txt s = getSequence(RefactoredSystem);
+//print(s);
+***/
+ 
+ 

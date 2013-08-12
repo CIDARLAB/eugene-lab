@@ -1,0 +1,23 @@
+PartType Promoter();
+PartType RBS();
+PartType Gene();
+PartType Terminator();
+
+Device TU1 (Promoter, RBS, Gene, Terminator);
+Device TU2 (Promoter, RBS, Gene, Terminator);
+Device TU3 (Promoter, RBS, Gene, Terminator);
+Device TU4 (Promoter, RBS, Gene, Terminator);
+
+Device Inverter (-TU1, -TU2, -TU3, -TU4);
+
+num n = Inverter.maxDepth();
+println("max depth: ", n);
+
+Inv = Inverter.depth(0);
+println(Inv);
+
+TUs = Inverter.depth(1);
+println(TUs);
+
+Parts = Inverter.depth(2);
+println(Parts);

@@ -1,0 +1,32 @@
+digraph BST {
+    node [color=lightblue2, style=filled, fontname="Arial", shape=box];
+    Inverter -> TU1;
+    Inverter -> TU2;
+    Inverter -> TU3;
+    Inverter -> TU4;
+    
+    node [shape=promoter];
+    TU1 -> promoter1;
+    TU2 -> promoter2;
+    TU3 -> promoter3;
+    TU4 -> promoter4;
+    
+    
+    node [shape=utr];
+    TU1 -> rbs1;
+    TU2 -> rbs2;
+    TU3 -> rbs3;
+    TU4 -> rbs4;
+
+    node [shape=cds];
+    TU1 -> cds1;
+    TU2 -> cds2;
+    TU3 -> cds3;
+    TU4 -> cds4;
+
+    node [shape=terminator];
+    TU1 -> terminator1;
+    TU2 -> terminator2;
+    TU3 -> terminator3;
+    TU4 -> terminator4;
+}

@@ -1,0 +1,11 @@
+include "./tests/declaration/part-declaration.eug"
+
+Device D (P1, P2, P3, P4, P5, P6, P7, P8, P9, P10);
+//Device X (D, D);
+//Device Y (X);
+//Device Z (X, Y, D);
+
+//println(D);
+//println(X);
+//println(Y);
+//println(Z);

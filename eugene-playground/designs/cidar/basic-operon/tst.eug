@@ -1,0 +1,60 @@
+Property seq(txt);
+Property name(txt);
+Property regulator(txt);
+Property type(txt);
+Property maxLow(num);
+Property minHigh(num);
+Property copyCount(num);
+
+
+Part Promoter(name, type, regulator, minHigh, maxLow, seq);
+Part miRNA(name, seq);
+Part CDS(name, seq);
+Part miRNASite(name, seq, regulator);
+
+
+Promoter  pLac("pLac", "R", "LacI", 20, 0, "HAHA");
+miRNA     m1("m1", "MAMA");
+CDS       s1("s1", "SISI");
+miRNASite ms1("m1", "MAMA", "m1");
+miRNASite ms2("m2", "PAPA", "m1");
+
+
+Device miRNA2x(miRNASite, miRNASite);
+Device miRNA4x(miRNA2x, miRNA2x);
+Device OutputmRNA(CDS, miRNA4x);
+
+Device [] d = product(OutputmRNA);
+Device dd;
+
+// rule test function
+function boolean ruleTest (Device d, Part p) {
+    print("[ruleTest] d: ",d);
+    Rule r (NOT d CONTAINS p);
+    if(r) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+boolean b = ruleTest(d[0], ms2);
+
+for(num i=0; i<d.size(); i++) {
+    b = ruleTest(d[i], s1);
+    if(b) {
+        print(d[i]," passed the rule test");
+    } else {
+        print(d[i]," failed at the rule test");
+    }
+}
+
+// build some faulty device
+Device faulty(pLac);
+b = ruleTest(faulty,s1);
+if(b) {
+    print("The ",faulty," device passed the rule test");
+} else {
+    print("The ",faulty," device failed at the rule test");
+}
+

@@ -1,0 +1,62 @@
+include "./tests/declaration/device-declaration.eug"
+
+/**
+Device D1 (P1);
+Rule r ( ( CONTAINS p1_1 AND NOT CONTAINS p1_1 ) );
+product(D1, strict);   // <- there should be no solutions
+ **/
+ 
+/** 
+Device D2 (P1, P2);
+Rule r( ( CONTAINS p1_1 AND NOT CONTAINS p2_1 ) OR
+        ( CONTAINS p2_1 AND NOT CONTAINS p1_1 ) );        
+product(D2, strict);         // <- 198 (i.e. 99 + 99) solutions  
+                             // i.e. the first 99 designs contain p1_1 and not p2_1
+                             //  and the second 99 design do not contain p1_1 but contain p2_1
+ **/
+
+/**
+Device D3 (P1, P2, P3);
+Rule r (CONTAINS p1_1 AND CONTAINS p2_1 AND CONTAINS p3_1);
+product(D3, strict);   // <- 1 solution
+ **/
+ 
+/** 
+Rule r( ( CONTAINS p1_1 AND NOT CONTAINS p2_1 AND NOT CONTAINS p3_1 ) OR
+        ( CONTAINS p2_1 AND NOT CONTAINS p1_1 AND NOT CONTAINS p3_1 ) OR
+        ( CONTAINS p3_1 AND NOT CONTAINS p1_1 AND NOT CONTAINS p2_1 ) );        
+product(D3, strict);         // <- 29403 ( (1x99x99) x (99x1x99) x (99x99x1)) possible solutions
+        // WHY DOES THIS NOT WORK???
+ **/
+
+
+/**
+Device DonlyP1(P1, P1);
+Rule r (
+	ON DonlyP1:
+		NOT CONTAINS p1_1);
+product(DonlyP1, strict);    // <-- 9801 (99x99) possible solutions
+ **/
+
+Device D_P1(
+	P1, P1, P1, P1, P1, P1, P1, P1, P1, P1, 
+	P1, P1, P1, P1, P1, P1, P1, P1, P1, P1, 
+	P1, P1, P1, P1, P1, P1, P1, P1, P1, P1, 
+	P1, P1, P1, P1, P1, P1, P1, P1, P1, P1, 
+	P1, P1, P1, P1, P1, P1, P1, P1, P1, P1, 
+	P1, P1, P1, P1, P1);
+Rule r(
+	CONTAINS p1_1 AND CONTAINS p1_2 AND CONTAINS p1_3 AND CONTAINS p1_4 AND CONTAINS p1_5
+	AND
+	CONTAINS p1_6 AND CONTAINS p1_7 AND CONTAINS p1_8 AND CONTAINS p1_9 AND CONTAINS p1_10
+	AND
+	CONTAINS p1_11 AND CONTAINS p1_12 AND CONTAINS p1_13 AND CONTAINS p1_14 AND CONTAINS p1_15
+	AND
+	CONTAINS p1_16 AND CONTAINS p1_17 AND CONTAINS p1_18 AND CONTAINS p1_19 AND CONTAINS p1_20
+	AND
+	CONTAINS p1_21 AND CONTAINS p1_22 AND CONTAINS p1_23 AND CONTAINS p1_24 AND CONTAINS p1_25
+	AND
+	CONTAINS p1_26 AND CONTAINS p1_27 AND CONTAINS p1_28 AND CONTAINS p1_29 AND CONTAINS p1_30
+ );
+product(D_P1, strict);    	
+

@@ -1,0 +1,46 @@
+// here we will test Eugene's product function
+
+include "./tests/design-space.h"
+
+/*
+                             A
+               /             |            \
+          B1                 B2               B3
+     /    / \   \       /   /   \  \     /   /  \   \
+    C11 C12 C13 C14    C21 C22 C23 C24  C31 C32 C33 C34        
+ */
+
+Device C11(P1, P2, P3, P4, P5);
+Device C12(P1, P2, P3, P4, P5);
+Device C13(P1, P2, P3, P4, P5);
+Device C14(P1, P2, P3, P4, P5);
+ 
+Device C21(P1, P2, P3, P4, P5);
+Device C22(P1, P2, P3, P4, P5);
+Device C23(P1, P2, P3, P4, P5);
+Device C24(P1, P2, P3, P4, P5);
+
+Device C31(P1, P2, P3, P4, P5);
+Device C32(P1, P2, P3, P4, P5);
+Device C33(P1, P2, P3, P4, P5);
+Device C34(P1, P2, P3, P4, P5);
+
+Device B1(C11, C12, C13, C14);
+Device B2(C21, C22, C23, C24);
+Device B3(C31, C32, C33, C34);
+
+Device A(B1, B2, B3);
+println(A);
+
+product(A);
+/**
+product(A, strict, 1);
+product(A, strict, 2);
+product(A, strict, 3);   // too deep
+product(A, strict, 4);   // too deep
+
+permute(A, strict, 1);
+permute(A, strict, 2);
+permute(A, strict, 3);
+permute(A, strict, 4);
+**/

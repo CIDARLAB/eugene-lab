@@ -1,0 +1,36 @@
+/*
+ * HERE ARE SOME DEMOS OF FOL RULES
+ */
+ 
+// for all rules 
+Rule forall1(
+    ON D:
+        FORALL A: (A AFTER B AND A AFTER C)
+);
+
+
+// exists rules
+
+
+Rule exists2(
+    ON D:
+        EXISTS A: (A AFTER B)
+);
+
+Rule exists2(
+    ON D:
+        EXISTS B: (A AFTER B)
+);
+
+
+// combined
+Rule comb1(
+    ON D:
+        FORALL A EXISTS B: (A AFTER B) 
+        
+        AND
+        
+        NOT CONTAINS C        
+);
+
+
