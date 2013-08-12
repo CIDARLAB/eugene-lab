@@ -269,7 +269,7 @@ public class EugeneServlet extends HttpServlet {
                 String fileName = request.getParameter("input");
                 fileName = getFileExtension(fileName, true);
                 try {
-                    Component c = importGenbankComponent(fileName);
+                    Component c = loadGenBank(new File(fileName));
                     result = c.toString();
                 } catch(Exception e) {
                     result = e.toString();
@@ -672,7 +672,65 @@ public class EugeneServlet extends HttpServlet {
         return SBOLImporter.importSBOL(sbolFileName);
     }
     
-    private static Component importGenbankComponent(String sFileName) throws MalformedURLException, IOException, 
+    // Loads a GenBank component straight from the 
+    private Component loadGenBank(String componentName) throws MalformedURLException, IOException, 
+            InvalidEugeneAssignmentException, NoSuchElementException, BioException {
+        URL url = new URL("http:www.ncbi.nlm.nih.gov/nuccore/" + componentName);
+        BufferedReader br = new BufferedReader(new InputStreamReader(url.openStream()));
+        return readGenBankComponent(br);
+    }
+    
+    private Component loadGenBank(File file) throws FileNotFoundException, InvalidEugeneAssignmentException, 
+            NoSuchElementException, BioException {
+        BufferedReader br = new BufferedReader(new FileReader(file));
+        return readGenBankComponent(br);
+    }
+    
+    private Component readGenBankComponent(BufferedReader br) throws InvalidEugeneAssignmentException, 
+            NoSuchElementException, BioException {
+        SequenceIterator sequences = SeqIOTools.readGenbank(br);
+        List<Component> parts = new ArrayList<Component>();
+        String deviceName = "UnnamedDevice";
+        // Should only have one sequence
+        boolean firstPass = true;
+        while(sequences.hasNext()) {
+            Sequence seq = sequences.nextSequence();
+            if(firstPass) {
+                deviceName = seq.getName();
+            } else {
+                deviceName += "|" + seq.getName();
+            }
+            Iterator it = seq.features();
+            while(it.hasNext()) {
+                Feature feature = (Feature) it.next();
+                parts.add(buildPart(feature));
+            }
+        }
+        if(parts.isEmpty()) {
+            return null;
+        } else if(parts.size() == 1) {
+            // Size 1 imples just one part
+            return parts.get(0);
+        } else {
+            //@TODO: get a real device name
+            return Device.newInstance(deviceName, parts);
+        }
+    }
+    
+    private Part buildPart(Feature feature) throws InvalidEugeneAssignmentException {
+        PartType partType = new PartType(feature.getType());
+        String partName = getPartName(feature);
+        Part part = new Part(partType, partName);
+        part.setSequence(feature.getSequence().seqString());
+        return part;     
+    }
+    
+    private String getPartName(Feature feature) {
+        return feature.getType() + "_at_" + feature.getLocation().getMin();
+    }
+    
+    /* Temporarily saved for reference
+    private Component importGenbankComponent(String sFileName) throws MalformedURLException, IOException, 
             NoSuchElementException, BioException, InvalidEugeneAssignmentException {
         //Website has files embedded in the website so need to find a way to isolate the file from the rest of the website
         //Currently using direct file upload to test
@@ -712,6 +770,7 @@ public class EugeneServlet extends HttpServlet {
         }
 		
     }
+    * */
     
     // Takes a device and stores it in Clotho
     private boolean toClotho(NamedElement element) {
