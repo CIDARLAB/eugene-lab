@@ -6,14 +6,12 @@ import eugene.data.sbol.SBOLImporter;
 import eugene.dom.NamedElement;
 import eugene.dom.PropertyValue;
 import eugene.dom.SavableElement;
-import eugene.dom.collection.Collection;
 import eugene.dom.components.Component;
 import eugene.dom.components.Device;
 import eugene.dom.components.Part;
 import eugene.dom.components.Property;
 import eugene.dom.components.types.PartType;
 import eugene.exception.EugeneException;
-import eugene.exception.InvalidEugeneAssignmentException;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -48,6 +46,7 @@ import org.biojava.bio.seq.Feature;
 import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.SequenceIterator;
 import org.biojava.bio.seq.io.SeqIOTools;
+import org.cidarlab.eugene.builder.EugeneBuilder;
 import org.cidarlab.weyekin.WeyekinPoster;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -674,19 +673,19 @@ public class EugeneServlet extends HttpServlet {
     
     // Loads a GenBank component straight from the 
     private Component loadGenBank(String componentName) throws MalformedURLException, IOException, 
-            InvalidEugeneAssignmentException, NoSuchElementException, BioException {
+            EugeneException, NoSuchElementException, BioException {
         URL url = new URL("http:www.ncbi.nlm.nih.gov/nuccore/" + componentName);
         BufferedReader br = new BufferedReader(new InputStreamReader(url.openStream()));
         return readGenBankComponent(br);
     }
     
-    private Component loadGenBank(File file) throws FileNotFoundException, InvalidEugeneAssignmentException, 
+    private Component loadGenBank(File file) throws FileNotFoundException, EugeneException, 
             NoSuchElementException, BioException {
         BufferedReader br = new BufferedReader(new FileReader(file));
         return readGenBankComponent(br);
     }
     
-    private Component readGenBankComponent(BufferedReader br) throws InvalidEugeneAssignmentException, 
+    private Component readGenBankComponent(BufferedReader br) throws EugeneException, 
             NoSuchElementException, BioException {
         SequenceIterator sequences = SeqIOTools.readGenbank(br);
         List<Component> parts = new ArrayList<Component>();
@@ -713,11 +712,12 @@ public class EugeneServlet extends HttpServlet {
             return parts.get(0);
         } else {
             //@TODO: get a real device name
-            return Device.newInstance(deviceName, parts);
+            return EugeneBuilder.buildDevice(deviceName, parts);
         }
     }
     
-    private Part buildPart(Feature feature) throws InvalidEugeneAssignmentException {
+    private Part buildPart(Feature feature) 
+                throws EugeneException {
         PartType partType = new PartType(feature.getType());
         String partName = getPartName(feature);
         Part part = new Part(partType, partName);
