@@ -1,3 +1,0 @@
-include "./tests/declaration/device-declaration.eug"
-
-permute(D);
