@@ -25,7 +25,7 @@ public class EugeneTester {
     public static void main(String[] args) 
             throws Exception {
         EugeneTester et = new EugeneTester();
-        et.execute("./web/eugene-examples/inverter_rev1.eug");
+        et.execute("./web/eugene-examples/inverter_rev3.eug");
     }
 
     public void execute(String sFile) 

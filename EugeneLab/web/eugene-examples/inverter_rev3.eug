@@ -23,7 +23,7 @@ PartType Terminator (Name, Sequence, Pigeon);
 PartType SmallMolecule (Name, Pigeon);
 
 
-/* fusion sites -> NOT NEEDED FOR NOW
+/* fusion sites
 PartType FusionSite(Name, Sequence);
 FusionSite A(.Name("A"), .Sequence("GGAG"));
 FusionSite B(.Name("B"), .Sequence("TACT"));
@@ -35,10 +35,22 @@ FusionSite G(.Name("G"), .Sequence("TGCC"));
 FusionSite H(.Name("H"), .Sequence("GGAG"));
  */
  
+/*** Constituitive Promoter ***/ 
 ConstPr J23100(
 	.Name("J23100"), 
 	.Sequence("TTGACGGCTAGCTCAGTCCTAGGTACAGTGCTAGC"), 
 	.Pigeon("p J23100"));
+	
+/*** Inducible Promoters ***/
+
+// pLuxR
+IndPr R0062(
+	.Name("R0062"),
+	.Sequence("acctgtaggatcgtacaggtttacgcaagaaaatggtttgttatagtcgaataaa"),
+	.InducedBy("C0062"),
+	.Pigeon("p R0062 3"));
+
+/*** Repressible Promoters ***/ 	
 RepPr R0040(
 	.Name("R0040"), 
 	.Sequence("TCCCTATCAGTGATAGAGATTGACATCCCTATCAGTGATAGAGATACTGAGCAC"),
@@ -48,8 +60,23 @@ RepPr R0051 (
 	.Name("R0051"),
 	.Sequence("taacaccgtgcgtgttgactattttacctctggcggtgataatggttgc"),
 	.RepressedBy("C0051"),
-	.Pigeon("p R0051 7"));
+	.Pigeon("p R0051 2"));
 
+// pLacI
+RepPr K091112 (
+	.Name("K091112"),
+	.Sequence("agcggcatgcatttacgttgacaccacctttcgcggtatggcatgatagcgcccgg"),
+	.RepressedBy("C0012"),
+	.Pigeon("p K091112 9"));
+
+RepPr I13453 (
+	.Name("I13453"),
+	.Sequence("acattgattatttgcacggcgtcacactttgctatgccatagcatttttatccataagattagcggatcctacctgacgctttttatcgcaactctctactgtttctccataccgtttttttgggctagc"),
+	.RepressedBy("C0080"),
+	.Pigeon("p I13453 7"));	
+
+
+/*** RBSs ***/	
 RBS B0030m(.Name("B0030m"), 
 	.Sequence("AGAGATTAAAGAGGAGAAATACTA"), 
 	.Strength(2), 
@@ -73,8 +100,9 @@ RBS B0034m1(
 	.Name("B0034m1"), 
 	.Sequence("AGAGAAAGAGGAGAAATACTA"), 
 	.Strength(1), 
-	.Pigeon("r B0034m_BC"));
+	.Pigeon("r B0034m"));
 
+/*** REPRESSORS ***/
 Repressor C0040(
 	.Name("C0040"), 
 	.Sequence("ATGTCCAGATTAGATAAAAGTAAAGTGATTAACAGCGCATT
@@ -89,7 +117,7 @@ TATGCGGATTAGAAAAACAACTTAAATGTGAAAGTGGGTCCGCTGCAAACGACGAAAACTACGCTTTAGTAGCTTAA
 TAACACTGATAGTGCTAGTGTAGATCAC"),
 	.Represses("R0040"),
 	.Pigeon("c C0040 5"));
-	
+
 Repressor C0012(
 	.Name("C0012"), 
 	.Sequence("ATGGTGAATGTGAAACCAGTAACGTTATACGATGTCGCAGAGTAT
@@ -108,7 +136,7 @@ GGCCAGGCGGTGAAGGGCAATCAGCTGTTGCCCGTCTCACTGGTGAAAAGAAAAACCACCCTGGCGCCCAATACGCAAAC
 GCCTCTCCCCGCGCGTTGGCCGATTCATTAATGCAGCTGGCACGACAGGTTTCCCGACTGGAAAGCGGGCAGGCTGCAAAC
 GACGAAAACTACGCTTTAGTAGCTTAATAACTCTGATAGTGCTAGTGTAGATCTC"), 
 	.Represses("K091112"),
-	.Pigeon("c C0012 5"));
+	.Pigeon("c C0012 9"));
 
 Repressor C0080(
 	.Name("C0080"), 
@@ -141,9 +169,10 @@ AACTGATCAGGGATAGCGGTCAGGTGTTTTTACAACCACTAAACCCACAGTACCCAATGATCCCATGCAATGAGAGT
 TGTTCCGTTGTGGGGAAAGTTATCGCTAGTCAGTGGCCTGAAGAGACGTTTGGCGCTGCAAACGACGAAAACTACGC
 TTTAGTAGCTTAATAACGCTGATAGTGCTAGTGTAGATCGC"),
 	.Represses("R0051"),
-	.Pigeon("c C0051 7"));
+	.Pigeon("c C0051 2"));
 
 
+/*** INDUCERS ***/
 Inducer C0062(
 	.Name("C0062"), 
 	.Sequence("atgaaaaacataaatgccgacgacacatacagaataattaata
@@ -159,6 +188,8 @@ tgcgcaaatgaaactcaatacaacaaaccgctgccaaagtatttctaaagcaattttaacaggagcaattgattgcc
 catactttaaaaattaataa"),
 	.Induces("R0062"));
 
+
+/*** REPORTERS ***/
 Reporter E1010m(
 	.Name("E1010m"), 
 	.Sequence("AATGATGGCTTCCTCCGAGGATGTTATCAAAGAGTTCATG
@@ -189,6 +220,7 @@ TTCTTGAGTTTGTAACAGCTGCTGGGATTACACATGGCATGGATGAACTATACAAATAATAA"),
 	.Description("GFP"),
 	.Pigeon("c E0040 4"));
 
+/*** TERMINATORS ***/
 Terminator B0015(
 	.Name("B0015"), 
 	.Sequence("CCAGGCATCAAATAAAACGAAAGGCTCAGTCGAAAGACTG
@@ -196,51 +228,80 @@ GGCCTTTCGTTTTATCTGTTGTTTGTCGGTGAACGCTCTCTACTAGAGTCACACTGGCTCACCTTCGGGTGGGCCTT
 TCTGCGTTTATA"),
 	.Pigeon("t B0015"));
 
+/***
+Terminator B0015x(
+	.Name("B0015x"), 
+	.Sequence("CCAGGCATCAAATAAAACGAAAGGCTCAGTCGAAAGACTG
+GGCCTTTCGTTTTATCTGTTGTTTGTCGGTGAACGCTCTCTACTAGAGTCACACTGGCTCACCTTCGGGTGGGCCTT
+TCTGCGTTTATA"),
+	.Pigeon("t B0015x"));
+***/
+
+/** SPECIFICATION OF RELATIONSHIPS **/
+C0040 REPRESSES R0040;
+C0012 REPRESSES K091112;
+C0080 REPRESSES I13453;
+C0051 REPRESSES R0051;
+C0062 INDUCES R0062;
+
 
 //Intermediate Devices (Transcriptional Units)
-Device Inverter ( 
-	ConstPr, RBS, Repressor, Terminator,
-	RepPr, RBS, Repressor, Terminator,
-	RepPr, RBS, Reporter, Terminator,
-	RepPr, RBS, Reporter, Terminator);
+Device TU1 (ConstPr, RBS, Repressor, Terminator);
+Device TU2 (RepPr, RBS, Repressor, Terminator);
+Device TU3 (RepPr, RBS, Reporter, Terminator);
+Device TU4 (RepPr, RBS, Reporter, Terminator);
 
-Rule rTmp (
+Device Inverter (TU1, TU2, TU3, TU4);
+
+// now, let's define some rules
+
+Rule validInverter(
 	ON Inverter:
-	 	// Represses relationships
-		Inverter[2].Represses EQUALS Inverter[4].Name 
-				AND
-        	Inverter[2].Represses EQUALS Inverter[8].Name 
-        		AND
-			Inverter[6].Represses EQUALS Inverter[12].Name 
-		
-		AND
-		
-			// equal RBS in TU2 and TU3
-			Inverter[5] EQUALS Inverter[9] 
-		
-		AND
-		
-			// GFP and RFP ??
-			E0040 WITH E1010m 
-				AND
-			E0040 AFTER E1010m
-		 
-		AND
-			// RBS order ?? 
-			B0030m WITH B0031m AND B0031m WITH B0032m
-				AND
-			B0030m BEFORE B0031m AND B0031m BEFORE B0032m
+// RULE 1: equal RBSs in TU2 and TU3			
+		Inverter[1][1] EQUALS Inverter[2][1]
+		// ALTERNATIVES:
+		// - Inverter.TU2.RBS EQUALS Inverter.TU3.RBS
+		// - Inverter.TU2[1] EQUALS Inverter.TU3[1]
+		// - Inverter[2].RBS EQUALS Inverter[1].RBS
 
-		AND 
+			AND
+			
+// RULE 2: the RBSs in TU2 and TU3 can either be B0030m or B0034m1			
+		( Inverter.TU2.RBS EQUALS B0030m OR Inverter.TU2.RBS EQUALS B0034m1 )
 		
-			// different Repressors
-			Inverter[2] NOTEQUALS Inverter[6]
+			AND
+
+// RULE 3: different Repressors
 		
+		Inverter.TU1.Repressor NOTEQUALS Inverter.TU2.Repressor
+			
+			AND
+			
+// RULE 4: different Reporters		
+		E0040 WITH E1010m 
+
+			AND
+			
+// RULE 5: GFP before RFP
+		E0040 BEFORE E1010m
+
+			AND			
+			
+// RULE 6: REPRESSION relationships
+		Inverter.TU1.Repressor REPRESSES Inverter.TU2.RepPr
+			AND
+		Inverter.TU1.Repressor REPRESSES Inverter.TU3.RepPr
+			AND
+		Inverter.TU2.Repressor REPRESSES Inverter.TU4.RepPr
+		
+			AND
+			
+// Rule 7: order of the repressors
+		CONTAINS C0040 AND CONTAINS C0012 AND C0040 BEFORE C0012
 );
 
-
-Device[] lst = product(Inverter, strict);
-
-//println(lst.size(), " inverters were generated...");
-save(lst);
-
+Device[] lstInverters = product(Inverter, strict);
+println("lstInverters.size -> ", lstInverters.size());
+println("*** DONE ***");
+//println(lstInverters);
+pigeon(lstInverters);
