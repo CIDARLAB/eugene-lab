@@ -1,6 +1,6 @@
 package org.cidarlab.eugene.rules.tree.predicate;
 
-import eugene.exception.EugeneException;
+import org.cidarlab.eugene.exception.EugeneException;
 
 public interface RulePredicate 
 	extends Predicate {

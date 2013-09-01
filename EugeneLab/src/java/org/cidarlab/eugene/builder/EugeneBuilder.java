@@ -22,6 +22,7 @@ ENHANCEMENTS, OR MODIFICATIONS.
 
 package org.cidarlab.eugene.builder;
 
+import org.cidarlab.eugene.dom.arrays.PermutedDeviceArray;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -33,24 +34,23 @@ import org.cidarlab.eugene.rules.tree.predicate.Predicate;
 
 import com.rits.cloning.Cloner;
 
-import eugene.cache.SymbolTables;
-import eugene.constants.EugeneConstants;
-import eugene.dom.NamedElement;
-import eugene.dom.PropertyValue;
-import eugene.dom.Variable;
-import eugene.dom.arrays.DeviceArray;
-import eugene.dom.collection.EugeneCollection;
-import eugene.dom.collection.CollectionElement;
-import eugene.dom.components.Component;
-import eugene.dom.components.Device;
-import eugene.dom.components.Part;
-import eugene.dom.components.Property;
-import eugene.dom.components.types.DeviceType;
-import eugene.dom.components.types.PartType;
-import eugene.dom.arrays.*;
-import eugene.dom.rules.Rule;
-import eugene.exception.EugeneException;
-import eugene.exception.EugeneException;
+import org.cidarlab.eugene.cache.SymbolTables;
+import org.cidarlab.eugene.constants.EugeneConstants;
+import org.cidarlab.eugene.dom.NamedElement;
+import org.cidarlab.eugene.dom.PropertyValue;
+import org.cidarlab.eugene.dom.Variable;
+import org.cidarlab.eugene.dom.arrays.DeviceArray;
+import org.cidarlab.eugene.dom.collection.EugeneCollection;
+import org.cidarlab.eugene.dom.collection.CollectionElement;
+import org.cidarlab.eugene.dom.components.Component;
+import org.cidarlab.eugene.dom.components.Device;
+import org.cidarlab.eugene.dom.components.Part;
+import org.cidarlab.eugene.dom.components.Property;
+import org.cidarlab.eugene.dom.components.types.DeviceType;
+import org.cidarlab.eugene.dom.components.types.PartType;
+import org.cidarlab.eugene.dom.rules.Rule;
+import org.cidarlab.eugene.exception.EugeneException;
+import org.cidarlab.eugene.exception.EugeneException;
 
 public class EugeneBuilder {
 

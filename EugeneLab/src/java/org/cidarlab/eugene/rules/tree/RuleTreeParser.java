@@ -15,10 +15,10 @@ import org.cidarlab.eugene.rules.tree.predicate.Precedence;
 import org.cidarlab.eugene.rules.tree.predicate.Predicate;
 import org.cidarlab.eugene.rules.tree.predicate.RuleID;
 
-import eugene.cache.SymbolTables;
-import eugene.dom.NamedElement;
-import eugene.dom.rules.Rule;
-import eugene.exception.EugeneException;
+import org.cidarlab.eugene.cache.SymbolTables;
+import org.cidarlab.eugene.dom.NamedElement;
+import org.cidarlab.eugene.dom.rules.Rule;
+import org.cidarlab.eugene.exception.EugeneException;
 
 public class RuleTreeParser {
 

@@ -1,8 +1,8 @@
 package org.cidarlab.eugene.rules.tree.predicate;
 
-import eugene.cache.SymbolTables;
-import eugene.dom.components.Component;
-import eugene.exception.EugeneException;
+import org.cidarlab.eugene.cache.SymbolTables;
+import org.cidarlab.eugene.dom.components.Component;
+import org.cidarlab.eugene.exception.EugeneException;
 
 /* 
  * Unary predicates are rule predicates that MUST have at least one rule operand 

@@ -2,12 +2,12 @@ package org.cidarlab.eugene.rules.tree;
 
 import org.antlr.runtime.tree.CommonTree;
 
-import eugene.cache.SymbolTables;
-import eugene.dom.NamedElement;
-import eugene.dom.Variable;
-import eugene.dom.components.Component;
-import eugene.dom.components.Device;
-import eugene.exception.EugeneException;
+import org.cidarlab.eugene.cache.SymbolTables;
+import org.cidarlab.eugene.dom.NamedElement;
+import org.cidarlab.eugene.dom.Variable;
+import org.cidarlab.eugene.dom.components.Component;
+import org.cidarlab.eugene.dom.components.Device;
+import org.cidarlab.eugene.exception.EugeneException;
 
 public class Indexer {
 	

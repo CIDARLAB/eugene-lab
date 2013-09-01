@@ -5,7 +5,7 @@ import org.cidarlab.eugene.rules.tree.predicate.*;
 import org.cidarlab.eugene.rules.tree.predicate.relations.Induces;
 import org.cidarlab.eugene.rules.tree.predicate.relations.Represses;
 
-import eugene.exception.EugeneException;
+import org.cidarlab.eugene.exception.EugeneException;
 
 public class PredicateBuilder {
 

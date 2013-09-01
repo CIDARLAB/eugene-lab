@@ -15,11 +15,11 @@ import JaCoP.constraints.PrimitiveConstraint;
 import JaCoP.constraints.XeqC;
 import JaCoP.core.IntVar;
 import JaCoP.core.Store;
-import eugene.cache.SymbolTables;
-import eugene.dom.NamedElement;
-import eugene.dom.components.Component;
-import eugene.dom.components.Device;
-import eugene.exception.EugeneException;
+import org.cidarlab.eugene.cache.SymbolTables;
+import org.cidarlab.eugene.dom.NamedElement;
+import org.cidarlab.eugene.dom.components.Component;
+import org.cidarlab.eugene.dom.components.Device;
+import org.cidarlab.eugene.exception.EugeneException;
 
 public class Induces 
 	extends PairingPredicate {

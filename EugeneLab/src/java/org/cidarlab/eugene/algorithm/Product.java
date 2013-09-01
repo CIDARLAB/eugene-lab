@@ -1,8 +1,8 @@
 package org.cidarlab.eugene.algorithm;
 
-import eugene.cache.SymbolTables;
-import eugene.dom.arrays.DeviceArray;
-import eugene.exception.EugeneException;
+import org.cidarlab.eugene.cache.SymbolTables;
+import org.cidarlab.eugene.dom.arrays.DeviceArray;
+import org.cidarlab.eugene.exception.EugeneException;
 
 public class Product {
 

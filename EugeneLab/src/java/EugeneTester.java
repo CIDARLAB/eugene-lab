@@ -1,10 +1,10 @@
 
-import eugene.EugeneExecutor;
-import eugene.dom.SavableElement;
-import eugene.dom.components.Component;
-import eugene.dom.components.Device;
-import eugene.dom.components.Part;
-import eugene.dom.components.types.PartType;
+import org.cidarlab.eugene.EugeneExecutor;
+import org.cidarlab.eugene.dom.SavableElement;
+import org.cidarlab.eugene.dom.components.Component;
+import org.cidarlab.eugene.dom.components.Device;
+import org.cidarlab.eugene.dom.components.Part;
+import org.cidarlab.eugene.dom.components.types.PartType;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -7,10 +7,10 @@ import JaCoP.constraints.Constraint;
 import JaCoP.constraints.PrimitiveConstraint;
 import JaCoP.core.IntVar;
 import JaCoP.core.Store;
-import eugene.dom.components.Component;
-import eugene.dom.components.Device;
-import eugene.dom.rules.Rule;
-import eugene.exception.EugeneException;
+import org.cidarlab.eugene.dom.components.Component;
+import org.cidarlab.eugene.dom.components.Device;
+import org.cidarlab.eugene.dom.rules.Rule;
+import org.cidarlab.eugene.exception.EugeneException;
 
 public class RuleID 
 	implements RulePredicate {

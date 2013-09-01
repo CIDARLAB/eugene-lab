@@ -13,10 +13,10 @@ import JaCoP.constraints.XeqC;
 import JaCoP.core.IntVar;
 import JaCoP.core.Store;
 
-import eugene.cache.SymbolTables;
-import eugene.dom.components.Component;
-import eugene.dom.components.Device;
-import eugene.exception.EugeneException;
+import org.cidarlab.eugene.cache.SymbolTables;
+import org.cidarlab.eugene.dom.components.Component;
+import org.cidarlab.eugene.dom.components.Device;
+import org.cidarlab.eugene.exception.EugeneException;
 
 public class Then 
 		extends BinaryPredicate {

@@ -24,18 +24,18 @@ import JaCoP.core.IntDomain;
 import JaCoP.core.IntVar;
 import JaCoP.core.Store;
 import JaCoP.core.ValueEnumeration;
-import eugene.cache.SymbolTables;
-import eugene.constants.EugeneConstants;
-import eugene.dom.NamedElement;
-import eugene.dom.PropertyValue;
-import eugene.dom.Variable;
-import eugene.dom.components.Component;
-import eugene.dom.components.Device;
-import eugene.dom.components.Part;
-import eugene.dom.components.Property;
-import eugene.dom.components.types.PartType;
-import eugene.exception.EugeneException;
-import eugene.parser.EugeneParser.propertyDeclaration_return;
+import org.cidarlab.eugene.cache.SymbolTables;
+import org.cidarlab.eugene.constants.EugeneConstants;
+import org.cidarlab.eugene.dom.NamedElement;
+import org.cidarlab.eugene.dom.PropertyValue;
+import org.cidarlab.eugene.dom.Variable;
+import org.cidarlab.eugene.dom.components.Component;
+import org.cidarlab.eugene.dom.components.Device;
+import org.cidarlab.eugene.dom.components.Part;
+import org.cidarlab.eugene.dom.components.Property;
+import org.cidarlab.eugene.dom.components.types.PartType;
+import org.cidarlab.eugene.exception.EugeneException;
+import org.cidarlab.eugene.parser.EugeneParser.propertyDeclaration_return;
 
 /* Example:
  * X + Y > Z

@@ -21,12 +21,12 @@ import org.cidarlab.eugene.rules.tree.predicate.Then;
 import org.cidarlab.eugene.rules.tree.predicate.UnaryPredicate;
 import org.cidarlab.eugene.rules.tree.predicate.With;
 
-import eugene.cache.SymbolTables;
-import eugene.dom.NamedElement;
-import eugene.dom.arrays.PermutedDeviceArray;
-import eugene.dom.components.Device;
-import eugene.dom.rules.Rule;
-import eugene.exception.EugeneException;
+import org.cidarlab.eugene.cache.SymbolTables;
+import org.cidarlab.eugene.dom.NamedElement;
+import org.cidarlab.eugene.dom.arrays.PermutedDeviceArray;
+import org.cidarlab.eugene.dom.components.Device;
+import org.cidarlab.eugene.dom.rules.Rule;
+import org.cidarlab.eugene.exception.EugeneException;
 
 
 public class Permutor {

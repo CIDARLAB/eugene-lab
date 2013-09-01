@@ -1,6 +1,6 @@
 package org.cidarlab.eugene.algorithm;
 
-import eugene.cache.DesignSpace;
+import org.cidarlab.eugene.cache.DesignSpace;
 
 public class DeviceCreator
 	implements Runnable {

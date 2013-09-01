@@ -8,11 +8,11 @@ import JaCoP.constraints.Constraint;
 import JaCoP.constraints.Count;
 import JaCoP.core.IntVar;
 import JaCoP.core.Store;
-import eugene.cache.SymbolTables;
-import eugene.dom.components.Component;
-import eugene.dom.components.Device;
-import eugene.dom.components.types.PartType;
-import eugene.exception.EugeneException;
+import org.cidarlab.eugene.cache.SymbolTables;
+import org.cidarlab.eugene.dom.components.Component;
+import org.cidarlab.eugene.dom.components.Device;
+import org.cidarlab.eugene.dom.components.types.PartType;
+import org.cidarlab.eugene.exception.EugeneException;
 
 public class Exactly 
 	extends BinaryPredicate {

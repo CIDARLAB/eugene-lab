@@ -3,9 +3,9 @@ package org.cidarlab.eugene.rules.tree.predicate;
 import java.util.Arrays;
 import java.util.List;
 
-import eugene.dom.components.Component;
-import eugene.dom.components.Device;
-import eugene.exception.EugeneException;
+import org.cidarlab.eugene.dom.components.Component;
+import org.cidarlab.eugene.dom.components.Device;
+import org.cidarlab.eugene.exception.EugeneException;
 import JaCoP.constraints.Constraint;
 import JaCoP.constraints.PrimitiveConstraint;
 import JaCoP.constraints.XeqC;

@@ -5,8 +5,8 @@ import java.util.List;
 import JaCoP.constraints.Constraint;
 import JaCoP.core.IntVar;
 import JaCoP.core.Store;
-import eugene.dom.components.Component;
-import eugene.exception.EugeneException;
+import org.cidarlab.eugene.dom.components.Component;
+import org.cidarlab.eugene.exception.EugeneException;
 
 public abstract class CountingPredicate 
 	extends BinaryPredicate {
