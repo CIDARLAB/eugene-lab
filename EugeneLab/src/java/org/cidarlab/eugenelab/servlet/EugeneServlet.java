@@ -27,6 +27,8 @@ import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -570,7 +572,11 @@ public class EugeneServlet extends HttpServlet {
         File newFolder = new File(folderExtension);
         return newFolder.mkdir(); //returns true if successful
     }
-
+    
+    private String getRootDirectory() {
+        return this.getServletContext().getRealPath("/") + "data/" + getCurrentUser() + "/";
+    }
+    
     private String getFileExtension(String localExtension, boolean isFile) {
         String extension = this.getServletContext().getRealPath("/") + "data/" + getCurrentUser() + "/" + localExtension;
         if (!isFile) {
@@ -672,7 +678,7 @@ public class EugeneServlet extends HttpServlet {
         return SBOLImporter.importSBOL(sbolFileName);
     }
     
-    // Loads a GenBank component straight from the 
+    // Interface that loads a GenBank component straight from the website
     private Component loadGenBank(String componentName) throws MalformedURLException, IOException, 
             InvalidEugeneAssignmentException, NoSuchElementException, BioException {
         URL url = new URL("http:www.ncbi.nlm.nih.gov/nuccore/" + componentName);
@@ -680,41 +686,100 @@ public class EugeneServlet extends HttpServlet {
         return readGenBankComponent(br);
     }
     
+    // Interface that loads a GenBank component from a file
     private Component loadGenBank(File file) throws FileNotFoundException, InvalidEugeneAssignmentException, 
             NoSuchElementException, BioException {
         BufferedReader br = new BufferedReader(new FileReader(file));
         return readGenBankComponent(br);
     }
     
+    // Converts a GenBank component to a Eugene component
+    // Do not call directly; use above APIs
     private Component readGenBankComponent(BufferedReader br) throws InvalidEugeneAssignmentException, 
             NoSuchElementException, BioException {
         SequenceIterator sequences = SeqIOTools.readGenbank(br);
-        List<Component> parts = new ArrayList<Component>();
+        List<Feature> features = new ArrayList<Feature>();
         String deviceName = "UnnamedDevice";
         // Should only have one sequence
         boolean firstPass = true;
+        // Get a list of all features
         while(sequences.hasNext()) {
             Sequence seq = sequences.nextSequence();
             if(firstPass) {
                 deviceName = seq.getName();
+                firstPass = false;
             } else {
                 deviceName += "|" + seq.getName();
             }
             Iterator it = seq.features();
             while(it.hasNext()) {
                 Feature feature = (Feature) it.next();
-                parts.add(buildPart(feature));
+                features.add(feature);
             }
+        }
+        // Process the features to remove overlaps and make it more natural for a Eugene device
+        //removeOverlap(features); //Currently just return list of parts
+        List<Component> parts = new ArrayList<Component>();
+        // Convert features to Eugene parts
+        for(Feature feature : features) {
+            parts.add(buildPart(feature));
         }
         if(parts.isEmpty()) {
             return null;
         } else if(parts.size() == 1) {
             // Size 1 imples just one part
-            return parts.get(0);
+            return new Part(deviceName, (Part) parts.get(0));
         } else {
-            //@TODO: get a real device name
             return Device.newInstance(deviceName, parts);
         }
+    }
+    
+    private void removeOverlap(List<Feature> features) {
+        // Sort the features based on when they start in the sequence
+        Collections.sort(features, new Comparator<Feature>() {
+            @Override
+            public int compare(Feature a, Feature b) {
+                return a.getLocation().getMin() - b.getLocation().getMin();
+            }
+        });
+        int i = 0;
+        while(i <= features.size() - 2) {
+            Feature a = features.get(i);
+            Feature b = features.get(i+1);
+            String typeA = a.getType();
+            String typeB = b.getType();
+            if(typeA.equals("source")) {
+                features.remove(a);
+            } else if(typeB.equals("source")) {
+                features.remove(b);
+            } else if(isSameFeature(a, b)) {
+                if(typeA.equals("gene")) {
+                    features.remove(b);
+                } else if(typeB.equals("gene")) {
+                    features.remove(a);
+                    // Do not advance as current feature is still at i
+                } else {
+                    features.remove(a);
+                }
+            } else if(firstContainsSecond(a, b)) {
+                features.remove(b);
+                i++;
+            } else if (firstContainsSecond(b, a)) {
+                features.remove(a);
+            } else {
+                i++;
+            }
+        }    
+    }
+    
+    private boolean isSameFeature(Feature a, Feature b) {
+        return a.getLocation().getMin() == b.getLocation().getMin() && 
+                a.getLocation().getMax() == b.getLocation().getMax();
+    }
+    
+    private boolean firstContainsSecond(Feature a, Feature b) {
+        return a.getLocation().getMin() <= b.getLocation().getMin() &&
+                a.getLocation().getMax() >= b.getLocation().getMax();
     }
     
     private Part buildPart(Feature feature) throws InvalidEugeneAssignmentException {
@@ -726,51 +791,10 @@ public class EugeneServlet extends HttpServlet {
     }
     
     private String getPartName(Feature feature) {
+        //@TODO: Improve part naming system
         return feature.getType() + "_at_" + feature.getLocation().getMin();
     }
     
-    /* Temporarily saved for reference
-    private Component importGenbankComponent(String sFileName) throws MalformedURLException, IOException, 
-            NoSuchElementException, BioException, InvalidEugeneAssignmentException {
-        //Website has files embedded in the website so need to find a way to isolate the file from the rest of the website
-        //Currently using direct file upload to test
-	//URL url = new URL("http://www.ncbi.nlm.nih.gov/nuccore/" + sFileName);
-	BufferedReader in = new BufferedReader(new FileReader(sFileName));//new InputStreamReader(url.openStream()));
-	SequenceIterator sequences = SeqIOTools.readGenbank(in);
-        List<Component> parts = new ArrayList<Component>();
-        int i = 0;
-	// Can this lead to multiple devices?
-        while(sequences.hasNext()) {
-            Sequence seq = sequences.nextSequence();
-            Iterator it = seq.features();
-            while(it.hasNext()) {
-                Feature feature = (Feature) it.next();
-                //Feature is essentially the Genbank version of a part
-                PartType partType = new PartType(feature.getType());
-                // Still need a part name
-                String partName = feature.getType() + "_part" + i;
-                Part part = new Part(partType, partName);
-                // Add the sequence to the part
-                Property property = new Property("sequence", "txt");
-                PropertyValue propertyValue = new PropertyValue("sequence", "txt");
-                propertyValue.setTxt(feature.getSequence().seqString());
-                part.setValue(property, propertyValue);
-                parts.add(part);
-                i++;
-            }
-	}
-        if(parts.isEmpty()) {
-            return null;
-        } else if(parts.size() == 1) {
-            // File is just a device
-            return parts.get(0);
-        } else {
-            //Will be able to get actual device name when website file upload works
-            return Device.newInstance("DeviceName", parts);
-        }
-		
-    }
-    * */
     
     // Takes a device and stores it in Clotho
     private boolean toClotho(NamedElement element) {
