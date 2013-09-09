@@ -1,4 +1,4 @@
- /* Gets a list of images from the server and adds them to the imageList
+/* Gets a list of images from the server and adds them to the imageList
  * Also adds a unique id to each part, viewable when clicked
  */
 
@@ -10,7 +10,7 @@ $(document).ready(function() {
     var _partTypes = {};
     var _parts = {}; //key: name, value: part JSON
     var _partIds = {}; //key: name, value: uuid
-
+    var _newParts = {}; //key: name, value: part JSON
 
 
 
@@ -28,28 +28,30 @@ $(document).ready(function() {
             if (_partIds[part["name"]] === undefined) {
                 _parts[part["name"]] = part;
                 _partIds[part["name"]] = partId;
-                send("create", JSON.stringify({
-                    schema: "BasicPart",
-                    _id: partId,
-                    author: "51e9579344ae846673a51b0f", //this probably shouldnt be hard coded later...
-                    shortDescription: part["pigeon"],
-                    sequence: {
-                        _id: seqId,
-                        isRNA: false,
-                        isSingleStranded: false,
-                        sequence: part["sequence"],
-                        isDegenerate: false,
-                        isLinear: false,
-                        isCircular: false,
-                        isLocked: false
-                    },
-                    name: part["name"],
-                    format: "FreeForm",
-                    type: part["type"],
-                    riskGroup: 0,
-                    showDetail: true
+                if (_connection.readyState === 1) {
+                    send("create", JSON.stringify({
+                        schema: "BasicPart",
+                        _id: partId,
+                        author: "51e9579344ae846673a51b0f", //this probably shouldnt be hard coded later...
+                        shortDescription: part["pigeon"],
+                        sequence: {
+                            _id: seqId,
+                            isRNA: false,
+                            isSingleStranded: false,
+                            sequence: part["sequence"],
+                            isDegenerate: false,
+                            isLinear: false,
+                            isCircular: false,
+                            isLocked: false
+                        },
+                        name: part["name"],
+                        format: "FreeForm",
+                        type: part["type"],
+                        riskGroup: 0,
+                        showDetail: true
+                    }
+                    ));
                 }
-                ));
             }
         } else if (part["schema"] === "CompositePart") {
             if (_partIds[part["name"]] === undefined) {
@@ -58,7 +60,7 @@ $(document).ready(function() {
                 _partIds[part["name"]] = partId;
 
                 //gather the composition and sequence of the composite part
-                var composition = []
+                var composition = [];
                 var compositeSequence = "";
                 for (var i = 0; i < part["components"].length; i++) {
                     var basicPart = part["components"][i];
@@ -70,58 +72,62 @@ $(document).ready(function() {
 
                         _parts[basicPart["name"]] = basicPart;
                         _partIds[basicPart["name"]] = basicPartId;
-                        
-                        send("create", JSON.stringify({
-                            schema: "BasicPart",
-                            _id: basicPartId,
-                            author: "51e9579344ae846673a51b0f", //this probably shouldnt be hard coded later...
-                            shortDescription: basicPart["pigeon"],
-                            sequence: {
-                                _id: basicSeqId,
-                                isRNA: false,
-                                isSingleStranded: false,
-                                sequence: basicPart["sequence"],
-                                isDegenerate: false,
-                                isLinear: false,
-                                isCircular: false,
-                                isLocked: false
-                            },
-                            name: basicPart["name"],
-                            format: "FreeForm",
-                            type: basicPart["type"],
-                            riskGroup: 0,
-                            showDetail: true
-                        })
-                                );
+                        if (_connection.readyState === 1) {
+                            send("create", JSON.stringify({
+                                schema: "BasicPart",
+                                _id: basicPartId,
+                                author: "51e9579344ae846673a51b0f", //this probably shouldnt be hard coded later...
+                                shortDescription: basicPart["pigeon"],
+                                sequence: {
+                                    _id: basicSeqId,
+                                    isRNA: false,
+                                    isSingleStranded: false,
+                                    sequence: basicPart["sequence"],
+                                    isDegenerate: false,
+                                    isLinear: false,
+                                    isCircular: false,
+                                    isLocked: false
+                                },
+                                name: basicPart["name"],
+                                format: "FreeForm",
+                                type: basicPart["type"],
+                                riskGroup: 0,
+                                showDetail: true
+                            })
+                                    );
+                        }
+
                     }
                     composition.push(basicPartId);
                     compositeSequence = compositeSequence + basicPart.sequence;
                 }
 
                 //create composite part
-                send("create", JSON.stringify({
-                    schema: "CompositePart",
-                    _id: partId,
-                    author: "51e9579344ae846673a51b0f", //this probably shouldnt be hard coded later...
-                    shortDescription: part["pigeon"],
-                    sequence: {
-                        _id: seqId,
-                        isRNA: false,
-                        isSingleStranded: false,
-                        sequence: compositeSequence,
-                        isDegenerate: false,
-                        isLinear: false,
-                        isCircular: false,
-                        isLocked: false
-                    },
-                    name: part["name"],
-                    composition: composition,
-                    format: "FreeForm",
-                    type: "composite",
-                    riskGroup: 0,
-                    showDetail: true
+                if (_connection.readyState === 1) {
+                    send("create", JSON.stringify({
+                        schema: "CompositePart",
+                        _id: partId,
+                        author: "51e9579344ae846673a51b0f", //this probably shouldnt be hard coded later...
+                        shortDescription: part["pigeon"],
+                        sequence: {
+                            _id: seqId,
+                            isRNA: false,
+                            isSingleStranded: false,
+                            sequence: compositeSequence,
+                            isDegenerate: false,
+                            isLinear: false,
+                            isCircular: false,
+                            isLocked: false
+                        },
+                        name: part["name"],
+                        composition: composition,
+                        format: "FreeForm",
+                        type: "composite",
+                        riskGroup: 0,
+                        showDetail: true
+                    }
+                    ));
                 }
-                ));
 
             }
         } else {
@@ -132,15 +138,27 @@ $(document).ready(function() {
     var drawPartsList = function(data) {
         var drawn = {};
         var toAppend = '<table class="table table-bordered table-hover" id="partsList"><thead><tr><th>Name</th><th>Type</th></tr></thead><tbody>';
-        $.each(data, function() {
+        if (data !== undefined) {
+            $.each(data, function() {
+                if (drawn[this["name"]] === undefined) {
+                    if (this["type"] === undefined) {
+                        this["type"] = "gene";
+                    }
+                    toAppend = toAppend + '<tr><td>' + this["name"] + '</td><td>' + this["type"] + '</td></tr>';
+                    _parts[this["name"]] = this;
+                    _partIds[this["name"]] = this['id'];
+                    drawn[this["name"]] = "added";
+                }
+            });
+        }
+        $.each(_parts, function() {
             if (drawn[this["name"]] === undefined) {
                 if (this["type"] === undefined) {
                     this["type"] = "gene";
                 }
                 toAppend = toAppend + '<tr><td>' + this["name"] + '</td><td>' + this["type"] + '</td></tr>';
-                _parts[this["name"]] = this;
-                _partIds[this["name"]] = this['id'];
                 drawn[this["name"]] = "added";
+
             }
         });
         toAppend = toAppend + "</tbody></table>";
@@ -160,12 +178,16 @@ $(document).ready(function() {
             if (typeof _parts[name].sequence === "string") {
                 sequence = _parts[name].sequence;
             } else {
-                sequence = _parts[name].sequence.sequence;
+                if (_parts[name].sequence === undefined) {
+                    sequence = "";
+                } else {
+                    sequence = _parts[name].sequence.sequence;
+                }
             }
-            var newLine =type + ' ' + name + '(.Name("' + name + '"),.Sequence("' + sequence + '"));\n';
+            var newLine = type + ' ' + name + '(.Name("' + name + '"),.Sequence("' + sequence + '"));\n';
             var line = editor.getCursor("start")["line"];
             var currentLine = editor.getLine(line);
-            editor.setLine(line, newLine+currentLine);
+            editor.setLine(line, newLine + currentLine);
         });
     };
 
@@ -186,34 +208,34 @@ $(document).ready(function() {
             $('#filesArea').dynatree("getTree").reload();
         });
     };
-    
+
     var getActiveNode = function() {
         return $("#filesArea").dynatree("getActiveNode");
     };
-    
+
     // Return the active node's file extension
     var getActiveNodeExtension = function() {
         var node = getActiveNode();
         var nodeName = node.data.title;
-            var parent = node.getParent();
-            while (parent.data.title !== null) {
-                nodeName = parent.data.title + "/" + nodeName;
-                parent = parent.getParent();
-            }
+        var parent = node.getParent();
+        while (parent.data.title !== null) {
+            nodeName = parent.data.title + "/" + nodeName;
+            parent = parent.getParent();
+        }
         if (node.data.isFolder) {
             nodeName += "/";
         }
-        return nodeName;   
+        return nodeName;
     };
-    
+
     var addNewFolder = function(newFolderName) {
         var activeFolder = getActiveNodeExtension();
         var newFolderExtension = activeFolder + newFolderName + "/";
-        var command = {"command": "addNewFolder", "extension": newFolderExtension };
+        var command = {"command": "addNewFolder", "extension": newFolderExtension};
         $.post("EugeneServlet", command, function(response) {
             var isSuccessful = response["isSuccessful"];
             alert(JSON.stringify(response));
-            if(isSuccessful) {
+            if (isSuccessful) {
                 getActiveNode().addChild({
                     title: newFolderName,
                     isFolder: true
@@ -221,7 +243,7 @@ $(document).ready(function() {
             } else {
                 alert("Folder name already exists");
             }
-        });   
+        });
     };
 
     //save files
@@ -240,16 +262,16 @@ $(document).ready(function() {
             $('#newFileNameInput').val("");
         });
     };
-    
+
     var getFileType = function() {
         var fileName = $('#fileName').text();
         var index = fileName.lastIndexOf('.');
         var fileType = fileName.substring(index + 1);
         return fileType;
-             
+
     };
-    
-    
+
+
     var currentFileExtension;
     var setCurrentFileExtension = function(fileExtension) {
         currentFileExtension = fileExtension;
@@ -257,7 +279,7 @@ $(document).ready(function() {
     var getCurrentFileExtension = function() {
         return currentFileExtension;
     };
-    
+
     var loadFile = function() {
         var node = getActiveNode();
         if (node.data.isFolder) {
@@ -272,16 +294,20 @@ $(document).ready(function() {
             });
         }
     };
-    
-    
+
+
 
     //Event Handlers
     $('#refreshButton').click(function() {
         var refreshType = $('ul#leftTabHeader li.active').text();
         if (refreshType === "Parts") {
-            send("query", '{"schema":"BasicPart"}', function(data) {
-                drawPartsList(data);
-            });
+            if (_connection.readyState === 1) {
+                send("query", '{"schema":"BasicPart"}', function(data) {
+                    drawPartsList(data);
+                });
+            } else {
+                drawPartsList();
+            }
 
         } else {
             //refresh files
@@ -476,12 +502,12 @@ $(document).ready(function() {
                         var newParts = {};
                         $.each(response["results"], function() {
                             if (newParts[this["name"]] !== "added") {
-                                _parts[this["name"]] = this;
+                                _newParts[this["name"]] = this;
                                 toAppend = toAppend + '<tr><td>' + this["name"] + '</td><td>' + this["type"] + '</td><td><button class="btn btn-success savePartButton">Save</button></td></tr>';
                                 //handle each component
                                 $.each(this["components"], function() {
                                     if (this["type"] !== undefined && newParts[this["name"]] !== "added") {
-                                        _parts[this["name"]] = this;
+                                        _newParts[this["name"]] = this;
                                         toAppend = toAppend + '<tr><td>' + this["name"] + '</td><td>' + this["type"] + '</td><td><button class="btn btn-success savePartButton">Save</button></td></tr>';
                                         newParts[this["name"]] = "added";
                                     }
@@ -493,19 +519,19 @@ $(document).ready(function() {
                         $('#outputListArea').html(toAppend);
                         $("#outputList").dataTable({
                             "bPaginate": false,
-                            "sScrollY": "300px",
+                            "sScrollY": "300px"
                         });
                         $('#outputListArea').parent().append('<button class=btn btn-large btn-success" id="saveAllButton">Save All Parts</button>');
                         $('.savePartButton').click(function() {
                             //save a part
-                            savePart(_parts[$(this).parent().parent().children("td:first").text()]);
+                            savePart(_newParts[$(this).parent().parent().children("td:first").text()]);
                             $(this).text("Saved");
                             $(this).addClass("disabled");
                         });
                         $('#saveAllButton').click(function() {
                             $('#outputList tr').each(function(i) {
                                 if (i > 0) {
-                                    savePart(_parts[$(this).children('td:first').text()]);
+                                    savePart(_newParts[$(this).children('td:first').text()]);
                                 }
                             });
                             $('.savePartButton').text("Saved");
@@ -514,6 +540,7 @@ $(document).ready(function() {
                             $(this).addClass("disabled");
                         });
                         $('#outputArea').collapse('show');
+                        drawPartsList()
                     }
                 } else {
                     console.log(response["error"]);
@@ -565,7 +592,7 @@ $(document).ready(function() {
     };
 
     _connection.onerror = function(e) {
-        alert("connection error: is clotho running?");
+//        alert("connection error: is clotho running?");
     };
 
     _connection.onclose = function() {
@@ -573,9 +600,11 @@ $(document).ready(function() {
     };
 
     _connection.onopen = function(e) {
-        send("query", '{"schema":"BasicPart"}', function(data) {
-            drawPartsList(data);
-        });
+        if (_connection.readyState === 1) {
+            send("query", '{"schema":"BasicPart"}', function(data) {
+                drawPartsList(data);
+            });
+        }
     };
 
 
