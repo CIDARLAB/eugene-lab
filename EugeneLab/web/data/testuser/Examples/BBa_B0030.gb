@@ -1,0 +1,12 @@
+LOCUS       BBa_B0030          15 bp    DNA    linear
+DEFINITION  RBS.1 (strong) -- modified from R. Weiss
+FEATURES             Location/Qualifiers
+     RBS             1..15
+                     /label=RBS-1\Strong
+     misc_feature    1..15
+                     /label=BBa_B0030
+     RBS             8..12
+                     /label=RBS
+ORIGIN
+        1 attaaagagg agaaa 
+//

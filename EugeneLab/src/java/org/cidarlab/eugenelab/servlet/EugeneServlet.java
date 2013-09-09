@@ -1,11 +1,14 @@
 package org.cidarlab.eugenelab.servlet;
 
 import eugene.EugeneExecutor;
+import eugene.data.sbol.SBOLImporter;
+import eugene.dom.NamedElement;
 import eugene.dom.SavableElement;
 import eugene.dom.components.Component;
 import eugene.dom.components.Device;
 import eugene.dom.components.Part;
 import eugene.dom.components.types.PartType;
+import eugene.exception.InvalidEugeneAssignmentException;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -13,14 +16,20 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -30,6 +39,11 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.biojava.bio.BioException;
+import org.biojava.bio.seq.Feature;
+import org.biojava.bio.seq.Sequence;
+import org.biojava.bio.seq.SequenceIterator;
+import org.biojava.bio.seq.io.SeqIOTools;
 import org.cidarlab.weyekin.WeyekinPoster;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -121,11 +135,7 @@ public class EugeneServlet extends HttpServlet {
                 out.write(toReturn);
             } else if (command.equals("test")) {
                 out.write("{\"response\":\"test response\"}");
-            } else if (command.equals("deleteFile")) {
-                String fileName = request.getParameter("fileName");
-                deleteFile(fileName);
-                out.write("{\"status\":\"good\"}");
-            }
+            } 
         } catch (Exception e) {
             e.printStackTrace();
             StringWriter stringWriter = new StringWriter();
@@ -233,6 +243,35 @@ public class EugeneServlet extends HttpServlet {
                     String sPigeon = request.getParameter("Pigeon");
                     WeyekinPoster.setPigeonText(sPigeon);
                     WeyekinPoster.postMyBird();
+                } else if (command.equals("executeSBOL")) {
+                    String fileName = request.getParameter("input");
+                    fileName = getFileExtension(fileName, true);
+                    NamedElement eugeneConversion;
+                    String result;
+                    try {
+                        eugeneConversion = convertSBOL(fileName);
+                        result = eugeneConversion.toString().replaceAll("[\r\n\t]+", " ");
+                        result = "{\"results\":\"" + result + "\", \"status\":\"good\"}";
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        String exceptionAsString = e.toString().replaceAll("[\r\n\t]+", " ");
+                        exceptionAsString = exceptionAsString.replaceAll("[\"]+", "'");
+                        result = "{\"result\":\"" + exceptionAsString + "\",\"status\":\"bad\"}";
+                    }
+                    out.write(result);
+                } else if (command.equals("executeGenBank")) {
+                    response.setContentType("text/plain");
+                    String result;
+                    String fileName = request.getParameter("input");
+                    fileName = getFileExtension(fileName, true);
+                    try {
+                        Component c = loadGenBank(new File(fileName));
+                        result = c.toString();
+                    } catch (Exception e) {
+                        result = e.toString();
+                    }
+                    out.write(result);
+
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -240,75 +279,8 @@ public class EugeneServlet extends HttpServlet {
                 out.flush();
                 out.close();
             }
+
         }
-    }
-
-    /**
-     * private String simulateReadingPartsFromClotho() { JSONObject resultsJSON
-     * = new JSONObject();
-     *
-     * try { List<JSONObject> lstResults = new ArrayList<JSONObject>();
-     * resultsJSON.put("results", lstResults); * JSONObject partJSON = new
-     * JSONObject(); partJSON.put("name", "J23100"); partJSON.put("type",
-     * "Promoter"); partJSON.put("sequence",
-     * "TTGACGGCTAGCTCAGTCCTAGGTACAGTGCTAGC"); partJSON.put("Pigeon", "p
-     * J23100");
-     *
-     * lstResults.add(partJSON); } catch(Exception e) {}
-     *
-     * return resultsJSON.toString(); }
-     *
-     */
-    private String readFiles() {
-        String toReturn = "[";
-
-        try {
-            String imagePath = this.getServletContext().getRealPath("/") + "resources/";
-
-            File[] filesToRead = new File(imagePath).listFiles();
-            if (filesToRead != null) {
-                for (int j = 0; j < filesToRead.length; j++) {
-                    File currentFile = filesToRead[j];
-                    String filePath = currentFile.getAbsolutePath();
-                    String fileExtension = filePath.substring(filePath.lastIndexOf(".") + 1, filePath.length()).toLowerCase();
-                    if ("csv".equals(fileExtension)) {
-                        BufferedReader reader = new BufferedReader(new FileReader(currentFile.getAbsolutePath()));
-                        String line = reader.readLine();
-                        line = reader.readLine(); //skip first line
-                        while (line != null) {
-                            while (line.matches("^[\\s,]+")) {
-                                line = reader.readLine();
-                            }
-                            String[] tokens = line.split(",");
-                            int tokenCount = tokens.length; //keeps track of how many columns are filled by counting backwards
-                            for (int i = tokens.length - 1; i > -1; i--) {
-                                if (tokens[i].trim().matches("[\\s]*")) {
-                                    tokenCount--;
-                                } else {
-                                    break;
-                                }
-                            }
-                            String name = tokens[0].trim();
-                            String sequence = tokens[1].trim();
-                            String leftOverhang = tokens[2].trim();
-                            String rightOverhang = tokens[3].trim();
-                            String type = tokens[4].trim();
-                            toReturn = toReturn
-                                    + "{\"Name\":\"" + name
-                                    + "\",\"LO\":\"" + leftOverhang
-                                    + "\",\"RO\":\"" + rightOverhang
-                                    + "\",\"type\":\"" + type + "\"},";
-                            line = reader.readLine();
-                        }
-                        reader.close();
-                    }
-                }
-                toReturn = "{\"result\":" + toReturn.subSequence(0, toReturn.length() - 1) + "]}";
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return toReturn;
     }
 
     private String run(String devices) throws RecognitionException {
@@ -481,12 +453,6 @@ public class EugeneServlet extends HttpServlet {
         bw.close();
     }
 
-    private void deleteFile(String fileName) {
-        String currentFileExtension = getFileExtension("/" + fileName, true);
-        File file = new File(currentFileExtension);
-        file = file.getAbsoluteFile();
-        file.delete();
-    }
 
     private String getFileExtension(String localExtension, boolean isFile) {
         String extension = this.getServletContext().getRealPath("/") + "data/" + getCurrentUser() + "/" + localExtension;
@@ -583,5 +549,140 @@ public class EugeneServlet extends HttpServlet {
         deviceJSON.put("Pigeon", sPigeon);
 
         return deviceJSON;
+    }
+
+    // Takes an SBOL file and converts it into a eugene device
+    private NamedElement convertSBOL(String sbolFileName) throws Exception {
+        return SBOLImporter.importSBOL(sbolFileName);
+    }
+
+    // Interface that loads a GenBank component straight from the website
+    private Component loadGenBank(String componentName) throws MalformedURLException, IOException,
+            NoSuchElementException, BioException, InvalidEugeneAssignmentException {
+        URL url = new URL("http:www.ncbi.nlm.nih.gov/nuccore/" + componentName);
+        BufferedReader br = new BufferedReader(new InputStreamReader(url.openStream()));
+        return readGenBankComponent(br);
+    }
+
+    // Interface that loads a GenBank component from a file
+    private Component loadGenBank(File file) throws FileNotFoundException,
+            NoSuchElementException, BioException, InvalidEugeneAssignmentException {
+        BufferedReader br = new BufferedReader(new FileReader(file));
+        return readGenBankComponent(br);
+    }
+
+    // Converts a GenBank component to a Eugene component
+    // Do not call directly; use above APIs
+    private Component readGenBankComponent(BufferedReader br) throws
+            NoSuchElementException, BioException, InvalidEugeneAssignmentException {
+        SequenceIterator sequences = SeqIOTools.readGenbank(br);
+        List<Feature> features = new ArrayList<Feature>();
+        String deviceName = "UnnamedDevice";
+        // Should only have one sequence
+        boolean firstPass = true;
+        // Get a list of all features
+        while (sequences.hasNext()) {
+            Sequence seq = sequences.nextSequence();
+            if (firstPass) {
+                deviceName = seq.getName();
+                firstPass = false;
+            } else {
+                deviceName += "|" + seq.getName();
+            }
+            Iterator it = seq.features();
+            while (it.hasNext()) {
+                Feature feature = (Feature) it.next();
+                features.add(feature);
+            }
+        }
+        // Process the features to remove overlaps and make it more natural for a Eugene device
+        //removeOverlap(features); //Currently just return list of parts
+        List<Component> parts = new ArrayList<Component>();
+        // Convert features to Eugene parts
+        for (Feature feature : features) {
+            parts.add(buildPart(feature));
+        }
+        if (parts.isEmpty()) {
+            return null;
+        } else if (parts.size() == 1) {
+            // Size 1 imples just one part
+            return new Part(deviceName, (Part) parts.get(0));
+        } else {
+            return Device.newInstance(deviceName, parts);
+        }
+    }
+
+    private void removeOverlap(List<Feature> features) {
+        // Sort the features based on when they start in the sequence
+        Collections.sort(features, new Comparator<Feature>() {
+            @Override
+            public int compare(Feature a, Feature b) {
+                return a.getLocation().getMin() - b.getLocation().getMin();
+            }
+        });
+        int i = 0;
+        while (i <= features.size() - 2) {
+            Feature a = features.get(i);
+            Feature b = features.get(i + 1);
+            String typeA = a.getType();
+            String typeB = b.getType();
+            if (typeA.equals("source")) {
+                features.remove(a);
+            } else if (typeB.equals("source")) {
+                features.remove(b);
+            } else if (isSameFeature(a, b)) {
+                if (typeA.equals("gene")) {
+                    features.remove(b);
+                } else if (typeB.equals("gene")) {
+                    features.remove(a);
+                    // Do not advance as current feature is still at i
+                } else {
+                    features.remove(a);
+                }
+            } else if (firstContainsSecond(a, b)) {
+                features.remove(b);
+                i++;
+            } else if (firstContainsSecond(b, a)) {
+                features.remove(a);
+            } else {
+                i++;
+            }
+        }
+    }
+
+    private boolean isSameFeature(Feature a, Feature b) {
+        return a.getLocation().getMin() == b.getLocation().getMin()
+                && a.getLocation().getMax() == b.getLocation().getMax();
+    }
+
+    private boolean firstContainsSecond(Feature a, Feature b) {
+        return a.getLocation().getMin() <= b.getLocation().getMin()
+                && a.getLocation().getMax() >= b.getLocation().getMax();
+    }
+
+    private Part buildPart(Feature feature) throws InvalidEugeneAssignmentException {
+        PartType partType = new PartType(feature.getType());
+        String partName = getPartName(feature);
+        Part part = new Part(partType, partName);
+        part.setSequence(feature.getSequence().seqString());
+        return part;
+    }
+
+    private String getPartName(Feature feature) {
+        //@TODO: Improve part naming system
+        return feature.getType() + "_at_" + feature.getLocation().getMin();
+    }
+
+    // Takes a device and stores it in Clotho
+    private boolean toClotho(NamedElement element) {
+        try {
+            if (element instanceof Device) {
+                //return clotho.create(this.toJSON((Device)element));   
+            } else if (element instanceof Part) {
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return true;
     }
 }
