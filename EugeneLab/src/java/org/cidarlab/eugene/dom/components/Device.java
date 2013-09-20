@@ -28,7 +28,6 @@ import java.util.List;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.cidarlab.eugene.builder.EugeneBuilder;
-
 import org.cidarlab.eugene.cache.SymbolTables;
 import org.cidarlab.eugene.constants.EugeneConstants;
 import org.cidarlab.eugene.dom.NamedElement;
@@ -36,6 +35,7 @@ import org.cidarlab.eugene.dom.Variable;
 import org.cidarlab.eugene.dom.components.types.PartType;
 import org.cidarlab.eugene.dom.relation.Interaction;
 import org.cidarlab.eugene.exception.EugeneException;
+
 
 public class Device extends Component {
 

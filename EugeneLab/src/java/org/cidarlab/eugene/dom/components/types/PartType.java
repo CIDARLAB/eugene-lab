@@ -32,6 +32,7 @@ import org.cidarlab.eugene.dom.components.Property;
 import org.cidarlab.eugene.dom.relation.Participant;
 import org.cidarlab.eugene.exception.EugeneException;
 
+
 public class PartType 
 	extends Component 
 	implements Participant {

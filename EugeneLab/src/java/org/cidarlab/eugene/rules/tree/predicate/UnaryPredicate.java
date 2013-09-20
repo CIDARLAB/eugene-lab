@@ -1,8 +1,8 @@
 package org.cidarlab.eugene.rules.tree.predicate;
 
-import org.cidarlab.eugene.cache.SymbolTables;
 import org.cidarlab.eugene.dom.components.Component;
 import org.cidarlab.eugene.exception.EugeneException;
+
 
 /* 
  * Unary predicates are rule predicates that MUST have at least one rule operand 
@@ -12,31 +12,16 @@ import org.cidarlab.eugene.exception.EugeneException;
  * CONTAINS, STARTSWITH, ENDSWITH
  */
 public abstract class UnaryPredicate 
-		implements RulePredicate {
-	
-	private long A;
-	private Component componentA;
-	private long B;
-	private Component componentB;
+		extends BinaryPredicate {
 	
 	public UnaryPredicate(long A, long B) 
 			throws EugeneException {
-		this.A = A;
-		this.B = B;
-		
-		this.componentA = SymbolTables.getComponent(A);
-		//System.out.println("[UnaryPredicate] -> "+this.componentA);
-		this.componentB = SymbolTables.getComponent(B);
-		//System.out.println("[UnaryPredicate] -> "+this.componentB);
+		super(A, B);
 	}
 	
 	public UnaryPredicate(long B) 
 			throws EugeneException {
-		this.A = -1;
-		this.B = B;
-		this.componentA = null;
-		this.componentB = SymbolTables.getComponent(B);
-//		System.out.println("[UnaryPredicate] -> "+this.componentB);
+		super(-1, B);
 	}
 	
 	public long getB() {

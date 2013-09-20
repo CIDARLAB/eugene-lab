@@ -3,17 +3,19 @@ package org.cidarlab.eugene.rules.tree.predicate;
 import java.util.Arrays;
 import java.util.List;
 
-import JaCoP.constraints.Constraint;
-import JaCoP.constraints.PrimitiveConstraint;
-import JaCoP.core.IntVar;
-import JaCoP.core.Store;
 import org.cidarlab.eugene.dom.components.Component;
 import org.cidarlab.eugene.dom.components.Device;
 import org.cidarlab.eugene.dom.rules.Rule;
 import org.cidarlab.eugene.exception.EugeneException;
 
+import JaCoP.constraints.Constraint;
+import JaCoP.constraints.Not;
+import JaCoP.constraints.PrimitiveConstraint;
+import JaCoP.core.IntVar;
+import JaCoP.core.Store;
+
 public class RuleID 
-	implements RulePredicate {
+	implements LogicalPredicate {
 
 	private Rule rule;
 	public RuleID(Rule rule) 
@@ -49,13 +51,6 @@ public class RuleID
 	}
 
 	@Override
-	public boolean evaluate() 
-			throws EugeneException {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
 	public String getOperator() {
 		// TODO Auto-generated method stub
 		return null;
@@ -70,22 +65,49 @@ public class RuleID
 	
 	@Override
 	public Constraint toJaCoP(
-			Store store, List<Component> components, IntVar[] variables) {
-		return this.rule.getPredicate().toJaCoP(store, components, variables);
+			Store store, IntVar[] variables, 
+			Device device, List<Component> components) 
+				throws EugeneException {
+		return this.rule.getPredicate().toJaCoP(store, variables, device, components);
 	}
 
 	public Constraint toJaCoPNot(
-			Store store, List<Component> components, IntVar[] variables) {
-		if(this.rule.getPredicate() instanceof MoreThan) {
-			store.impose(((MoreThan)this.rule.getPredicate()).toJaCoPNot(store, components, variables));
+			Store store, IntVar[] variables, 
+			Device device, List<Component> components) 
+				throws EugeneException {
+		
+		System.out.println("[RuleID.toJaCoPNot]");
+		if(this.rule.getPredicate() instanceof CountingPredicate) {
+			return ((CountingPredicate)this.rule.getPredicate()).toJaCoPNot(store, variables, device, components);
 		} else {
-			Constraint c = this.rule.getPredicate().toJaCoP(store, components, variables);
+			Constraint c = this.rule.getPredicate().toJaCoP(store, variables, device, components);
 			if(c instanceof PrimitiveConstraint) {
-				return c;
+				return new Not((PrimitiveConstraint)c);
 			} else {
 				store.impose(c);
 			}
 		}
+		
 		return null;
+	}
+
+	@Override
+	public Constraint toJaCoPAnd(
+			Store store, IntVar[] variables,
+			Device device, List<Component> components) 
+					throws EugeneException {
+		return this.rule.getPredicate().toJaCoP(store, variables, device, components);
+	}
+
+	@Override
+	public Constraint toJaCoPOr(Store store, IntVar[] variables, Device device,
+			List<Component> components) throws EugeneException {
+		return this.rule.getPredicate().toJaCoP(store, variables, device, components);
+	}
+
+	@Override
+	public Constraint toJaCoPXor(Store store, IntVar[] variables,
+			Device device, List<Component> components) throws EugeneException {
+		return this.rule.getPredicate().toJaCoP(store, variables, device, components);
 	}
 }

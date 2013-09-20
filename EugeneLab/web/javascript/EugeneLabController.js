@@ -4,7 +4,6 @@
 
 
 $(document).ready(function() {
-    /********"Field" Variables********/
     var deviceCount = 0;
     var _properties = {};
     var _partTypes = {};

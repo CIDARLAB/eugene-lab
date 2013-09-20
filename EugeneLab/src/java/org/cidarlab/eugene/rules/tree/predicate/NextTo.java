@@ -1,20 +1,24 @@
 package org.cidarlab.eugene.rules.tree.predicate;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang3.ArrayUtils;
-import org.cidarlab.eugene.rules.RuleOperator;
-
-import JaCoP.constraints.*;
-import JaCoP.core.IntVar;
-import JaCoP.core.Store;
-
 import org.cidarlab.eugene.cache.SymbolTables;
 import org.cidarlab.eugene.dom.components.Component;
 import org.cidarlab.eugene.dom.components.Device;
+import org.cidarlab.eugene.dom.components.Part;
 import org.cidarlab.eugene.dom.components.types.PartType;
 import org.cidarlab.eugene.exception.EugeneException;
+import org.cidarlab.eugene.rules.RuleOperator;
+
+import JaCoP.constraints.And;
+import JaCoP.constraints.Constraint;
+import JaCoP.constraints.Or;
+import JaCoP.constraints.PrimitiveConstraint;
+import JaCoP.constraints.XeqC;
+import JaCoP.constraints.XneqC;
+import JaCoP.core.IntVar;
+import JaCoP.core.Store;
 
 /*
  * A NEXTTO B
@@ -104,84 +108,108 @@ public class NextTo
 		return RuleOperator.NEXTTO.toString();
 	}
 
-
 	@Override
 	public Constraint toJaCoP(
-			Store store, List<Component> components, IntVar[] variables) {
+			Store store, IntVar[] variables, 
+			Device device, List<Component> components) 
+				throws EugeneException {
+
 		if(variables.length <= 1 || (null != components && components.size()<=1)) {
 			IntVar iv = new IntVar(store, "invalid", 1, 1);
 			return new XneqC(iv, 1);
 		}
-		
-		int a = (int)this.getA();
-		int b = (int)this.getB();
-		int NR_OF_VARIABLES = variables.length;
-		
-		
-		PrimitiveConstraint[] pc = new PrimitiveConstraint[NR_OF_VARIABLES*2];
-		int posA = 0;
-//		pc[posA] = new IfThen(
-//				new XeqC(variables[posA], a),
-//				new XeqC(variables[posA+1], b));
-		pc[posA] = new And(
-				new XeqC(variables[posA], a),
-				new XeqC(variables[posA+1], b));
-		
-		for(posA=1; posA<NR_OF_VARIABLES-1; posA++) {
-//			pc[posA] = new IfThen(
-//				new XeqC(variables[posA], a),
-//				new Or(
-//					new XeqC(variables[posA-1], b),
-//					new XeqC(variables[posA+1], b)));
-			pc[posA] = new And(
-					new XeqC(variables[posA], a),
-					new Or(
-						new XeqC(variables[posA-1], b),
-						new XeqC(variables[posA+1], b)));
-		}
-		
-		posA = NR_OF_VARIABLES-1;		
-//		pc[posA] = new IfThen(
-//				new XeqC(variables[posA], a),
-//				new XeqC(variables[posA-1], b));
-		pc[posA] = new And(
-				new XeqC(variables[posA], a),
-				new XeqC(variables[posA-1], b));
-		posA++;
-		
-		//PrimitiveConstraint[] pcB = new PrimitiveConstraint[NR_OF_VARIABLES];
-		int posB = 0;
-//		pc[posA+posB] = new IfThen(
-//				new XeqC(variables[posB], b),
-//				new XeqC(variables[posB+1], a));
-		pc[posA+posB] = new And(
-				new XeqC(variables[posB], b),
-				new XeqC(variables[posB+1], a));
-		
-		for(posB=1; posB<NR_OF_VARIABLES-1; posB++) {
-//			pc[posA+posB] = new IfThen(
-//					new XeqC(variables[posB], b),
-//					new Or(
-//						new XeqC(variables[posB-1], a),
-//						new XeqC(variables[posB+1], a)));
-			pc[posA+posB] = new And(
-					new XeqC(variables[posB], b),
-					new Or(
-						new XeqC(variables[posB-1], a),
-						new XeqC(variables[posB+1], a)));
-		}
-		
-		posB = NR_OF_VARIABLES-1;
-//		pc[posA+posB] = new IfThen(
-//				new XeqC(variables[posB], b),
-//				new XeqC(variables[posB-1], a));
-		pc[posA+posB] = new And(
-				new XeqC(variables[posB], b),
-				new XeqC(variables[posB-1], a));
 
-		//PrimitiveConstraint b_nextto_a = new Or(pcB);
+//		PrimitiveConstraint[] pcA = null;
+
+		try {
+			int a = (int)this.getA();
+			int b = (int)this.getB();
+
+//			System.out.println(this.componentA.getName()+"("+a+") NEXTTO "+this.componentB.getName()+"("+b+")");
+			PrimitiveConstraint[] pc = null;
+			
+			int i=0;
+			for(Component component : components) {
+
+				if(component instanceof Device) {
+					if(null == pc) {
+						pc = new PrimitiveConstraint[1];
+						pc[0] = (PrimitiveConstraint)this.toJaCoP(
+								store, variables, (Device)device, ((Device)component).getComponents());
+					} else {
+						pc = ArrayUtils.add(pc, (PrimitiveConstraint)this.toJaCoP(
+								store, variables, (Device)device, ((Device)component).getComponents()));
+					}
+
+				} else if(this.componentA instanceof Part && component instanceof PartType &&
+						((Part)this.componentA).getPartType().equals((PartType)component)) {
+
+					if(i == 0) {
+
+						PrimitiveConstraint pConst = new And(new XeqC(variables[i], a), new XeqC(variables[i+1], b));
+
+						if(null == pc) {
+							pc = new PrimitiveConstraint[1];
+							pc[0] = pConst;
+						} else {
+							pc = ArrayUtils.add(pc, pConst);
+						}
+
+					} else if (i==components.size()-1) {
+						PrimitiveConstraint pConst = new And(new XeqC(variables[i], a), new XeqC(variables[i-1], b)); 
+						if(null == pc) {
+							pc = new PrimitiveConstraint[1];
+							pc[0] = pConst;
+						} else {
+							pc = ArrayUtils.add(pc, pConst);
+						}
+						
+					} else {
+						PrimitiveConstraint pConst = new And(new XeqC(variables[i], a), 
+															new Or(new XeqC(variables[i-1], b), new XeqC(variables[i+1], b)));
+
+						if(null == pc) {
+							pc = new PrimitiveConstraint[1];
+							pc[0] = pConst;
+						} else {
+							pc = ArrayUtils.add(pc, pConst);
+						}
+						
+					} 
+
+				}	
+	
+				
+				i++;
+			}
+
+			if(null != pc) {
+				return new Or(pc);
+			}
+			
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
 		
-		return new Or(pc);
+		return null;
 	}
 
+
+	/*** toJaCoP for the ``positioning'' approach
+	@Override
+	public Constraint toJaCoP(
+			Store store, List<Component> components, IntVar[] variables) {
+		int a = (int)this.getA();
+		int b = (int)this.getB();
+
+		
+		IntVar ivA = (IntVar)store.findVariable(String.valueOf(a));
+		IntVar ivB = (IntVar)store.findVariable(String.valueOf(b));
+		
+		return new Or(
+				new Or(new XplusCeqZ(ivA, 1, ivB), new XplusCeqZ(ivA, -1, ivB)),
+				new Or(new XplusCeqZ(ivB, 1, ivA), new XplusCeqZ(ivB, -1, ivA)));
+
+	}
+	****/
 }

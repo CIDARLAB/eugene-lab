@@ -1,10 +1,14 @@
 package org.cidarlab.eugene.rules.tree.predicate;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.cidarlab.eugene.cache.SymbolTables;
+import org.cidarlab.eugene.dom.components.Component;
+import org.cidarlab.eugene.dom.components.Device;
+import org.cidarlab.eugene.dom.components.Part;
+import org.cidarlab.eugene.dom.components.types.PartType;
+import org.cidarlab.eugene.exception.EugeneException;
 import org.cidarlab.eugene.rules.RuleOperator;
 
 import JaCoP.constraints.And;
@@ -12,19 +16,13 @@ import JaCoP.constraints.Constraint;
 import JaCoP.constraints.IfThen;
 import JaCoP.constraints.Or;
 import JaCoP.constraints.PrimitiveConstraint;
+import JaCoP.constraints.Reified;
 import JaCoP.constraints.XeqC;
-import JaCoP.constraints.XeqY;
 import JaCoP.constraints.XneqC;
 import JaCoP.constraints.XneqY;
+import JaCoP.core.BooleanVar;
 import JaCoP.core.IntVar;
 import JaCoP.core.Store;
-
-import org.cidarlab.eugene.cache.SymbolTables;
-import org.cidarlab.eugene.dom.components.Component;
-import org.cidarlab.eugene.dom.components.Device;
-import org.cidarlab.eugene.dom.components.Part;
-import org.cidarlab.eugene.dom.components.types.PartType;
-import org.cidarlab.eugene.exception.EugeneException;
 
 /* A BEFORE B 
  * 
@@ -41,15 +39,9 @@ import org.cidarlab.eugene.exception.EugeneException;
 public class Before 
 		extends BinaryPredicate {
 
-	private Component compA;
-	private Component compB;	
-
 	public Before(long A, long B) 
 			throws EugeneException {
 		super(A,B);
-		
-		compA = null;
-		compB = null;
 	}
 	
 	@Override
@@ -104,13 +96,11 @@ public class Before
 	@Override
 	public boolean evaluate(Device device) 
 			throws EugeneException {
-		Component componentA = SymbolTables.getComponent(this.getA());
-		Component componentB = SymbolTables.getComponent(this.getB());
-		if((null != componentB && (componentB instanceof Device || componentB instanceof PartType)) &&
-				null != componentA && (componentA instanceof Device || componentA instanceof PartType)) {
+		if((null != this.componentB && (this.componentB instanceof Device || this.componentB instanceof PartType)) &&
+				null != this.componentA && (this.componentA instanceof Device || this.componentA instanceof PartType)) {
 			
-			int idxA = device.getComponents().indexOf(componentA);
-			int idxB = device.getComponents().indexOf(componentB);
+			int idxA = device.getComponents().indexOf(this.componentA);
+			int idxB = device.getComponents().indexOf(this.componentB);
 
 			if(idxA != (-1) && idxB != (-1)) {
 				/* 
@@ -119,7 +109,9 @@ public class Before
 				return idxA < idxB;
 			}
 			
+			return true;
 		}
+		
 		return this.evaluate(SymbolTables.getDeviceComponentIds(device.getName()));
 	}
 
@@ -140,7 +132,73 @@ public class Before
 		return sb.toString();
 	}
 
+	@Override
+	public Constraint toJaCoP(
+			Store store, IntVar[] variables, 
+			Device device, List<Component> components) 
+				throws EugeneException {
 
+		if(variables.length <= 1 || (null != components && components.size()<=1)) {
+			IntVar iv = new IntVar(store, "invalid", 1, 1);
+			return new XneqC(iv, 1);
+		}
+
+//		PrimitiveConstraint[] pcA = null;
+
+		try {
+			int a = (int)this.getA();
+			int b = (int)this.getB();
+
+//			System.out.println(this.componentA.getName()+"("+a+") BEFORE "+this.componentB.getName()+"("+b+")");
+			PrimitiveConstraint[] pc = null;
+			
+			int i=0;
+			for(Component component : components) {
+
+				if(component instanceof Device) {
+					if(null == pc) {
+						pc = new PrimitiveConstraint[1];
+						pc[0] = (PrimitiveConstraint)this.toJaCoP(
+								store, variables, (Device)device, ((Device)component).getComponents());
+					} else {
+						pc = ArrayUtils.add(pc, (PrimitiveConstraint)this.toJaCoP(
+								store, variables, (Device)device, ((Device)component).getComponents()));
+					}
+
+				} else if(this.componentA instanceof Part && component instanceof PartType &&
+						((Part)this.componentA).getPartType().equals((PartType)component)) {
+
+					for(int k=i+1; k<components.size(); k++) {
+						Component comp = components.get(k);
+						if(this.componentB instanceof Part && comp instanceof PartType && 
+							((Part)this.componentB).getPartType().equals((PartType)comp)) {
+							
+							if(null == pc) {
+								pc = new PrimitiveConstraint[1];
+								pc[0] = new And(new XeqC(variables[i], a), new XeqC(variables[k], b));
+							} else {
+								pc = ArrayUtils.add(pc, new And(new XeqC(variables[i], a), new XeqC(variables[k], b)));
+							}
+						}
+					}
+
+				}	
+				
+				i++;
+			}
+
+			if(null != pc) {
+				return new Or(pc);
+			}
+			
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		
+		return null;
+	}
+
+/*** toJaCop if we use the ``positioning'' approach 	
 	@Override
 	public Constraint toJaCoP(
 			Store store, List<Component> components, IntVar[] variables) {
@@ -151,83 +209,14 @@ public class Before
 			return new XneqC(iv, 1);
 		}
 
-		List<PrimitiveConstraint> pcA = new ArrayList<PrimitiveConstraint>();
+		int a = (int)this.getA();
+		int b = (int)this.getB();
 
-		try {
-			int a = (int)this.getA();
-			int b = (int)this.getB();
-
-			if(this.compA == null) {
-				this.compA = SymbolTables.getComponent(a);
-			}
-			if(this.compB == null) {
-				this.compB = SymbolTables.getComponent(b);
-			}
-			
-			
-			int i=0;
-			for(Component component : components) {
-//				System.out.println("component "+component.getName());
-				if(compA instanceof Part && component instanceof PartType &&
-						((Part)compA).getPartType().equals((PartType)component)) {
-
-					int[] possibleBPositions = new int[1];
-					int[] impossibleBPositions = new int[1];
-					
-					/* possible positions of B */
-					List<PrimitiveConstraint> possibleB = new ArrayList<PrimitiveConstraint>();
-					
-					/* impossible positions of B */
-					List<PrimitiveConstraint> impossibleB = new ArrayList<PrimitiveConstraint>();
-					
-					for(int k=0; k<variables.length; k++) {
-						Component comp = components.get(k);
-						if(compB instanceof Part && comp instanceof PartType && 
-							((Part)compB).getPartType().equals((PartType)comp)) {
-							
-							if(k <= i) {
-								impossibleB.add(new XneqC(variables[k], b));
-								impossibleBPositions = ArrayUtils.add(impossibleBPositions, k);
-							} else {
-								possibleB.add(new XeqC(variables[k], b));
-								possibleBPositions = ArrayUtils.add(possibleBPositions, k);
-							}
-						}
-					}
-
-					PrimitiveConstraint[] pcPossibleB = new PrimitiveConstraint[possibleB.size()];
-					PrimitiveConstraint[] pcImpossibleB = new PrimitiveConstraint[impossibleB.size()];
-					
-					/*
-					 * If A is at position N, then we're not allowed to 
-					 * 
-					 */
-					pcA.add(new IfThen(
-								new XeqC(variables[i], a),
-								new And(new Or(possibleB.toArray(pcPossibleB)), 
-										new And(impossibleB.toArray(pcImpossibleB)))));
-
-
-					possibleBPositions = ArrayUtils.remove(possibleBPositions, 0);
-					impossibleBPositions = ArrayUtils.remove(impossibleBPositions, 0);
-
-//					System.out.println(
-//							"impossible positions of "+this.compB.getName()+"... "+Arrays.toString(impossibleBPositions)+" -> "+
-//							"possible positions of "+this.compB.getName()+"... "+Arrays.toString(possibleBPositions));
-
-//					pcA.add(new IfThen(
-//								new XeqC(variables[i], a),
-//								new And(pcB.toArray(pcBB))));
-				}				
-				i++;
-			}
-
-			PrimitiveConstraint[] pcAA = new PrimitiveConstraint[pcA.size()];
-			return new And(pcA.toArray(pcAA));		
-		} catch(Exception e) {
-			e.printStackTrace();
-		}
+		IntVar ivA = (IntVar)store.findVariable(String.valueOf(a));
+		IntVar ivB = (IntVar)store.findVariable(String.valueOf(b));
 		
-		return null;
+		return new XltY(ivA, ivB);
 	}
+***/
+	
 }

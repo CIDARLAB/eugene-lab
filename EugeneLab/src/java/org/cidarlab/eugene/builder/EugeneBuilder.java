@@ -22,26 +22,20 @@ ENHANCEMENTS, OR MODIFICATIONS.
 
 package org.cidarlab.eugene.builder;
 
-import org.cidarlab.eugene.dom.arrays.PermutedDeviceArray;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import org.antlr.runtime.Token;
 import org.antlr.runtime.tree.CommonTree;
-import org.cidarlab.eugene.rules.tree.RuleTreeParser;
-import org.cidarlab.eugene.rules.tree.predicate.Predicate;
-
-import com.rits.cloning.Cloner;
-
 import org.cidarlab.eugene.cache.SymbolTables;
 import org.cidarlab.eugene.constants.EugeneConstants;
 import org.cidarlab.eugene.dom.NamedElement;
 import org.cidarlab.eugene.dom.PropertyValue;
 import org.cidarlab.eugene.dom.Variable;
-import org.cidarlab.eugene.dom.arrays.DeviceArray;
-import org.cidarlab.eugene.dom.collection.EugeneCollection;
+import org.cidarlab.eugene.dom.arrays.*;
 import org.cidarlab.eugene.dom.collection.CollectionElement;
+import org.cidarlab.eugene.dom.collection.EugeneCollection;
 import org.cidarlab.eugene.dom.components.Component;
 import org.cidarlab.eugene.dom.components.Device;
 import org.cidarlab.eugene.dom.components.Part;
@@ -50,7 +44,11 @@ import org.cidarlab.eugene.dom.components.types.DeviceType;
 import org.cidarlab.eugene.dom.components.types.PartType;
 import org.cidarlab.eugene.dom.rules.Rule;
 import org.cidarlab.eugene.exception.EugeneException;
-import org.cidarlab.eugene.exception.EugeneException;
+import org.cidarlab.eugene.rules.tree.RuleTreeParser;
+import org.cidarlab.eugene.rules.tree.predicate.Predicate;
+
+import com.rits.cloning.Cloner;
+
 
 public class EugeneBuilder {
 
@@ -107,11 +105,6 @@ public class EugeneBuilder {
 		return device;
 	}
 
-        public static Device buildDevice(
-			String sName, List<Component> lstComponents) {
-            return new Device(sName, lstComponents);
-        }
-        
 	public static PermutedDeviceArray buildPermutedDeviceArray(
 			Device device, long[][] valid_combinations) {
 		return new PermutedDeviceArray(device, valid_combinations);

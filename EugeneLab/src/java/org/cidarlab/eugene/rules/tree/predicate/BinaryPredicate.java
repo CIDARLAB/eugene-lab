@@ -4,6 +4,7 @@ import org.cidarlab.eugene.cache.SymbolTables;
 import org.cidarlab.eugene.dom.components.Component;
 import org.cidarlab.eugene.exception.EugeneException;
 
+
 /* 
  * Binary predicates are predicates that MUST have two rule operators (A and B)
  * 
@@ -13,20 +14,20 @@ import org.cidarlab.eugene.exception.EugeneException;
 public abstract class BinaryPredicate 
 	implements RulePredicate {
 	
-	private long A;
-	private long B;
-	private Component componentA;
-	private Component componentB;
+	protected long A;
+	protected long B;
+	protected Component componentA;
+	protected Component componentB;
 	
 	public BinaryPredicate(long A, long B) 
 			throws EugeneException {
 		this.A = A;
 		this.B = B;
 		
-		this.componentA = SymbolTables.getComponent(A);
-		//System.out.println("[UnaryPredicate] -> "+this.componentA);
+		if(A != -1) {
+			this.componentA = SymbolTables.getComponent(A);
+		}
 		this.componentB = SymbolTables.getComponent(B);
-		//System.out.println("[UnaryPredicate] -> "+this.componentB);
 	}
 	
 	public long getA() {

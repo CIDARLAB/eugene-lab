@@ -1,7 +1,6 @@
 package org.cidarlab.eugene.rules.tree;
 
 import org.antlr.runtime.tree.CommonTree;
-
 import org.cidarlab.eugene.cache.SymbolTables;
 import org.cidarlab.eugene.dom.NamedElement;
 import org.cidarlab.eugene.dom.Variable;
@@ -9,34 +8,67 @@ import org.cidarlab.eugene.dom.components.Component;
 import org.cidarlab.eugene.dom.components.Device;
 import org.cidarlab.eugene.exception.EugeneException;
 
+
 public class Indexer {
 	
 	public static int getIndex(NamedElement element, CommonTree t) 
 			throws EugeneException {
 		
+//		System.out.println("[Indexer.getIndex] t.getText: "+t.getText());
+
+		/*
+		 * INITIALIZATION 
+		 */
 		global_element = null;
+		global_index = 0;
+		parent_element = null;
 		if(element == null) {
 			global_element = SymbolTables.get(t.getText());						
 		} else {
-			global_element = element.get(t.getText());
+			if(!t.getText().equals(element.getName())) {
+				
+				/*
+				 * here, we need to calculate the global index
+				 * i.e. the index of the first element of the specified sub-device
+				 */
+				parent_element = element; 
+
+				if(element instanceof Device) {
+					Device d = (Device)element;
+					for(Component component : d.getComponents()) {
+						if(component.getName().equals(t.getText())) {
+							break;
+						} else {
+							global_index += component.size();
+						}
+					}
+				}
+				
+				global_element = element.get(t.getText());
+			} else {
+				global_element = element;
+			}
 		}
 
 		if(global_element == null) {
-			throw new EugeneException("I don't know "+t.getText());						
+			return -1;
+//			throw new EugeneException("I don't know "+t.getText());						
 		}
 		
-//		System.out.println("[Indexer.getIndex] objElement: "+global_element.getName()+", tree: "+t.toStringTree());
+//		System.out.println("[Indexer.getIndex] global_element: "+global_element+", global_index: "+global_index+", tree: "+t.toStringTree());
+
 		
 		if(t.getChildCount() == 1) {
-			global_index = 0;
-			parent_element = null;
 			current_element = global_element;
 			int idx = calculateIndex((CommonTree)t.getChild(0));
 
+//			System.out.println(idx);
+			
 //			System.out.println(((CommonTree)t.getChild(0)).getChildCount());
 			if(((CommonTree)t.getChild(0)).getChildCount() == 1) {
-				return idx;
-			}
+//				System.out.println("index -> "+(global_index+idx));
+				return global_index + idx;
+			} 
 //			
 //			//System.out.println("global_index: "+global_index);
 			return global_index;
@@ -52,6 +84,7 @@ public class Indexer {
 	
 	private static int calculateIndex(CommonTree tree) 
 			throws EugeneException {
+		
 		if(tree != null) {
 			
 			if("[".equals(tree.getText()) || 
@@ -109,7 +142,6 @@ public class Indexer {
 					}
 					
 				}
-			} else if(tree.getChildCount() == 0) {
 			}
 		}
 		return -1;

@@ -5,12 +5,12 @@ import java.util.Arrays;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.cidarlab.eugene.builder.EugeneBuilder;
-
 import org.cidarlab.eugene.cache.SymbolTables;
 import org.cidarlab.eugene.dom.NamedElement;
 import org.cidarlab.eugene.dom.components.Component;
 import org.cidarlab.eugene.dom.components.Device;
 import org.cidarlab.eugene.exception.EugeneException;
+
 
 public class PermutedDeviceArray 
 		extends DeviceArray {

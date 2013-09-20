@@ -28,7 +28,7 @@ import java.util.Iterator;
 import org.cidarlab.eugene.dom.components.Component;
 import org.cidarlab.eugene.dom.components.Device;
 import org.cidarlab.eugene.exception.EugeneException;
-import org.cidarlab.eugene.exception.EugeneException;
+
 
 public class CharacterizationDevice extends Device {
 

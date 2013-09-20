@@ -24,14 +24,13 @@ package org.cidarlab.eugene.dom.rules;
 
 import org.antlr.runtime.Token;
 import org.antlr.runtime.tree.CommonTree;
-import org.cidarlab.eugene.rules.tree.predicate.Predicate;
-
 import org.cidarlab.eugene.cache.SymbolTables;
 import org.cidarlab.eugene.dom.NamedElement;
 import org.cidarlab.eugene.dom.collection.CollectionElement;
 import org.cidarlab.eugene.dom.components.Device;
 import org.cidarlab.eugene.exception.EugeneException;
-import org.cidarlab.eugene.exception.EugeneException;
+import org.cidarlab.eugene.rules.tree.predicate.Predicate;
+
 
 /**
  * 

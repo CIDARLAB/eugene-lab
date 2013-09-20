@@ -1,12 +1,12 @@
 package org.cidarlab.eugene.data.pigeon;
 
+import java.net.URI;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import org.cidarlab.eugene.fact.relation.Relation;
 
 import org.cidarlab.eugene.cache.SymbolTables;
 import org.cidarlab.eugene.dom.NamedElement;
@@ -18,6 +18,8 @@ import org.cidarlab.eugene.dom.components.Part;
 import org.cidarlab.eugene.dom.components.types.PartType;
 import org.cidarlab.eugene.dom.relation.Interaction;
 import org.cidarlab.eugene.exception.EugeneException;
+import org.cidarlab.eugene.fact.relation.Relation;
+
 
 public class Pigeon {
 
@@ -41,8 +43,8 @@ public class Pigeon {
 		try {
 			if(element instanceof DeviceArray) {
 				visualizeDeviceArray((DeviceArray)element);
-			} else if(element instanceof Component) {
-				visualizeComponent((Component)element);
+			} else if(element instanceof Device) {
+				visualize((Device)element);
 			}
 		} catch(EugeneException ee) {
 			throw new EugeneException (ee.toString());
@@ -63,6 +65,7 @@ public class Pigeon {
 		//String NEWLINE = System.getProperty("line.separator");
 		for(int i=0; i<size; i++) {
 			Device device = (Device)deviceArray.get(i);
+//			System.out.println("device.getDirections -> "+Arrays.toString(device.getDirections()));
 			List<Component> lst = device.getComponents();
 			if(null != lst && !lst.isEmpty()) {
 				int pos=0;
@@ -97,6 +100,8 @@ public class Pigeon {
 								setArcs.add(lhs.getName()+" "+toPigeonRelation(interaction.getRelation())+" "+rhs.getName());
 							}
 						}
+					} else if (c instanceof Device) {
+						System.out.println("DEVICE");
 					}
 					pos++;
 				}
@@ -137,9 +142,76 @@ public class Pigeon {
 		return pigeonType + " " + part.getName()+ " " + color;
 	}
 	
-	private static void visualizeComponent(Component component) 
+	public static URI visualize(Device device) 
 			throws EugeneException {
+		if(null != device) {
+			String pigeon = toPigeon(device);
+			WeyekinPoster.setPigeonText(pigeon);
+			URI url = WeyekinPoster.getMyBirdsURL();
+			return url;
+		}
 		
+		return null;
+	}
+	
+	private static Set<String> setArcs;
+	private static String toPigeon(Device device) 
+			throws EugeneException {
+		setArcs = new HashSet<String>();
+		StringBuilder sb = new StringBuilder();
+		String NEWLINE = "\r\n";
+
+		List<Component> lst = device.getComponents();
+		if(null != lst && !lst.isEmpty()) {
+			int pos=0;
+			for(Component c:lst) {
+				if(c instanceof Part) {
+
+					String pigeon = new String();
+					
+					PropertyValue pv = ((Part)c).getPropertyValue("Pigeon");
+					if(null != pv) {
+						pigeon = pv.getValue();
+					} else {
+						pigeon = toPigeon((Part)c);
+					}
+
+					if(device.getDirections()[pos] == '-') {
+						if(pigeon.startsWith(">")) {
+							pigeon = "<" + pigeon.substring(1);
+						} else {
+							pigeon = "<" + pigeon;
+						}
+					}
+					
+					sb.append(pigeon).append(NEWLINE);
+					
+					/* check for any regulatory interactions */
+					List<Interaction> interactions = SymbolTables.getInteractions(c);
+					if(null != interactions && !interactions.isEmpty()) {
+						for(Interaction interaction : interactions) {
+							Component lhs = (Component)interaction.getLhs();
+							Component rhs = (Component)interaction.getRhs();
+							setArcs.add(lhs.getName()+" "+toPigeonRelation(interaction.getRelation())+" "+rhs.getName());
+						}
+					}
+				} else if (c instanceof Device) {
+					sb.append(".");
+					sb.append(toPigeon((Device)c));
+					sb.append(".");
+				}
+				pos++;
+			}
+
+		}
+		//sb.append(NEWLINE);
+		/* now, let's create the arcs */
+		sb.append("# Arcs").append(NEWLINE);
+		for(String arc : setArcs) {
+			sb.append(arc).append(NEWLINE);
+		}
+		
+		return sb.toString();
 	}
 	
 	private static String toPigeonRelation(Relation relation) {

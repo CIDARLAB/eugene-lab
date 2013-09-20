@@ -4,6 +4,14 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.antlr.runtime.tree.CommonTree;
+import org.cidarlab.eugene.cache.SymbolTables;
+import org.cidarlab.eugene.dom.NamedElement;
+import org.cidarlab.eugene.dom.components.Component;
+import org.cidarlab.eugene.dom.components.Device;
+import org.cidarlab.eugene.dom.components.Part;
+import org.cidarlab.eugene.dom.components.types.PartType;
+import org.cidarlab.eugene.exception.EugeneException;
+import org.cidarlab.eugene.fact.relation.Relation;
 import org.cidarlab.eugene.rules.RuleOperator;
 import org.cidarlab.eugene.rules.tree.Indexer;
 import org.cidarlab.eugene.rules.tree.predicate.PairingPredicate;
@@ -15,11 +23,6 @@ import JaCoP.constraints.PrimitiveConstraint;
 import JaCoP.constraints.XeqC;
 import JaCoP.core.IntVar;
 import JaCoP.core.Store;
-import org.cidarlab.eugene.cache.SymbolTables;
-import org.cidarlab.eugene.dom.NamedElement;
-import org.cidarlab.eugene.dom.components.Component;
-import org.cidarlab.eugene.dom.components.Device;
-import org.cidarlab.eugene.exception.EugeneException;
 
 public class Induces 
 	extends PairingPredicate {
@@ -70,19 +73,24 @@ public class Induces
 
 	@Override
 	public Constraint toJaCoP(
-			Store store, List<Component> components, IntVar[] variables) {
-		// TODO 
-		
-		//System.out.println("[ExpressionPredicate.toJaCoP] -> "+tree.toStringTree());
-		
-		if(components.size() != variables.length) {
-			return null;
-		}
+			Store store, IntVar[] variables, 
+			Device device, List<Component> components) 
+				throws EugeneException {
+
+//		NamedElement element = null;
+//		if(components.size() != variables.length) {
+//			
+//			/*
+//			 * this is a current hack
+//			 * -> we should pass the device to the toJaCoP methods instead a list of components!
+//			 */
+//			element = new Device(null, components);
+//		}
 		
 		// here we need to parse the ExpressionTree
 		PrimitiveConstraint pc = null;
 		try {
-			pc = buildConstraint(store, variables, components, tree, null);
+			pc = buildConstraint(store, variables, components, tree, device);
 		} catch (EugeneException e) {
 			e.printStackTrace();
 			pc = null;
@@ -94,6 +102,9 @@ public class Induces
 	private PrimitiveConstraint buildConstraint(
 			Store store, IntVar[] variables, List<Component> components, CommonTree t, NamedElement element) 
 			throws EugeneException {
+		
+//		System.out.println("[Induces.buildConstraint] components -> "+t.toStringTree()+", element: "+element);
+		
 		if (null != t) {
 			CommonTree lhs = (CommonTree)t.getChild(0);
 			CommonTree rhs = (CommonTree)t.getChild(1);
@@ -103,44 +114,53 @@ public class Induces
 			}
 			
 			int lhsIdx = -1;
+			Component lhsComponent = null;
 			try {
 				lhsIdx = Indexer.getIndex(element, lhs);
+				if(lhsIdx == -1) {
+					lhsComponent = (Component)SymbolTables.get(lhs.getText());
+				}
 			} catch(EugeneException e) {
 				throw new EugeneException(e.toString());
 			}
 			
 			// RIGHT-HAND SIDE
-			int rhsIdx = -1;
-			try {
-				rhsIdx = Indexer.getIndex(element, rhs);
-			} catch(EugeneException e) {
-				throw new EugeneException(e.toString());
+			int rhsIdx = Indexer.getIndex(element, rhs);
+			if(rhsIdx == -1) {
+				throw new EugeneException("Invalid INDUCES rule!");
 			}
 			
-			if(lhsIdx == -1 || rhsIdx == -1) {
-				throw new EugeneException("Invalid index!");
-			}
-			
-//			System.out.println(lhsIdx+" "+this.getOperator()+" "+rhsIdx);
 						
-			return this.buildConstraint(
-					variables,
-					components.get(lhsIdx), lhsIdx, 
-					components.get(rhsIdx), rhsIdx);
+			if( null != lhsComponent && lhsIdx == -1) {
+				return this.buildConstraint(
+						store, 
+						variables,
+						lhsComponent, 
+						components.get(rhsIdx), rhsIdx);
+			}
+
+			throw new EugeneException("Invalid INDUCES rule!");
 		}
 		
 		return null;	
 	}
 	
-	private PrimitiveConstraint buildConstraint(IntVar[] variables, Component lhs, int lhsIdx, Component rhs, int rhsIdx) 
+	private PrimitiveConstraint buildConstraint(Store store, IntVar[] variables, Component lhs, Component rhs, int rhsIdx) 
 			throws EugeneException {
 		/*
 		 * first, we need to query all parts of the given part type
 		 * and their corresponding partners 
 		 */
+		
+//		System.out.println("[Induces.buildConstraint] -> "+lhs+" -> "+rhs+", "+rhsIdx);
+		
 		long[][] pairs = null;
 		try {
-			pairs = SymbolTables.queryPairs(this.getOperator(), lhs, rhs);
+			if(rhs instanceof Device || rhs instanceof PartType) {
+				pairs = SymbolTables.queryPairs(Relation.INDUCES.toString(), lhs, null);
+			} else if(rhs instanceof Part) {
+				pairs = SymbolTables.queryPairs(Relation.INDUCES.toString(), lhs, rhs);
+			}
 		} catch(Exception e) {
 			throw new EugeneException(e.getMessage());
 		}
@@ -154,11 +174,14 @@ public class Induces
 		if(null != pairs) {
 			PrimitiveConstraint[] pcArray = new PrimitiveConstraint[pairs.length];
 			for(int i=0; i<pairs.length; i++) {
+
+				IntVar ivInducer = new IntVar(store, (int)pairs[i][0], (int)pairs[i][0]);
+
 				pcArray[i] = new And(
-						new XeqC(variables[lhsIdx], (int)pairs[i][0]),
+						new XeqC(ivInducer, (int)pairs[i][0]),
 						new XeqC(variables[rhsIdx], (int)pairs[i][1]));
 			}
-			return new Or(pcArray);
+			return new And(pcArray);
 		}
 			
 		return null;
@@ -167,7 +190,7 @@ public class Induces
 	@Override
 	public boolean evaluate(Device device) 
 			throws EugeneException {
-		throw new UnsupportedOperationException("a REPRESSES b is not available yet");
+		throw new UnsupportedOperationException("a INDUCES b is not available yet");
 	}
 	
 

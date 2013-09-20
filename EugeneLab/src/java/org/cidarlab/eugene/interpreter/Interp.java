@@ -37,12 +37,6 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.cidarlab.eugene.algorithm.Permutor;
 import org.cidarlab.eugene.algorithm.Product;
 import org.cidarlab.eugene.builder.EugeneBuilder;
-import org.cidarlab.eugene.fact.relation.*;
-import org.cidarlab.eugene.rules.RuleMemo;
-import org.cidarlab.eugene.rules.tree.Indexer;
-
-import com.rits.cloning.Cloner;
-
 import org.cidarlab.eugene.cache.SymbolTables;
 import org.cidarlab.eugene.constants.EugeneConstants;
 import org.cidarlab.eugene.data.sbol.SBOLExporter;
@@ -56,21 +50,27 @@ import org.cidarlab.eugene.dom.arrays.DeviceArray;
 import org.cidarlab.eugene.dom.arrays.PartArray;
 import org.cidarlab.eugene.dom.arrays.PartTypeArray;
 import org.cidarlab.eugene.dom.arrays.PropertyArray;
-import org.cidarlab.eugene.dom.collection.EugeneCollection;
 import org.cidarlab.eugene.dom.collection.CollectionElement;
 import org.cidarlab.eugene.dom.collection.CollectionOps;
+import org.cidarlab.eugene.dom.collection.EugeneCollection;
 import org.cidarlab.eugene.dom.components.Component;
 import org.cidarlab.eugene.dom.components.Device;
 import org.cidarlab.eugene.dom.components.Part;
 import org.cidarlab.eugene.dom.components.Property;
 import org.cidarlab.eugene.dom.components.types.DeviceType;
 import org.cidarlab.eugene.dom.components.types.PartType;
-import org.cidarlab.eugene.controlflow.functions.Function;
+import org.cidarlab.eugene.dom.functions.Function;
 import org.cidarlab.eugene.dom.rules.Rule;
 import org.cidarlab.eugene.exception.EugeneException;
+import org.cidarlab.eugene.fact.relation.*;
 import org.cidarlab.eugene.factory.DeviceFactory;
 import org.cidarlab.eugene.output.ResultSet;
 import org.cidarlab.eugene.parser.EugeneParser;
+import org.cidarlab.eugene.rules.RuleMemo;
+import org.cidarlab.eugene.rules.tree.Indexer;
+
+import com.rits.cloning.Cloner;
+
 
 public class Interp {
 
@@ -280,7 +280,6 @@ public class Interp {
 		
 
 		Device objDevice = EugeneBuilder.buildDevice(sName, lst, lstProperties, directions);
-		//System.out.println("[Interp.createDevice] -> "+objDevice);
 		
 		SymbolTables.put(objDevice);
 		return objDevice;
@@ -653,25 +652,22 @@ public class Interp {
 	
 	public void assign(String sName, NamedElement objAssignElement)
 			throws EugeneException {
-		
 		if(null == objAssignElement) {
 			return;
 		}
 
 		// 1. lookup the sName element in the symbol tables
-		if(SymbolTables.contains(sName)) {
-			SymbolTables.remove(sName);
+		NamedElement objElement = SymbolTables.get(sName);
+		if(null == objElement) {
+			objElement = cloner.deepClone(objAssignElement);
+			objElement.setName(sName);
+			SymbolTables.put(objElement);
+		} else {
+//			System.out.println("[Interp.assign] -> "+objElement+" "+objAssignElement.getName());
+			objElement.assign(objAssignElement);
 		}
-		
-		NamedElement objElement = cloner.deepClone(objAssignElement);
-		objElement.setName(sName);
-		SymbolTables.put(objElement);
 
-		
-//		System.out.println("[Interp.assign] -> "+objElement.getName());
-//		if(objElement instanceof EugeneCollection) {
-//			System.out.println(Arrays.toString(((EugeneCollection)objElement).getDeviceIds()));
-//		}
+				
 	}
 
 	// method: getPartVariable
@@ -938,8 +934,8 @@ public class Interp {
         } else if(leftElement instanceof Component && rightElement instanceof Component) { 
         	
         	if(leftElement instanceof Device) {        		
-	        	List<Component> lst = new ArrayList<Component>(
-	        			((Device)leftElement).getComponents());
+	        	List<Component> lst = 
+	        			new ArrayList<Component>(((Device)leftElement).getComponents());
         		char[] directions = ((Device)leftElement).getDirections();
         		
 	        	if(rightElement instanceof Device) {

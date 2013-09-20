@@ -1,8 +1,8 @@
 package org.cidarlab.eugene.fact.relation;
 
+import org.cidarlab.eugene.cache.SymbolTables;
 import org.cidarlab.eugene.fact.BinaryFact;
 
-import org.cidarlab.eugene.cache.SymbolTables;
 
 public class Ortho 
 	extends BinaryFact {

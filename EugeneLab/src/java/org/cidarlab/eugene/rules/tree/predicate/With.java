@@ -3,6 +3,10 @@ package org.cidarlab.eugene.rules.tree.predicate;
 import java.util.List;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.cidarlab.eugene.cache.SymbolTables;
+import org.cidarlab.eugene.dom.components.Component;
+import org.cidarlab.eugene.dom.components.Device;
+import org.cidarlab.eugene.exception.EugeneException;
 import org.cidarlab.eugene.rules.RuleOperator;
 
 import JaCoP.constraints.Constraint;
@@ -14,10 +18,6 @@ import JaCoP.constraints.XneqC;
 import JaCoP.core.IntVar;
 import JaCoP.core.Store;
 
-import org.cidarlab.eugene.cache.SymbolTables;
-import org.cidarlab.eugene.dom.components.Component;
-import org.cidarlab.eugene.dom.components.Device;
-import org.cidarlab.eugene.exception.EugeneException;
 
 public class With 
 		extends BinaryPredicate {
@@ -76,7 +76,10 @@ public class With
 
 	@Override
 	public Constraint toJaCoP(
-			Store store, List<Component> components, IntVar[] variables) {
+			Store store, IntVar[] variables, 
+			Device device, List<Component> components) 
+				throws EugeneException {
+		
 		int a = (int)this.getA();
 		int b = (int)this.getB();
 		int NR_OF_VARIABLES = variables.length;

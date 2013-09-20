@@ -25,7 +25,7 @@ package org.cidarlab.eugene.dom;
 import java.io.Serializable;
 
 import org.cidarlab.eugene.exception.EugeneException;
-import org.cidarlab.eugene.exception.EugeneException;
+
 
 /**
  * 

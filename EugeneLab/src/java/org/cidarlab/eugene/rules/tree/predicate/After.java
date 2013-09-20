@@ -2,6 +2,10 @@ package org.cidarlab.eugene.rules.tree.predicate;
 
 import java.util.List;
 
+import org.cidarlab.eugene.cache.SymbolTables;
+import org.cidarlab.eugene.dom.components.Component;
+import org.cidarlab.eugene.dom.components.Device;
+import org.cidarlab.eugene.exception.EugeneException;
 import org.cidarlab.eugene.rules.RuleOperator;
 
 import JaCoP.constraints.Constraint;
@@ -14,10 +18,6 @@ import JaCoP.core.IntVar;
 import JaCoP.core.Store;
 
 
-import org.cidarlab.eugene.cache.SymbolTables;
-import org.cidarlab.eugene.dom.components.Component;
-import org.cidarlab.eugene.dom.components.Device;
-import org.cidarlab.eugene.exception.EugeneException;
 
 /* A AFTER B 
  * 
@@ -111,9 +111,11 @@ public class After
 	}
 
 	@Override
-	public Constraint toJaCoP(Store store, List<Component> components,
-			IntVar[] variables) {
-		return this.before.toJaCoP(store, components, variables);
+	public Constraint toJaCoP(
+			Store store, IntVar[] variables, 
+			Device device, List<Component> components) 
+		throws EugeneException {
+		return this.before.toJaCoP(store, variables, device, components);
 	}
 }
 

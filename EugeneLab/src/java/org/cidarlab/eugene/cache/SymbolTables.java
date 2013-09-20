@@ -27,9 +27,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Stack;
 
-import org.cidarlab.eugene.fact.Fact;
-import org.cidarlab.eugene.fact.relation.Relation;
-
 import org.cidarlab.eugene.dom.NamedElement;
 import org.cidarlab.eugene.dom.StackElement;
 import org.cidarlab.eugene.dom.arrays.DeviceArray;
@@ -37,10 +34,13 @@ import org.cidarlab.eugene.dom.components.Component;
 import org.cidarlab.eugene.dom.components.Device;
 import org.cidarlab.eugene.dom.components.Part;
 import org.cidarlab.eugene.dom.components.types.PartType;
-import org.cidarlab.eugene.controlflow.functions.Function;
+import org.cidarlab.eugene.dom.functions.Function;
 import org.cidarlab.eugene.dom.relation.Interaction;
 import org.cidarlab.eugene.dom.rules.Rule;
 import org.cidarlab.eugene.exception.EugeneException;
+import org.cidarlab.eugene.fact.Fact;
+import org.cidarlab.eugene.fact.relation.Relation;
+
 
 /**
  * 
@@ -150,12 +150,18 @@ public class SymbolTables {
 
 	public static void cleanUp() {
 		if (null != objStack) {
-			objStack.clear();
 			objStack = null;
 		}
 
-		designSpace.clear();
-
+		if(null != designSpace) {
+			designSpace.clear();
+			designSpace = null;
+		}
+		
+		if(null != stCurrentFunction) {
+			stCurrentFunction = null;
+		}
+		
 		System.gc();
 	}
 
@@ -232,16 +238,12 @@ public class SymbolTables {
 	public static long getId(String sName) 
 			throws EugeneException {
 		long id = designSpace.getId(sName);
+
 		if(id > 0) {
 			return id;
 		}
 		throw new EugeneException("I cannot find "+sName);
-/**		
-		if(designSpace.contains(sName)) {
-			return ;
-		} else {
-		}
-		**/
+
 	}
 	
 	public static String getNameById(long nId) 
@@ -365,7 +367,7 @@ public class SymbolTables {
 			throws EugeneException {
 
 		if (null != objElement) {
-//			System.out.println("[SymbolTables.put] -> "+objElement.getName());
+//			System.out.println("[SymbolTables.put] -> "+objElement);
 			SymbolTables.put(objElement.getName(), objElement);
 		}
 	}

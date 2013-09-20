@@ -20,33 +20,49 @@ NO OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES,
 ENHANCEMENTS, OR MODIFICATIONS.
  */
 
-package org.cidarlab.eugene.dom.arrays;
+package org.cidarlab.eugene.dom.branches;
 
-import java.util.ArrayList;
-
+import org.antlr.runtime.Token;
+import org.antlr.runtime.tree.Tree;
+import org.cidarlab.eugene.cache.SymbolTables;
 import org.cidarlab.eugene.dom.NamedElement;
-import org.cidarlab.eugene.dom.SavableElement;
-import org.cidarlab.eugene.exception.EugeneException;
+import org.cidarlab.eugene.dom.StackElement;
+import org.cidarlab.eugene.dom.components.Device;
 
 
-public abstract class ComponentArray 
-	extends NamedElement 
-	implements SavableElement {
+public class ConditionalBranch 
+		implements StackElement {
 
-	private static final long serialVersionUID = 2304114629149581505L;
+	private Token condition;
+	private Token statements;
 
-	public ComponentArray(String sName) {
-		super(sName);
+	public ConditionalBranch(Token condition, Token statements) {
+		this.condition = condition;
+		this.statements = statements;
 	}
 
-	public abstract void add(NamedElement objComponent)
-			throws EugeneException;
+	public Token getCondition() {
+		return this.condition;
+	}
 
-	public abstract void add(String sComponent)
-			throws EugeneException;
+	public Token getStatements() {
+		return this.statements;
+	}
 
-	public abstract void remove(int idx)
-			throws EugeneException;
+	public NamedElement get(String sName) {
+		return (NamedElement) null;
+	}
+
+	public void clear() {
+		//System.out.println("[branch.clear] -> "+this + " -> " + this.hashCode());
+		SymbolTables.clear(String.valueOf(this.hashCode()+SymbolTables.stackSize()));
+	}
 	
-	public abstract ArrayList<?> getComponents();
+	
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+
+		return sb.toString();
+	}
 }

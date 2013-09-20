@@ -26,12 +26,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.ArrayUtils;
-
 import org.cidarlab.eugene.dom.NamedElement;
 import org.cidarlab.eugene.dom.components.Component;
 import org.cidarlab.eugene.dom.components.Device;
 import org.cidarlab.eugene.dom.components.Part;
 import org.cidarlab.eugene.exception.EugeneException;
+
 
 public class PartArray 
 		extends ComponentArray {

@@ -29,8 +29,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.cidarlab.eugene.builder.EugeneBuilder;
-import org.cidarlab.eugene.rules.RuleEngine;
-
 import org.cidarlab.eugene.cache.SymbolTables;
 import org.cidarlab.eugene.constants.EugeneConstants;
 import org.cidarlab.eugene.dom.NamedElement;
@@ -40,6 +38,8 @@ import org.cidarlab.eugene.dom.components.Device;
 import org.cidarlab.eugene.dom.components.Part;
 import org.cidarlab.eugene.dom.components.types.PartType;
 import org.cidarlab.eugene.dom.rules.Rule;
+import org.cidarlab.eugene.rules.RuleEngine;
+
 
 public class DeviceFactory {
 

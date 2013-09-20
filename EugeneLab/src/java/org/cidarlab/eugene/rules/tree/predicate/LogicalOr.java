@@ -1,21 +1,22 @@
 package org.cidarlab.eugene.rules.tree.predicate;
 
-import java.util.Arrays;
 import java.util.List;
 
-import org.cidarlab.eugene.rules.LogicalOperator;
-
-import JaCoP.constraints.And;
-import JaCoP.constraints.Constraint;
-import JaCoP.constraints.Or;
-import JaCoP.constraints.PrimitiveConstraint;
-import JaCoP.constraints.XeqC;
-import JaCoP.constraints.XneqC;
-import JaCoP.core.IntVar;
-import JaCoP.core.Store;
 import org.cidarlab.eugene.dom.components.Component;
 import org.cidarlab.eugene.dom.components.Device;
 import org.cidarlab.eugene.exception.EugeneException;
+import org.cidarlab.eugene.rules.LogicalOperator;
+
+import JaCoP.constraints.Constraint;
+import JaCoP.constraints.IfThen;
+import JaCoP.constraints.Not;
+import JaCoP.constraints.Or;
+import JaCoP.constraints.PrimitiveConstraint;
+import JaCoP.constraints.Reified;
+import JaCoP.constraints.XeqC;
+import JaCoP.core.BooleanVar;
+import JaCoP.core.IntVar;
+import JaCoP.core.Store;
 
 public class LogicalOr 
 	implements LogicalPredicate {
@@ -48,52 +49,83 @@ public class LogicalOr
 	}
 
 	@Override
-	public Constraint toJaCoP(Store store, List<Component> components, IntVar[] variables) {
-		Constraint cA = this.getA().toJaCoP(store, components, variables);
-		Constraint cB = this.getB().toJaCoP(store, components, variables);
+	public Constraint toJaCoP(
+			Store store, IntVar[] variables, 
+			Device device, List<Component> components) 
+				throws EugeneException {
+		System.out.println("[LogicalOr.toJaCoP]");
+		
+		Predicate predicateA = this.getA();
+		Predicate predicateB = this.getB();
+		
+		Constraint cA = null;
+		if(predicateA instanceof LogicalPredicate) {
+			cA = ((LogicalPredicate)predicateA).toJaCoPOr(store, variables, device, components);
+		} else if (predicateA instanceof CountingPredicate) {
+			cA = ((CountingPredicate)predicateA).toJaCoPNot(store, variables, device, components);
+		} else {
+			cA = predicateA.toJaCoP(store, variables, device, components);
+		}
+	
+		Constraint cB = null;
+		if(predicateB instanceof LogicalPredicate) {
+			cB = ((LogicalPredicate)predicateB).toJaCoPOr(store, variables, device, components);
+		} else if (predicateB instanceof CountingPredicate) {
+			cB = ((CountingPredicate)predicateB).toJaCoP(store, variables, device, components);
+		} else {
+			cB = predicateB.toJaCoP(store, variables, device, components);
+		}
+	
+		if(cA instanceof PrimitiveConstraint && cB instanceof PrimitiveConstraint) {
 
-		if(cA instanceof PrimitiveConstraint &&
-				cB instanceof PrimitiveConstraint) {
-//			System.out.println("[OR]");
-			return new Or(
-					(PrimitiveConstraint)cA, 
-					(PrimitiveConstraint)cB);
+			System.out.println(cA.getClass()+" OR "+cB.getClass());
 			
-		} else if(cA instanceof PrimitiveConstraint && 
-				!(cB instanceof PrimitiveConstraint)) {
+			BooleanVar bVar = new BooleanVar(store);
+			store.impose(new Reified((PrimitiveConstraint)cA, bVar));
+			store.impose(new Reified((PrimitiveConstraint)cB, bVar));
+			
+		} else if(cA instanceof PrimitiveConstraint && !(cB instanceof PrimitiveConstraint)) {
+			
+			/*
+			 * only if cA is false, cB should be evaluated
+			 * -> using Reified constraints
+			 */
 
-			// in this case, we return an ``always false'' constraint
-//			IntVar iv = new IntVar(store, "tmp", -1, -1);
-//			PrimitiveConstraint pc = new XneqC(iv, -1);
+			/*
+			 * IF NOT a THEN b
+			 */
+			IntVar bVar = new BooleanVar(store);
+			store.impose(new Reified(new Not((PrimitiveConstraint)cA), bVar));									
 			store.impose(cB);
-			return (PrimitiveConstraint)cA;
-//			return new Or((PrimitiveConstraint)cA, pc); 
 
-		} else if(!(cA instanceof PrimitiveConstraint) && 
-				cB instanceof PrimitiveConstraint) {
 
-//			IntVar iv = new IntVar(store, "tmp", -1, -1);
-//			PrimitiveConstraint pc = new XneqC(iv, -1);
-			
+		} else if(!(cA instanceof PrimitiveConstraint) && cB instanceof PrimitiveConstraint) {
+			IntVar bVar = new BooleanVar(store);
+			store.impose(new Reified(new Not((PrimitiveConstraint)cB), bVar));									
 			store.impose(cA);
-			
-			return (PrimitiveConstraint)cB;
-//			return new Or(pc, (PrimitiveConstraint)cB); 
-
 		} else {
 			
-			//store.impose(cA);
-			store.impose(cB);
+			/*
+			 * here we need an Reified constraint
+			 */
 			
-			return null;
+			if(null != cA) {		
+				store.impose(cA);
+			}
+			
+			if(null != cB) {
+				store.impose(cB);
+			}
 		}
+
+		return cB;
 	}
 
 	@Override
 	public boolean evaluate(long[] l) 
 			throws EugeneException {
 		boolean b = this.getA().evaluate(l);
-		System.out.println("[LogicalOr.evaluate] -> "+Arrays.toString(l)+" -> "+b);
+//		System.out.println("[LogicalOr.evaluate] -> "+Arrays.toString(l)+" -> "+b);
 		if(!b) {
 			b = b || this.getB().evaluate(l);
 		}	
@@ -134,4 +166,35 @@ public class LogicalOr
 		
 		return b;
 	}
+
+	@Override
+	public Constraint toJaCoPNot(Store store, IntVar[] variables,
+			Device device, List<Component> components) throws EugeneException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Constraint toJaCoPAnd(
+			Store store, IntVar[] variables,
+			Device device, List<Component> components) 
+					throws EugeneException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Constraint toJaCoPOr(Store store, IntVar[] variables, Device device,
+			List<Component> components) throws EugeneException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Constraint toJaCoPXor(Store store, IntVar[] variables,
+			Device device, List<Component> components) throws EugeneException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

@@ -5,9 +5,12 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -15,6 +18,19 @@ import java.util.Set;
 import java.util.logging.LogManager;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.cidarlab.eugene.constants.EugeneConstants;
+import org.cidarlab.eugene.dom.PropertyValue;
+import org.cidarlab.eugene.dom.arrays.DeviceArray;
+import org.cidarlab.eugene.dom.components.Component;
+import org.cidarlab.eugene.dom.components.Device;
+import org.cidarlab.eugene.dom.components.Part;
+import org.cidarlab.eugene.dom.components.Property;
+import org.cidarlab.eugene.dom.components.types.PartType;
+import org.cidarlab.eugene.dom.relation.Interaction;
+import org.cidarlab.eugene.dom.relation.Participant;
+import org.cidarlab.eugene.dom.relation.RelationType;
+import org.cidarlab.eugene.dom.rules.Rule;
+import org.cidarlab.eugene.exception.EugeneException;
 import org.cidarlab.eugene.fact.BinaryFact;
 import org.cidarlab.eugene.fact.Fact;
 import org.cidarlab.eugene.fact.relation.Relation;
@@ -55,17 +71,22 @@ import org.neo4j.kernel.Uniqueness;
 import org.neo4j.kernel.impl.util.FileUtils;
 
 import JaCoP.constraints.Constraint;
+import JaCoP.constraints.IfThen;
+import JaCoP.constraints.XeqC;
 import JaCoP.core.BoundDomain;
 import JaCoP.core.Domain;
+import JaCoP.core.IntDomain;
 import JaCoP.core.IntVar;
 import JaCoP.core.Store;
 import JaCoP.core.ValueEnumeration;
+import JaCoP.search.CreditCalculator;
 import JaCoP.search.DepthFirstSearch;
 import JaCoP.search.IndomainMiddle;
 import JaCoP.search.IndomainMin;
 import JaCoP.search.IndomainSimpleRandom;
 import JaCoP.search.InputOrderSelect;
 import JaCoP.search.LargestDomain;
+import JaCoP.search.LargestMin;
 import JaCoP.search.MostConstrainedDynamic;
 import JaCoP.search.MostConstrainedStatic;
 import JaCoP.search.PrintOutListener;
@@ -73,25 +94,13 @@ import JaCoP.search.Search;
 import JaCoP.search.SelectChoicePoint;
 import JaCoP.search.SimpleMatrixSelect;
 import JaCoP.search.SimpleSelect;
+import JaCoP.search.SimpleSolutionListener;
 import JaCoP.search.SmallestMax;
 import JaCoP.search.SolutionListener;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import org.cidarlab.eugene.constants.EugeneConstants;
-import org.cidarlab.eugene.dom.PropertyValue;
-import org.cidarlab.eugene.dom.arrays.DeviceArray;
-import org.cidarlab.eugene.dom.components.Component;
-import org.cidarlab.eugene.dom.components.Device;
-import org.cidarlab.eugene.dom.components.Part;
-import org.cidarlab.eugene.dom.components.Property;
-import org.cidarlab.eugene.dom.components.types.PartType;
-import org.cidarlab.eugene.dom.relation.Interaction;
-import org.cidarlab.eugene.dom.relation.Participant;
-import org.cidarlab.eugene.dom.relation.RelationType;
-import org.cidarlab.eugene.dom.rules.Rule;
-import org.cidarlab.eugene.exception.EugeneException;
 
 public class Neo4jPersistor {
 
@@ -115,12 +124,17 @@ public class Neo4jPersistor {
     }
     
     public void clearDb() {
+    	if(null != graphDb) {
+    		graphDb.shutdown();
+    	}
+
         try {
             FileUtils.deleteRecursively( new File( DB_NAME ) );
         } catch ( IOException e ) {
             throw new RuntimeException( e );
         }
     }
+    
     public void startTransaction() {
     	this.tx = graphDb.beginTx();
     }
@@ -133,13 +147,17 @@ public class Neo4jPersistor {
             @Override
             public void run() {   
 //            	System.out.println("*** shutting down neo4j ***");
-                graphDb.shutdown();
+            	if(null != graphDb) {
+            		graphDb.shutdown();
+            	}
             }
         } );
     }
 
     public void shutdown() {
-    	graphDb.shutdown();
+    	if(null != graphDb) {
+    		graphDb.shutdown();
+    	}
     }
 
     public void finalize() {
@@ -264,9 +282,45 @@ public class Neo4jPersistor {
     /*********************************/
 
     public DeviceArray product(Device device, List<Rule> lstRules, int N) {
+
+    	/*** STEP 1: FIGURE OUT THE ALLOWED POSITIONS OF EACH PART ***/
+    	/*
+    	 * create a new JaCoP store
+    	 */
     	Store store = new Store();
-//    	System.out.println("[Neo4j.product] -> "+device+", "+lstRules+", "+N);
     	
+    	/*
+    	 * create the variables of the constraint solving problem
+    	 * i.e. the parts
+    	 */
+    	IntVar[] variables = this.model(store, device);
+
+    	/*
+    	 * map the Eugene rules onto JaCoP constraints
+    	 */
+    	this.imposeConstraints(store, variables, device, lstRules);
+    	
+    	
+    	/*
+    	 * for testing: print the store's information
+    	 */
+    	//store.print();
+    	
+    	/*
+    	 * now, let's solve the problem
+    	 */
+    	Domain[][] solutions = this.solve(store, variables, N, device);
+    	
+    	
+    	/*
+    	 * finally, we return the solutions
+    	 */
+		return new DeviceArray(
+				device,
+				solutions);
+    }
+    
+    public IntVar[] model(Store store, Device device) {
     	List<Component> lstDeviceComponents = device.getAllComponents();
     	
     	IntVar[] variables = new IntVar[lstDeviceComponents.size()];
@@ -278,9 +332,10 @@ public class Neo4jPersistor {
 			 */
     		if(component instanceof PartType) {
 
-    			IntVar iv = new IntVar(store, (String)component.getName());
+    			String partTypeName = component.getName();
+    			IntVar iv = new IntVar(store, partTypeName);
     			
-    			//System.out.println("[neo4j.product] -> " + (String)component.getName());
+//    			System.out.println("[neo4j.product] -> " + component);
     			
     			// get all parts of the part type
     			Node partTypeNode = this.queryNodeByName(component.getName());
@@ -288,10 +343,13 @@ public class Neo4jPersistor {
     			if(null != partTypeNode) {
     				// check if there is any constraint defined on the part type
 	    			long[] partIds = this.queryParts(partTypeNode);
-	        		for(int k=0; k<partIds.length; k++) {
-	        			iv.addDom((int)partIds[k], (int)partIds[k]);
-	        		}
+
+    				for(int k=0; k<partIds.length; k++) {
+    					int partId = (int)partIds[k];
+	        			iv.addDom(partId, partId);
+    				}
     			}
+    			
         		variables[i++] = iv;
         		
     		} else if(component instanceof Part) {
@@ -302,52 +360,214 @@ public class Neo4jPersistor {
     			
     		}
     	}
+    	return variables;
+    }
+    
+    public IntVar[] modelPositioning(Store store, Device device) {
+        Map<String, IntVar> map = new HashMap<String, IntVar>();
+        
+    	List<Component> lstDeviceComponents = device.getAllComponents();
     	
-    	/*
-    	 * 3. load the constraints (i.e. by traversing the rule tree)
-    	 */
-    	for(Rule rule : lstRules) {
-//    		System.out.println("[Neo4j.product] -> "+rule);
-    		Constraint constraint = rule.getPredicate().toJaCoP(store, lstDeviceComponents, variables);
-    		if(null != constraint) {
-    			store.impose(constraint);
+    	int idx = 0;
+    	for(Component component : lstDeviceComponents) {
+
+			Node node = this.queryNodeByName(component.getName());
+			
+			if(null != node) {
+				
+	    		if(component instanceof PartType) {
+	    			long[] partIds = this.queryParts(node);
+	        		for(int k=0; k<partIds.length; k++) {
+
+	        			String sVariableName = String.valueOf(partIds[k]);
+	        			
+	        			IntVar iv = null;
+	        			if(map.containsKey(sVariableName)) {
+	        				iv = map.get(sVariableName);
+	        				iv.addDom(idx, idx);
+	        				map.remove(sVariableName);
+	        			} else {
+	        				iv = new IntVar(store, sVariableName, idx, idx);
+	        			}
+	        			
+	        			map.put(sVariableName, iv);
+	        		}
+	    		} else if(component instanceof Part) {
+	    					 
+	    			String sVariableName = String.valueOf(node.getId());
+        			
+        			IntVar iv = null;
+        			if(map.containsKey(sVariableName)) {
+        				iv = map.get(sVariableName);
+        				iv.addDom(idx, idx);
+        				map.remove(sVariableName);
+        			} else {
+        				iv = new IntVar(store, sVariableName, idx, idx);
+        			}
+
+	    			map.put(sVariableName, new IntVar(store, sVariableName, idx, idx));
+	    		}
+	    		
+    		}
+    		idx++;
+    	}
+    	
+    	IntVar[] variables = new IntVar[map.size()];
+    	map.values().toArray(variables);
+    	return variables;
+    }
+    
+    public void imposeConstraints(Store store, IntVar[] variables, Device device, List<Rule> rules) {
+    	for(Rule rule : rules) {
+    		try {
+	    		Constraint constraint = rule.getPredicate().toJaCoP(store, variables, device, device.getAllComponents());
+	    		
+	    		if(null != constraint) {
+	    			store.impose(constraint);
+	    		}
+    		} catch(EugeneException ee) {
+    			ee.printStackTrace();
     		}
     	}
+    }
+    
+    public Domain[][] solve(Store store, IntVar[] variables, int N, Device device) {
+    	Search<IntVar> search = new DepthFirstSearch<IntVar>(); 
 
-    	//System.out.println(store);
-
-    	Search<IntVar> label = new DepthFirstSearch<IntVar>(); 
         SelectChoicePoint<IntVar> select = null;
         if(N != (-1)) {
 			select =  new SimpleSelect<IntVar>(
 							variables, 
-							new MostConstrainedStatic<IntVar>(), 
+							new MostConstrainedDynamic<IntVar>(), 
 							new IndomainSimpleRandom<IntVar>());  
-        	label.getSolutionListener().setSolutionLimit(N);
-        } else {
+			search.getSolutionListener().setSolutionLimit(N);
+        } else {        	
         	select = new SimpleSelect<IntVar>(
-        				variables, 
-        				new LargestDomain<IntVar>(),
-        				new IndomainMin<IntVar>()); 
-            label.getSolutionListener().searchAll(true);            
+    				variables, 
+    				new LargestDomain<IntVar>(),
+    				new IndomainMin<IntVar>()); 
+        	search.getSolutionListener().searchAll(true);   
         }
 
-        label.setPrintInfo(false);
-        label.getSolutionListener().recordSolutions(true);
+        search.setPrintInfo(false);
+        search.getSolutionListener().recordSolutions(true);
                 
 		long T1 = System.nanoTime();
 
         // SOLVE
-        label.labeling(store, select);
+		try {
+			search.labeling(store, select);
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
 
 		long T2 = System.nanoTime();
 		
 		double nProcessing = (T2 - T1) * Math.pow(10, -9);
-		System.out.println("processing time: "+nProcessing+"sec");
+//		System.out.println("processing time: "+nProcessing+"sec");
+		System.out.println(nProcessing);
+
+		return search.getSolutionListener().getSolutions();
 		
-		return new DeviceArray(
-				device,
-				label.getSolutionListener().getSolutions());
+		/*************************************/
+		
+////		System.out.println("*************************************");
+//		
+//		IdentityHashMap<IntVar, Integer> map = select.getVariablesMapping();
+//
+//		String[] lstPartNames = new String[map.size()];
+//		
+//		/*
+//		 * key   ... idx
+//		 * value ... set of parts allowed at position idx 
+//		 */
+//
+//		Map<Integer, Set<String>> allowedPartsAtPosition = new HashMap<Integer, Set<String>>();
+//		int idx = 0;
+//		for(Component component : device.getAllComponents()) {
+//			allowedPartsAtPosition.put(idx++, new HashSet<String>());			
+//		}
+////		System.out.println(allowedPartsAtPosition.size());
+//		
+//		for(IntVar iv : map.keySet()) {
+//			lstPartNames[map.get(iv)] = iv.id();
+//		}
+//		
+//		for(Domain[] solution : search.getSolutionListener().getSolutions()) {
+//    		if(solution != null) {
+//	    		for(int j=0; j<solution.length; j++) {
+//	    			ValueEnumeration ve = solution[j].valueEnumeration();
+//	    			while(ve.hasMoreElements()) {
+//	    				int pos = ve.nextElement();
+////	    				System.out.println("adding "+lstPartNames[j]+" at position "+pos);
+//	    				allowedPartsAtPosition.get(pos).add(lstPartNames[j]);
+//	    			}
+//	    		}
+//    		} else {
+//    			break;
+//    		}
+//    	}
+//		
+////		for(Integer i : allowedPartsAtPosition.keySet()) {
+////			System.out.println(i+" -> "+allowedPartsAtPosition.get(i));
+////		}
+//		
+//		/*
+//		 * print out the possible positions of each part
+//		 */
+//		Store productStore = new Store();
+//		IntVar[] productVariables = new IntVar[allowedPartsAtPosition.size()];
+//		idx = 0;
+//		for(Integer index : allowedPartsAtPosition.keySet()) {
+//			IntVar iv = new IntVar(productStore, "idx-"+index); 
+//
+//			for(String s : allowedPartsAtPosition.get(index)) {
+//				iv.addDom(Integer.valueOf(s), Integer.valueOf(s));
+//			}
+//			
+//			productVariables[idx++] = iv;
+//		}
+//		
+//		productStore.print();
+//		
+//    	Search<IntVar> productSearch = new DepthFirstSearch<IntVar>(); 
+//        SelectChoicePoint<IntVar> productSelect = null;
+//
+////        System.out.println("N -> "+N);
+//        
+//        if(N != (-1)) {
+//			productSelect =  new SimpleSelect<IntVar>(
+//					productVariables, 
+//							new LargestMin<IntVar>(), 
+//							new IndomainSimpleRandom<IntVar>());  
+//			productSearch.getSolutionListener().setSolutionLimit(N);
+//        } else {        	
+//        	productSelect = new SimpleSelect<IntVar>(
+//        			productVariables, 
+//    				new LargestDomain<IntVar>(),
+//    				new IndomainMin<IntVar>()); 
+//        	productSearch.getSolutionListener().searchAll(true);   
+//        }
+//
+//        productSearch.setPrintInfo(false);
+//        productSearch.getSolutionListener().recordSolutions(true);
+//	            
+//		T1 = System.nanoTime();
+//	
+//	    // SOLVE
+//		try {
+//			productSearch.labeling(productStore, productSelect);
+//		} catch(Exception e) {
+//			e.printStackTrace();
+//		}
+//	
+//		T2 = System.nanoTime();
+//		
+//		nProcessing = (T2 - T1) * Math.pow(10, -9);
+//		System.out.println("processing time: "+nProcessing+"sec");
+//
+////		productSearch.getSolutionListener().printAllSolutions();
+//    	return productSearch.getSolutionListener().getSolutions();
     }
     
 	public long[][] queryPairs(String relation, Component c1, Component c2) 
@@ -363,16 +583,30 @@ public class Neo4jPersistor {
 		sb.append("START c1=node(*), c2=node(*) ");
 		sb.append("MATCH c1-[:").append(relation).append("]->c2 ");
 		sb.append("WHERE ");
+		boolean b = false;
 		if(c1 instanceof PartType) {
 			sb.append("HAS(c1.parttype) AND c1.parttype='").append(c1.getName()).append("' ");
+			b = true;
+		} else if(c1 instanceof Part) {
+			sb.append("HAS(c1.COMPONENT_NAME) AND c1.COMPONENT_NAME='").append(c1.getName()).append("' ");
+			b = true;
 		}
-		if(c2 instanceof PartType) {
-			sb.append("AND HAS(c2.parttype) AND c2.parttype='").append(c2.getName()).append("' ");
+		
+		if(c2 != null) {
+			if(c2 instanceof PartType) {
+				if(b) {
+					sb.append("AND ");
+				}
+				sb.append("HAS(c2.parttype) AND c2.parttype='").append(c2.getName()).append("' ");
+			} else if(c1 instanceof Part) {
+				if(b) {
+					sb.append("AND ");
+				}
+				sb.append("HAS(c1.COMPONENT_NAME) AND c1.COMPONENT_NAME='").append(c1.getName()).append("' ");
+			}
 		}
 		sb.append("RETURN c1, c2");
 
-//		System.out.println(sb.toString());
-		
 		ExecutionResult result = this.engine.execute(sb.toString());
 		
 		long[][] pairs = new long[1][2];

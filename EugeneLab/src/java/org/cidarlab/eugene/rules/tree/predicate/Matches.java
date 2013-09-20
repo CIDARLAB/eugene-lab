@@ -4,6 +4,11 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.antlr.runtime.tree.CommonTree;
+import org.cidarlab.eugene.cache.SymbolTables;
+import org.cidarlab.eugene.dom.NamedElement;
+import org.cidarlab.eugene.dom.components.Component;
+import org.cidarlab.eugene.dom.components.Device;
+import org.cidarlab.eugene.exception.EugeneException;
 import org.cidarlab.eugene.rules.RuleOperator;
 import org.cidarlab.eugene.rules.tree.Indexer;
 
@@ -12,13 +17,9 @@ import JaCoP.constraints.Constraint;
 import JaCoP.constraints.Or;
 import JaCoP.constraints.PrimitiveConstraint;
 import JaCoP.constraints.XeqC;
+import JaCoP.constraints.XeqY;
 import JaCoP.core.IntVar;
 import JaCoP.core.Store;
-import org.cidarlab.eugene.cache.SymbolTables;
-import org.cidarlab.eugene.dom.NamedElement;
-import org.cidarlab.eugene.dom.components.Component;
-import org.cidarlab.eugene.dom.components.Device;
-import org.cidarlab.eugene.exception.EugeneException;
 
 public class Matches 
 	extends PairingPredicate {
@@ -69,19 +70,14 @@ public class Matches
 
 	@Override
 	public Constraint toJaCoP(
-			Store store, List<Component> components, IntVar[] variables) {
-		// TODO 
-		
-		//System.out.println("[ExpressionPredicate.toJaCoP] -> "+tree.toStringTree());
-		
-		if(components.size() != variables.length) {
-			return null;
-		}
-		
+			Store store, IntVar[] variables, 
+			Device device, List<Component> components) 
+					throws EugeneException {
+
 		// here we need to parse the ExpressionTree
 		PrimitiveConstraint pc = null;
 		try {
-			pc = buildConstraint(store, variables, components, tree, null);
+			pc = buildConstraint(store, variables, components, tree, device);
 		} catch (EugeneException e) {
 			e.printStackTrace();
 			pc = null;
@@ -123,10 +119,11 @@ public class Matches
 //			System.out.println(lhsIdx+" "+this.getOperator()+" "+rhsIdx);
 			
 			
-			return this.buildConstraint(
-					variables,
-					components.get(lhsIdx), lhsIdx, 
-					components.get(rhsIdx), rhsIdx);
+			return new XeqY(variables[lhsIdx], variables[rhsIdx]); 
+//			return this.buildConstraint(
+//					variables,
+//					components.get(lhsIdx), lhsIdx, 
+//					components.get(rhsIdx), rhsIdx);
 		}
 		
 		return null;	

@@ -20,33 +20,35 @@ NO OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES,
 ENHANCEMENTS, OR MODIFICATIONS.
  */
 
-package org.cidarlab.eugene.dom.arrays;
+package org.cidarlab.eugene.dom.branches;
 
 import java.util.ArrayList;
 
-import org.cidarlab.eugene.dom.NamedElement;
-import org.cidarlab.eugene.dom.SavableElement;
-import org.cidarlab.eugene.exception.EugeneException;
+public class IfStatement {
 
+	private ConditionalBranch objIfBranch;
+	private ArrayList<ConditionalBranch> lstElseIfBranches;
+	private ConditionalBranch objElseBranch;
 
-public abstract class ComponentArray 
-	extends NamedElement 
-	implements SavableElement {
+	public IfStatement(ConditionalBranch objIfBranch,
+			ArrayList<ConditionalBranch> lstElseIfBranches,
+			ConditionalBranch objElseBranch) {
 
-	private static final long serialVersionUID = 2304114629149581505L;
-
-	public ComponentArray(String sName) {
-		super(sName);
+		this.objIfBranch = objIfBranch;
+		this.lstElseIfBranches = lstElseIfBranches;
+		this.objElseBranch = objElseBranch;
 	}
 
-	public abstract void add(NamedElement objComponent)
-			throws EugeneException;
+	public ConditionalBranch getIfBranch() {
+		return this.objIfBranch;
+	}
 
-	public abstract void add(String sComponent)
-			throws EugeneException;
+	public ArrayList<ConditionalBranch> getElseIfBranches() {
+		return this.lstElseIfBranches;
+	}
 
-	public abstract void remove(int idx)
-			throws EugeneException;
+	public ConditionalBranch getElseBranch() {
+		return this.objElseBranch;
+	}
 	
-	public abstract ArrayList<?> getComponents();
 }

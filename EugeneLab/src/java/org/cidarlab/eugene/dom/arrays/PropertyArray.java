@@ -29,6 +29,7 @@ import org.cidarlab.eugene.dom.components.Part;
 import org.cidarlab.eugene.dom.components.Property;
 import org.cidarlab.eugene.exception.EugeneException;
 
+
 public class PropertyArray 
 		extends ComponentArray {
 

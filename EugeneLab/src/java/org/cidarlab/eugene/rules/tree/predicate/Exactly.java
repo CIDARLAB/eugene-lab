@@ -2,27 +2,25 @@ package org.cidarlab.eugene.rules.tree.predicate;
 
 import java.util.List;
 
+import org.cidarlab.eugene.cache.SymbolTables;
+import org.cidarlab.eugene.dom.components.Component;
+import org.cidarlab.eugene.dom.components.Device;
+import org.cidarlab.eugene.dom.components.types.PartType;
+import org.cidarlab.eugene.exception.EugeneException;
 import org.cidarlab.eugene.rules.RuleOperator;
 
 import JaCoP.constraints.Constraint;
 import JaCoP.constraints.Count;
 import JaCoP.core.IntVar;
 import JaCoP.core.Store;
-import org.cidarlab.eugene.cache.SymbolTables;
-import org.cidarlab.eugene.dom.components.Component;
-import org.cidarlab.eugene.dom.components.Device;
-import org.cidarlab.eugene.dom.components.types.PartType;
-import org.cidarlab.eugene.exception.EugeneException;
 
 public class Exactly 
 	extends BinaryPredicate {
 
-	private long A;
-	private long N;
-	
 	public Exactly(long A, long N) 
 			throws EugeneException {				
 		super(A, N);
+
 	}
 
 	@Override
@@ -54,14 +52,6 @@ public class Exactly
 		throw new EugeneException(this.toString()+" requires information about a Device!");
 	}
 	
-	public long getA() {
-		return this.A;
-	}
-
-	public long getB() {
-		return this.N;
-	}
-
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append(this.getA())
@@ -87,12 +77,14 @@ public class Exactly
 
 	@Override
 	public Constraint toJaCoP(
-			Store store, List<Component> components, IntVar[] variables) {
+			Store store, IntVar[] variables, 
+			Device device, List<Component> components) 
+				throws EugeneException {
 
-		//System.out.println("imposing "+this.getA()+" MORETHAN "+this.getB());
+//		System.out.println("imposing "+this.getA()+" EXACTLY "+this.getB());
 
-		// a MORETHAN N
-		IntVar count = new IntVar(store, "counter", (int)(this.getB()), (int)(this.getB())); 
+		// a EXACTLY N
+		IntVar count = new IntVar(store, this.getA()+"_EXACTLY_"+this.getB()+"-counter", (int)(this.getB()), (int)(this.getB())); 
 		return new Count(variables, count, (int)this.getA());
 	}
 

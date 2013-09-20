@@ -26,16 +26,6 @@ package org.cidarlab.eugene.data.sbol.mapping;
 import java.net.URI;
 import java.util.ArrayList;
 
-import org.sbolstandard.core.Collection;
-import org.sbolstandard.core.DnaComponent;
-import org.sbolstandard.core.DnaSequence;
-import org.sbolstandard.core.SequenceAnnotation;
-import org.sbolstandard.core.impl.CollectionImpl;
-import org.sbolstandard.core.impl.DnaComponentImpl;
-import org.sbolstandard.core.impl.DnaSequenceImpl;
-import org.sbolstandard.core.impl.SequenceAnnotationImpl;
-import org.sbolstandard.core.util.SequenceOntology;
-
 import org.cidarlab.eugene.cache.SymbolTables;
 import org.cidarlab.eugene.constants.EugeneConstants;
 import org.cidarlab.eugene.dom.NamedElement;
@@ -47,6 +37,16 @@ import org.cidarlab.eugene.dom.components.Device;
 import org.cidarlab.eugene.dom.components.Part;
 import org.cidarlab.eugene.dom.components.types.PartType;
 import org.cidarlab.eugene.exception.EugeneException;
+import org.sbolstandard.core.Collection;
+import org.sbolstandard.core.DnaComponent;
+import org.sbolstandard.core.DnaSequence;
+import org.sbolstandard.core.SequenceAnnotation;
+import org.sbolstandard.core.impl.CollectionImpl;
+import org.sbolstandard.core.impl.DnaComponentImpl;
+import org.sbolstandard.core.impl.DnaSequenceImpl;
+import org.sbolstandard.core.impl.SequenceAnnotationImpl;
+import org.sbolstandard.core.util.SequenceOntology;
+
 
 public class Eugene2SBOL {
 

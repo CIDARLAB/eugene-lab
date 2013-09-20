@@ -3,11 +3,11 @@ package org.cidarlab.eugene.rules.tree.predicate;
 import java.util.BitSet;
 import java.util.List;
 
-import org.cidarlab.eugene.rules.LogicalOperator;
-
 import org.cidarlab.eugene.dom.components.Component;
 import org.cidarlab.eugene.dom.components.Device;
 import org.cidarlab.eugene.exception.EugeneException;
+import org.cidarlab.eugene.rules.LogicalOperator;
+
 
 import JaCoP.constraints.Constraint;
 import JaCoP.constraints.Not;
@@ -43,15 +43,19 @@ public class LogicalNot
 	}
 	
 	@Override
-	public Constraint toJaCoP(Store store, List<Component> components, IntVar[] variables) {
-		
-		if(this.getPredicate() instanceof MoreThan) {
-			store.impose(((MoreThan)this.getPredicate()).toJaCoPNot(store, components, variables));
+	public Constraint toJaCoP(
+			Store store, IntVar[] variables, 
+			Device device, List<Component> components) 
+				throws EugeneException {
+
+		if(this.getPredicate() instanceof LogicalPredicate) {
+			return ((LogicalPredicate)this.getPredicate()).toJaCoPNot(store, variables, device, components);
+		} else if(this.getPredicate() instanceof CountingPredicate) {
+			return ((CountingPredicate)this.getPredicate()).toJaCoPNot(store, variables, device, components);
 		} else {
-			Constraint c = this.getPredicate().toJaCoP(store, components, variables);
+			Constraint c = this.getPredicate().toJaCoP(store, variables, device, components);
 
 			if(null != c && c instanceof PrimitiveConstraint) {
-//				System.out.println("[LogicalNot] -> "+components+" -> "+this.getPredicate().getClass());
 				return new JaCoP.constraints.Not(
 						(PrimitiveConstraint)c);
 			}
@@ -64,11 +68,6 @@ public class LogicalNot
 	public boolean evaluate(long[] l) 
 			throws EugeneException {
 		boolean b = this.getPredicate().evaluate(l);
-//		if(!b) {
-//			System.err.println("[Not] everything's ok again...");
-//		} else {
-//			System.err.println("[Not] everything's broken...");
-//		}
 		return !b;
 	}
 	
@@ -87,6 +86,60 @@ public class LogicalNot
 	@Override
 	public boolean evaluate(Device device) 
 			throws EugeneException {
-		return !this.getPredicate().evaluate(device);
+            boolean b = this.getPredicate().evaluate(device);
+            System.out.println("[LogicalNot.evaluate] -> "+device+" -> "+b);
+            return !b;
+	}
+
+	@Override
+	public Constraint toJaCoPNot(
+			Store store, IntVar[] variables, 
+			Device device, List<Component> components) 
+				throws EugeneException {
+		if(this.getPredicate() instanceof LogicalPredicate) {
+			return ((LogicalPredicate)this.getPredicate()).toJaCoPNot(store, variables, device, components);
+		} else if(this.getPredicate() instanceof CountingPredicate) {
+			return ((CountingPredicate)this.getPredicate()).toJaCoPNot(store, variables, device, components);
+		}
+		return new Not((PrimitiveConstraint)this.getPredicate().toJaCoP(store, variables, device, components));
+	}
+
+	@Override
+	public Constraint toJaCoPAnd(
+			Store store, IntVar[] variables, 
+			Device device, List<Component> components) 
+				throws EugeneException {
+		if(this.getPredicate() instanceof LogicalPredicate) {
+			return ((LogicalPredicate)this.getPredicate()).toJaCoPNot(store, variables, device, components);
+		} else if(this.getPredicate() instanceof CountingPredicate) {
+			return ((CountingPredicate)this.getPredicate()).toJaCoPNot(store, variables, device, components);
+		}
+		return new Not((PrimitiveConstraint)this.getPredicate().toJaCoP(store, variables, device, components));
+	}
+
+	@Override
+	public Constraint toJaCoPOr(
+			Store store, IntVar[] variables, 
+			Device device, List<Component> components) 
+				throws EugeneException {
+		if(this.getPredicate() instanceof LogicalPredicate) {
+			return ((LogicalPredicate)this.getPredicate()).toJaCoPNot(store, variables, device, components);
+		} else if(this.getPredicate() instanceof CountingPredicate) {
+			return ((CountingPredicate)this.getPredicate()).toJaCoP(store, variables, device, components);
+		}
+		return new Not((PrimitiveConstraint)this.getPredicate().toJaCoP(store, variables, device, components));
+	}
+
+	@Override
+	public Constraint toJaCoPXor(
+			Store store, IntVar[] variables, 
+			Device device, List<Component> components) 
+				throws EugeneException {
+		if(this.getPredicate() instanceof LogicalPredicate) {
+			return ((LogicalPredicate)this.getPredicate()).toJaCoPNot(store, variables, device, components);
+		} else if(this.getPredicate() instanceof CountingPredicate) {
+			return ((CountingPredicate)this.getPredicate()).toJaCoPNot(store, variables, device, components);
+		}
+		return new Not((PrimitiveConstraint)this.getPredicate().toJaCoP(store, variables, device, components));
 	}
 }

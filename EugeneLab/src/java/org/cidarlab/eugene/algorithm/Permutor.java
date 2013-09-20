@@ -8,6 +8,12 @@ import java.util.Scanner;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.cidarlab.eugene.builder.EugeneBuilder;
+import org.cidarlab.eugene.cache.SymbolTables;
+import org.cidarlab.eugene.dom.NamedElement;
+import org.cidarlab.eugene.dom.arrays.PermutedDeviceArray;
+import org.cidarlab.eugene.dom.components.Device;
+import org.cidarlab.eugene.dom.rules.Rule;
+import org.cidarlab.eugene.exception.EugeneException;
 import org.cidarlab.eugene.rules.RuleEngine;
 import org.cidarlab.eugene.rules.tree.predicate.After;
 import org.cidarlab.eugene.rules.tree.predicate.Before;
@@ -21,12 +27,6 @@ import org.cidarlab.eugene.rules.tree.predicate.Then;
 import org.cidarlab.eugene.rules.tree.predicate.UnaryPredicate;
 import org.cidarlab.eugene.rules.tree.predicate.With;
 
-import org.cidarlab.eugene.cache.SymbolTables;
-import org.cidarlab.eugene.dom.NamedElement;
-import org.cidarlab.eugene.dom.arrays.PermutedDeviceArray;
-import org.cidarlab.eugene.dom.components.Device;
-import org.cidarlab.eugene.dom.rules.Rule;
-import org.cidarlab.eugene.exception.EugeneException;
 
 
 public class Permutor {

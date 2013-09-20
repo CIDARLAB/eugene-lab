@@ -30,11 +30,11 @@ import java.net.URL;
 
 import org.biojava.bio.seq.SequenceIterator;
 import org.biojava.bio.seq.io.SeqIOTools;
-
 import org.cidarlab.eugene.constants.EugeneConstants;
 import org.cidarlab.eugene.dom.PropertyValue;
 import org.cidarlab.eugene.dom.components.Part;
 import org.cidarlab.eugene.dom.components.types.PartType;
+
 
 public class GenbankImporter {
 

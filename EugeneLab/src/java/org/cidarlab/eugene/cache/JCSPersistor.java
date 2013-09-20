@@ -7,15 +7,15 @@ import java.util.Set;
 
 import org.apache.jcs.JCS;
 import org.apache.jcs.access.exception.CacheException;
-
-import com.rits.cloning.Cloner;
-
 import org.cidarlab.eugene.dom.NamedElement;
 import org.cidarlab.eugene.dom.StackElement;
 import org.cidarlab.eugene.dom.components.Component;
 import org.cidarlab.eugene.dom.components.Part;
 import org.cidarlab.eugene.dom.components.types.PartType;
 import org.cidarlab.eugene.exception.EugeneException;
+
+import com.rits.cloning.Cloner;
+
 
 public class JCSPersistor {
 	private JCS jcsCache;	

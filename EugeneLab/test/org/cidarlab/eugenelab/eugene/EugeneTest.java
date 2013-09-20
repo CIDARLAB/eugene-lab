@@ -12,7 +12,10 @@ import org.cidarlab.eugene.dom.components.types.PartType;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import org.clothocad.client.Clotho;
 import org.clothocad.client.ClothoFactory;
 import org.json.JSONObject;
@@ -25,34 +28,24 @@ public class EugeneTest {
 
     public static void main(String[] args)
             throws Exception {
-        new EugeneTest().testInverters();
+        //new EugeneTest().testInverters();
+        //new EugeneTest().testNORGates();
+        //new EugeneTest().testInvertaseNOR();
+        new EugeneTest().testNiF();
         System.exit(0);
     }
 
     public void testInverters()
             throws Exception {
-        //Clotho clotho = ClothoFactory.getAPI("ws://localhost:8080/websocket");
-        
-        Clotho clotho = ClothoFactory.getAPI("ws://cidar.bu.edu/clotho/websocket");
-        
-        HashMap<String, SavableElement> results = (HashMap<String, SavableElement>) EugeneExecutor.execute(
-                new File("./examples/inverter_rev1.eug"), 2);
+        Set<JSONObject> results = (HashSet<JSONObject>) EugeneExecutor.execute(
+                new File("./web/data/testuser/Examples/SynBERC/inverter.eug"), 3);
 
         if (null != results && !results.isEmpty()) {
-            for (String s : results.keySet()) {
-                SavableElement objElement = results.get(s);
-                if (objElement instanceof Device) {
-
-                    Device objDevice = (Device) objElement;
-
-                    /* we need to convert the Device into a nice JSON representation */
-                    JSONObject deviceJSON = this.toJSON(objDevice);
-                    
-                    // now, we store it in the Clotho DB...
-                    //clotho.create(deviceJSON);
-
-                    System.out.println("Device: " + deviceJSON);
-                }
+            Iterator<JSONObject> it = results.iterator();
+            while(it.hasNext()) {
+                JSONObject json = it.next();
+                
+                System.out.println(json.toString());
             }
         }
         /**
@@ -60,6 +53,53 @@ public class EugeneTest {
          * s:results.keySet()) { SavableElement se = results.get(s); }
         * *
          */
+    }
+
+    public void testNORGates()
+            throws Exception {
+        Set<JSONObject> results = (HashSet<JSONObject>) EugeneExecutor.execute(
+                new File("./web/data/testuser/Examples/SynBERC/nor-gate.eug"), 3);
+
+        if (null != results && !results.isEmpty()) {
+            Iterator<JSONObject> it = results.iterator();
+            while(it.hasNext()) {
+                JSONObject json = it.next();
+                
+                System.out.println(json.toString());
+            }
+        }
+    }
+
+    public void testInvertaseNOR()
+            throws Exception {
+        Set<JSONObject> results = (HashSet<JSONObject>) EugeneExecutor.execute(
+                new File("./web/data/testuser/Examples/SynBERC/invertase-nor.eug"), 3);
+
+        if (null != results && !results.isEmpty()) {
+            Iterator<JSONObject> it = results.iterator();
+            while(it.hasNext()) {
+                JSONObject json = it.next();
+                
+                System.out.println(json.toString());
+            }
+        }
+    }
+
+    public void testNiF()
+            throws Exception {
+//        Set<JSONObject> results = (HashSet<JSONObject>) EugeneExecutor.execute(
+//                new File("./web/data/testuser/Examples/SynBERC/NiF.eug"), 3);
+        Set<JSONObject> results = (HashSet<JSONObject>) EugeneExecutor.execute(
+                new File("./web/data/testuser/Examples/SynBERC/NiF.eug"), 3);
+
+        if (null != results && !results.isEmpty()) {
+            Iterator<JSONObject> it = results.iterator();
+            while(it.hasNext()) {
+                JSONObject json = it.next();
+                
+                System.out.println(json.toString());
+            }
+        }
     }
 
     private JSONObject toJSON(Device objDevice) 

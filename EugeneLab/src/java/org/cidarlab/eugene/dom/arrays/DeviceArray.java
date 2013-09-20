@@ -28,16 +28,15 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.lang3.ArrayUtils;
-
-import JaCoP.core.Domain;
-import JaCoP.core.ValueEnumeration;
-
 import org.cidarlab.eugene.cache.SymbolTables;
 import org.cidarlab.eugene.dom.NamedElement;
 import org.cidarlab.eugene.dom.components.Component;
 import org.cidarlab.eugene.dom.components.Device;
 import org.cidarlab.eugene.exception.EugeneException;
-import org.cidarlab.eugene.exception.EugeneException;
+
+import JaCoP.core.Domain;
+import JaCoP.core.ValueEnumeration;
+
 
 public class DeviceArray 
 	extends ComponentArray {
@@ -131,7 +130,7 @@ public class DeviceArray
 	}
 	
 	public void add(String sDeviceName) {
-		System.out.println("[DeviceArray.add] -> "+sDeviceName);
+//		System.out.println("[DeviceArray.add] -> "+sDeviceName);
 		
 		this.lstDeviceNames.add(sDeviceName);
 	}
@@ -355,8 +354,10 @@ public class DeviceArray
 		}
 		
 		this.devices = ArrayUtils.clone(((DeviceArray)objElement).getDevices());
-//		this.lstDeviceNames = new ArrayList<String>(
-//				((DeviceArray) objElement).getDeviceNames());
+		this.solutions = ArrayUtils.clone(((DeviceArray)objElement).getSolutions());
+                if( null != ((DeviceArray) objElement).getDeviceNames()) {
+                    this.lstDeviceNames = new ArrayList<String>(((DeviceArray) objElement).getDeviceNames());
+                }
 	}
 
 	@Override
@@ -399,19 +400,40 @@ public class DeviceArray
 	public void add(NamedElement objElement)
 			throws EugeneException {
 
-		if (!(objElement instanceof Device)) {
-			throw new EugeneException("I cannot add the "
-					+ objElement.getName() + " to the " + this.getName()
-					+ " device array!");
-		}
+            if(null != objElement) {
+                if(objElement instanceof DeviceArray) {
+                    Domain[][] solutions = ((DeviceArray)objElement).getSolutions();                    
 
-//		if (this.contains((Device) objElement)) {
-//			throw new EugeneException("The " + this.getName()
-//					+ " device array contains the " + objElement.getName()
-//					+ " device already!");
-//		}
+                    if(solutions != null) {
+                        if(null == this.solutions) {
+                            this.solutions = new Domain[1][solutions[0].length];
+                            for(int i=0; i<solutions.length; i++) {
+                                if(null !=  solutions[i]) {
+                                    this.solutions = ArrayUtils.add(this.solutions, solutions[i]);
+                                }
+                            }
+                            this.solutions = ArrayUtils.remove(this.solutions, 0);
+                        } else {
+                            for(int i=0; i<solutions.length; i++) {
+                                if(null !=  solutions[i]) {
+                                    this.solutions = ArrayUtils.add(this.solutions, solutions[i]);
+                                }
+                            }
+                        }
+                    }
+                    //this.solutions = ArrayUtils.add(
+                    //        this.solutions, ((DeviceArray)objElement).getSolutions());
+                    this.lstDeviceNames.addAll(
+                            ((DeviceArray)objElement).getDeviceNames());
+                } else if (objElement instanceof Device) {
+                    lstDeviceNames.add(objElement.getName());
+		} else {
+                    throw new EugeneException("I cannot add the "
+				+ objElement.getName() + " to the " + this.getName()
+				+ " device array!");
+                }
+            }
 
-		lstDeviceNames.add(objElement.getName());
 	}
 
 	public boolean isEmpty() {

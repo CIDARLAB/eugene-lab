@@ -2,17 +2,12 @@ package org.cidarlab.eugene.rules.tree.predicate;
 
 import java.util.List;
 
-import org.cidarlab.eugene.rules.LogicalOperator;
-
 import org.cidarlab.eugene.dom.components.Component;
 import org.cidarlab.eugene.dom.components.Device;
 import org.cidarlab.eugene.exception.EugeneException;
+import org.cidarlab.eugene.rules.LogicalOperator;
 
 import JaCoP.constraints.Constraint;
-import JaCoP.constraints.Not;
-import JaCoP.constraints.Or;
-import JaCoP.constraints.PrimitiveConstraint;
-import JaCoP.constraints.XneqC;
 import JaCoP.core.IntVar;
 import JaCoP.core.Store;
 
@@ -48,41 +43,6 @@ public class LogicalXor
 	}
 	
 
-	@Override
-	public Constraint toJaCoP(Store store, List<Component> components, IntVar[] variables) {
-
-		if(this.getA() instanceof CountingPredicate && 
-				this.getB() instanceof CountingPredicate) {
-			
-			store.impose(this.getA().toJaCoP(store, components, variables));
-			store.impose(this.getB().toJaCoP(store, components, variables));
-
-			// in this case, we return an ``always false'' constraint
-			IntVar iv = new IntVar(store, "tmp", -1, -1);
-			return new XneqC(iv, -1);
-		} else if(this.getA() instanceof CountingPredicate && 
-				!(this.getB() instanceof CountingPredicate)) {
-
-			store.impose(this.getA().toJaCoP(store, components, variables));
-			return this.getB().toJaCoP(store, components, variables);
-			
-		} else if(this.getB() instanceof CountingPredicate && 
-				!(this.getA() instanceof CountingPredicate)) {
-			
-			store.impose(this.getB().toJaCoP(store, components, variables));
-			return this.getA().toJaCoP(store, components, variables);
-			
-		} else {
-			PrimitiveConstraint pcA = (PrimitiveConstraint)this.getA().toJaCoP(store, components, variables);
-			PrimitiveConstraint pcB = (PrimitiveConstraint)this.getB().toJaCoP(store, components, variables);
-
-			// JaCoP does not support XOR, i.e.
-			// a XOR b ::=  (A OR B) AND NOT(A OR B)
-			return new JaCoP.constraints.And(
-					 new Or(pcA, pcB),
-					 new Not(new Or(pcA, pcB)));			
-		}
-	}
 
 	@Override
 	public boolean evaluate(long[] l) 
@@ -107,5 +67,41 @@ public class LogicalXor
 			throws EugeneException {
 		return this.getA().evaluate(device) ^ this.getB().evaluate(device);
 	}
+
+	@Override
+	public Constraint toJaCoP(Store store, IntVar[] variables, Device device,
+			List<Component> components) throws EugeneException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Constraint toJaCoPNot(Store store, IntVar[] variables,
+			Device device, List<Component> components) throws EugeneException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Constraint toJaCoPAnd(Store store, IntVar[] variables,
+			Device device, List<Component> components) throws EugeneException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Constraint toJaCoPOr(Store store, IntVar[] variables, Device device,
+			List<Component> components) throws EugeneException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Constraint toJaCoPXor(Store store, IntVar[] variables,
+			Device device, List<Component> components) throws EugeneException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 
 }

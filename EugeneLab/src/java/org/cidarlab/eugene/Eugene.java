@@ -29,6 +29,7 @@ import java.util.logging.LogManager;
 import org.cidarlab.eugene.dom.SavableElement;
 import org.cidarlab.eugene.util.EugeneUtil;
 
+
 /**
  * @author Ernst Oberortner
  */
@@ -51,6 +52,7 @@ public class Eugene {
 			**/
 			
 			HashMap<String, SavableElement> results = (HashMap<String, SavableElement>) EugeneExecutor.execute(eugFile, 2);
+
 			// 2 ... the EugeneExecutor returns a list of elements which were annotated with the save() function
 			if(null!=results && !results.isEmpty()) {
 				

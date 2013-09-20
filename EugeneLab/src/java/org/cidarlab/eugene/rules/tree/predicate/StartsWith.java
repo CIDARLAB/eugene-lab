@@ -4,6 +4,11 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.cidarlab.eugene.cache.SymbolTables;
+import org.cidarlab.eugene.dom.components.Component;
+import org.cidarlab.eugene.dom.components.Device;
+import org.cidarlab.eugene.dom.components.types.PartType;
+import org.cidarlab.eugene.exception.EugeneException;
 import org.cidarlab.eugene.rules.RuleOperator;
 
 import JaCoP.constraints.Constraint;
@@ -12,11 +17,6 @@ import JaCoP.constraints.XeqY;
 import JaCoP.core.IntVar;
 import JaCoP.core.Store;
 
-import org.cidarlab.eugene.cache.SymbolTables;
-import org.cidarlab.eugene.dom.components.Component;
-import org.cidarlab.eugene.dom.components.Device;
-import org.cidarlab.eugene.dom.components.types.PartType;
-import org.cidarlab.eugene.exception.EugeneException;
 
 /*
  * ? STARTSWITH B
@@ -34,7 +34,7 @@ public class StartsWith
 	
 	public StartsWith(long B) 
 			throws EugeneException {
-		super(B);
+		super(-1, B);
 	}
 	
 	@Override
@@ -96,7 +96,9 @@ public class StartsWith
 
 	@Override
 	public Constraint toJaCoP(
-			Store store, List<Component> components, IntVar[] variables) {
+			Store store, IntVar[] variables, 
+			Device device, List<Component> components) 
+				throws EugeneException {
 		return new XeqC(variables[0], (int)this.getB());
 	}
 

@@ -6,6 +6,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import org.cidarlab.eugene.cache.SymbolTables;
+import org.cidarlab.eugene.dom.components.Device;
+import org.cidarlab.eugene.dom.rules.Rule;
+import org.cidarlab.eugene.exception.EugeneException;
 import org.cidarlab.eugene.rules.tree.predicate.LogicalAnd;
 import org.cidarlab.eugene.rules.tree.predicate.BinaryPredicate;
 import org.cidarlab.eugene.rules.tree.predicate.LogicalPredicate;
@@ -16,10 +20,6 @@ import org.cidarlab.eugene.rules.tree.predicate.Predicate;
 import org.cidarlab.eugene.rules.tree.predicate.RulePredicate;
 import org.cidarlab.eugene.rules.tree.predicate.LogicalXor;
 
-import org.cidarlab.eugene.cache.SymbolTables;
-import org.cidarlab.eugene.dom.components.Device;
-import org.cidarlab.eugene.dom.rules.Rule;
-import org.cidarlab.eugene.exception.EugeneException;
 
 public class RuleEngine {
 

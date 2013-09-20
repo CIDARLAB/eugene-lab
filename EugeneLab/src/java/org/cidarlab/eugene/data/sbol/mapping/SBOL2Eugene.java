@@ -32,11 +32,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.cidarlab.eugene.builder.EugeneBuilder;
-import org.sbolstandard.core.DnaComponent;
-import org.sbolstandard.core.SBOLRootObject;
-import org.sbolstandard.core.SequenceAnnotation;
-import org.sbolstandard.core.util.SequenceOntology;
-
 import org.cidarlab.eugene.cache.SymbolTables;
 import org.cidarlab.eugene.constants.EugeneConstants;
 import org.cidarlab.eugene.dom.NamedElement;
@@ -45,6 +40,11 @@ import org.cidarlab.eugene.dom.collection.CollectionElement;
 import org.cidarlab.eugene.dom.components.Property;
 import org.cidarlab.eugene.dom.components.types.PartType;
 import org.cidarlab.eugene.exception.EugeneException;
+import org.sbolstandard.core.DnaComponent;
+import org.sbolstandard.core.SBOLRootObject;
+import org.sbolstandard.core.SequenceAnnotation;
+import org.sbolstandard.core.util.SequenceOntology;
+
 
 public class SBOL2Eugene {
 

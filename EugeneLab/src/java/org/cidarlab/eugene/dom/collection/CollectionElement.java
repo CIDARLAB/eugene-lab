@@ -22,8 +22,7 @@ ENHANCEMENTS, OR MODIFICATIONS.
 
 package org.cidarlab.eugene.dom.collection;
 
-import org.cidarlab.eugene.dom.NamedElement;
-import org.cidarlab.eugene.dom.SavableElement;
+import org.cidarlab.eugene.dom.*;
 
 public abstract class CollectionElement 
 		extends NamedElement 

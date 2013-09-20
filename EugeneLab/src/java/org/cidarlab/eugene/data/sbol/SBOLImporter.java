@@ -26,14 +26,14 @@ import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.sbolstandard.core.SBOLDocument;
-import org.sbolstandard.core.SBOLFactory;
-import org.sbolstandard.core.SBOLRootObject;
-
 import org.cidarlab.eugene.cache.SymbolTables;
 import org.cidarlab.eugene.data.sbol.mapping.SBOL2Eugene;
 import org.cidarlab.eugene.dom.NamedElement;
 import org.cidarlab.eugene.exception.EugeneException;
+import org.sbolstandard.core.SBOLDocument;
+import org.sbolstandard.core.SBOLFactory;
+import org.sbolstandard.core.SBOLRootObject;
+
 
 /**
  * 

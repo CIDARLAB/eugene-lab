@@ -7,6 +7,10 @@ import java.util.List;
 import java.util.Set;
 
 import org.antlr.runtime.tree.CommonTree;
+import org.cidarlab.eugene.cache.SymbolTables;
+import org.cidarlab.eugene.dom.NamedElement;
+import org.cidarlab.eugene.dom.rules.Rule;
+import org.cidarlab.eugene.exception.EugeneException;
 import org.cidarlab.eugene.rules.LogicalOperator;
 import org.cidarlab.eugene.rules.PredicateBuilder;
 import org.cidarlab.eugene.rules.tree.predicate.ExpressionPredicate;
@@ -15,10 +19,6 @@ import org.cidarlab.eugene.rules.tree.predicate.Precedence;
 import org.cidarlab.eugene.rules.tree.predicate.Predicate;
 import org.cidarlab.eugene.rules.tree.predicate.RuleID;
 
-import org.cidarlab.eugene.cache.SymbolTables;
-import org.cidarlab.eugene.dom.NamedElement;
-import org.cidarlab.eugene.dom.rules.Rule;
-import org.cidarlab.eugene.exception.EugeneException;
 
 public class RuleTreeParser {
 
@@ -108,7 +108,7 @@ public class RuleTreeParser {
 				return predicate;
 				
 			} else if(isCountingRule(t.getText())) {
-				
+
 				return PredicateBuilder.buildCountingPredicate(
 						getOperandId((CommonTree)t.getChild(0)),
 						t.getText(),
@@ -121,7 +121,7 @@ public class RuleTreeParser {
 			} else if (isRuleOperator(t.getText())) {
 				
 				/* here, we need to create the rule predicate dependent on the rule operator */
-				//System.out.println("[RuleTreeParser.parseTree] creating predicate for "+t.getText());
+//				System.out.println("[RuleTreeParser.parseTree] creating predicate for "+t.getText());
 				
 				if(t.getChildCount() == 1) {
 					return PredicateBuilder.build(
@@ -183,6 +183,7 @@ public class RuleTreeParser {
 	
 	private static long getOperandId(CommonTree t) 
 			throws EugeneException {
+
 		return SymbolTables.getId(t.getText());
 	}
 	

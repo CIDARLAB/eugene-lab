@@ -4,6 +4,15 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.antlr.runtime.tree.CommonTree;
+import org.cidarlab.eugene.builder.EugeneBuilder;
+import org.cidarlab.eugene.cache.SymbolTables;
+import org.cidarlab.eugene.dom.NamedElement;
+import org.cidarlab.eugene.dom.components.Component;
+import org.cidarlab.eugene.dom.components.Device;
+import org.cidarlab.eugene.dom.components.Part;
+import org.cidarlab.eugene.dom.components.types.PartType;
+import org.cidarlab.eugene.exception.EugeneException;
+import org.cidarlab.eugene.fact.relation.Relation;
 import org.cidarlab.eugene.rules.RuleOperator;
 import org.cidarlab.eugene.rules.tree.Indexer;
 import org.cidarlab.eugene.rules.tree.predicate.PairingPredicate;
@@ -15,11 +24,6 @@ import JaCoP.constraints.PrimitiveConstraint;
 import JaCoP.constraints.XeqC;
 import JaCoP.core.IntVar;
 import JaCoP.core.Store;
-import org.cidarlab.eugene.cache.SymbolTables;
-import org.cidarlab.eugene.dom.NamedElement;
-import org.cidarlab.eugene.dom.components.Component;
-import org.cidarlab.eugene.dom.components.Device;
-import org.cidarlab.eugene.exception.EugeneException;
 
 public class Represses 
 	extends PairingPredicate {
@@ -70,19 +74,27 @@ public class Represses
 
 	@Override
 	public Constraint toJaCoP(
-			Store store, List<Component> components, IntVar[] variables) {
-		// TODO 
-		
-		//System.out.println("[ExpressionPredicate.toJaCoP] -> "+tree.toStringTree());
-		
-		if(components.size() != variables.length) {
-			return null;
-		}
+			Store store, IntVar[] variables, 
+			Device device, List<Component> components) 
+				throws EugeneException {
+
+//		NamedElement element = null;
+//		if(components.size() != variables.length) {
+//			
+//			/*
+//			 * this is a current hack
+//			 * -> we should pass the device to the toJaCoP methods instead a list of components!
+//			 */
+//			element = new Device(null, components);
+//			
+////			System.out.println("[Represses.toJaCoP] -> "+element);
+////			
+//		}
 		
 		// here we need to parse the ExpressionTree
 		PrimitiveConstraint pc = null;
 		try {
-			pc = buildConstraint(store, variables, components, tree, null);
+			pc = buildConstraint(store, variables, components, tree, device);
 		} catch (EugeneException e) {
 			e.printStackTrace();
 			pc = null;
@@ -94,6 +106,8 @@ public class Represses
 	private PrimitiveConstraint buildConstraint(
 			Store store, IntVar[] variables, List<Component> components, CommonTree t, NamedElement element) 
 			throws EugeneException {
+		
+
 		if (null != t) {
 			CommonTree lhs = (CommonTree)t.getChild(0);
 			CommonTree rhs = (CommonTree)t.getChild(1);
@@ -102,9 +116,15 @@ public class Represses
 				throw new EugeneException("Inavlid "+t.getText()+" rule!");
 			}
 			
+//			System.out.println("[Represses.buildConstraint] element -> "+element+", lhs -> "+lhs.toStringTree()+", rhs: "+rhs.toStringTree());
+
 			int lhsIdx = -1;
+			Component lhsComponent = null;
 			try {
 				lhsIdx = Indexer.getIndex(element, lhs);
+				if(lhsIdx == -1) {
+					lhsComponent = (Component)SymbolTables.get(lhs.getText());
+				}
 			} catch(EugeneException e) {
 				throw new EugeneException(e.toString());
 			}
@@ -117,22 +137,45 @@ public class Represses
 				throw new EugeneException(e.toString());
 			}
 			
-			if(lhsIdx == -1 || rhsIdx == -1) {
-				throw new EugeneException("Invalid index!");
-			}
+//			if(lhsIdx == -1 || rhsIdx == -1) {
+//				throw new EugeneException("Invalid index! ("+lhsIdx+", "+rhsIdx+")");
+//			}
 			
-//			System.out.println(lhsIdx+" "+this.getOperator()+" "+rhsIdx);
-						
-			return this.buildConstraint(
-					variables,
-					components.get(lhsIdx), lhsIdx, 
-					components.get(rhsIdx), rhsIdx);
+			if(null == element) {
+				if( null != lhsComponent && lhsIdx == -1) {
+					return this.buildConstraint(
+							store, variables,
+							lhsComponent, -1,
+							components.get(rhsIdx), rhsIdx);
+				} else {
+					return this.buildConstraint(
+							store, variables,
+							components.get(lhsIdx), lhsIdx, 
+							components.get(rhsIdx), rhsIdx);
+				}
+			} else if (element instanceof Device) {
+//				System.out.println(lhsIdx+" "+this.getOperator()+" "+rhsIdx);
+				
+				if( null != lhsComponent && lhsIdx == -1) {
+					return this.buildConstraint(
+							store, variables,
+							lhsComponent, -1,
+							components.get(rhsIdx), rhsIdx);
+				} else {
+					return this.buildConstraint(
+							store, variables,
+							((Device)element).getAllComponents().get(lhsIdx), lhsIdx, 
+							((Device)element).getAllComponents().get(rhsIdx), rhsIdx);
+				}
+			}
 		}
 		
 		return null;	
 	}
 	
-	private PrimitiveConstraint buildConstraint(IntVar[] variables, Component lhs, int lhsIdx, Component rhs, int rhsIdx) 
+	private PrimitiveConstraint buildConstraint(
+				Store store, IntVar[] variables, 
+				Component lhs, int lhsIdx, Component rhs, int rhsIdx) 
 			throws EugeneException {
 		/*
 		 * first, we need to query all parts of the given part type
@@ -140,7 +183,11 @@ public class Represses
 		 */
 		long[][] pairs = null;
 		try {
-			pairs = SymbolTables.queryPairs(this.getOperator(), lhs, rhs);
+			if(rhs instanceof Device || rhs instanceof PartType) {
+				pairs = SymbolTables.queryPairs(Relation.REPRESSES.toString(), lhs, null);
+			} else if(rhs instanceof Part) {
+				pairs = SymbolTables.queryPairs(Relation.REPRESSES.toString(), lhs, rhs);
+			}
 		} catch(Exception e) {
 			throw new EugeneException(e.getMessage());
 		}
@@ -151,12 +198,27 @@ public class Represses
 		
 		// then, we iterate over the retrieved parts
 		// creating appropriate JaCoP constraints
+		
+		
 		if(null != pairs) {
 			PrimitiveConstraint[] pcArray = new PrimitiveConstraint[pairs.length];
 			for(int i=0; i<pairs.length; i++) {
-				pcArray[i] = new And(
+				
+				IntVar ivRepressor = null;
+				if(lhsIdx == -1) {
+					ivRepressor = new IntVar(store, (int)pairs[i][0], (int)pairs[i][0]);
+				}
+
+				if(null != ivRepressor) {
+					pcArray[i] = new And(
+							new XeqC(ivRepressor, (int)pairs[i][0]),
+							new XeqC(variables[rhsIdx], (int)pairs[i][1]));
+				} else {
+				
+					pcArray[i] = new And(
 						new XeqC(variables[lhsIdx], (int)pairs[i][0]),
 						new XeqC(variables[rhsIdx], (int)pairs[i][1]));
+				}
 			}
 			return new Or(pcArray);
 		}

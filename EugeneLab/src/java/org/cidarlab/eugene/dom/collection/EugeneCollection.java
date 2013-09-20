@@ -8,6 +8,7 @@ import org.cidarlab.eugene.dom.StackElement;
 import org.cidarlab.eugene.dom.components.Device;
 import org.cidarlab.eugene.exception.EugeneException;
 
+
 public class EugeneCollection 
 	extends NamedElement 
 	implements StackElement {

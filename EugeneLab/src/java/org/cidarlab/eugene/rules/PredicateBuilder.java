@@ -1,11 +1,11 @@
 package org.cidarlab.eugene.rules;
 
 import org.antlr.runtime.tree.CommonTree;
+import org.cidarlab.eugene.exception.EugeneException;
 import org.cidarlab.eugene.rules.tree.predicate.*;
 import org.cidarlab.eugene.rules.tree.predicate.relations.Induces;
 import org.cidarlab.eugene.rules.tree.predicate.relations.Represses;
 
-import org.cidarlab.eugene.exception.EugeneException;
 
 public class PredicateBuilder {
 
@@ -80,6 +80,7 @@ public class PredicateBuilder {
 		} else if(RuleOperator.NOTEXACTLY.toString().equals(op)) {
 			return new LogicalNot(new Exactly(A, (long)N));
 		} else if(RuleOperator.EXACTLY.toString().equals(op)) {
+//			System.out.println("[PredicateBuilder.buildCountingPredicate] -> "+A+" EXACTLY "+N);
 			return new Exactly(A, (long)N);
 		}
 		throw new EugeneException(op+" is an invalid rule operator!");

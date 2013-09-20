@@ -30,7 +30,7 @@ import org.cidarlab.eugene.dom.NamedElement;
 import org.cidarlab.eugene.dom.arrays.ComponentArray;
 import org.cidarlab.eugene.dom.components.Component;
 import org.cidarlab.eugene.exception.EugeneException;
-import org.cidarlab.eugene.exception.EugeneException;
+
 
 public class DeviceType 
 		extends ComponentArray {

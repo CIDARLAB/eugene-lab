@@ -42,6 +42,7 @@ public class EugeneConstants {
 	public static final String NOTMORETHAN = "NOTMORETHAN";
 	public static final String THEN = "THEN";
 	public static final String MATCHES = "MATCHES";
+	public static final String EXACTLY = "EXACTLY";
 	public static final String INSTANCEOF = "INSTANCEOF";
 
 	public static final String EQUALS = "EQUALS";

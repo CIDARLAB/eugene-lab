@@ -28,6 +28,9 @@ import java.util.LinkedHashMap;
 import org.cidarlab.eugene.cache.SymbolTables;
 import org.cidarlab.eugene.dom.SavableElement;
 import org.cidarlab.eugene.dom.arrays.DeviceArray;
+import org.cidarlab.eugene.dom.components.Device;
+import org.cidarlab.eugene.exception.EugeneException;
+
 
 public class ResultSet {
 	private LinkedHashMap<String, SavableElement> hmComponents;
@@ -44,21 +47,31 @@ public class ResultSet {
 		return hmComponents.containsKey(sComponent);
 	}
 
-	public void save(String sName, SavableElement objComponent) {
-		if (null != sName && null != objComponent) {
+	public void save(String sName, SavableElement objElement) 
+			throws EugeneException {
+		if (null != sName && null != objElement) {
 			if (contains(sName)) {
 				hmComponents.remove(sName);
 			}
 
-			if (objComponent instanceof DeviceArray) {
-				DeviceArray objArray = (DeviceArray) objComponent;
-				for (String s : objArray.getDeviceNames()) {
-					this.hmComponents.put(s,
-							(SavableElement) SymbolTables.get(s));
-				}
-			} else {
-				this.hmComponents.put(sName, objComponent);
-			}
+			this.hmComponents.put(sName, objElement);
+
+//			if (objElement instanceof DeviceArray) {
+//				DeviceArray objArray = (DeviceArray) objElement;
+//				
+//				for(int i=0; i<objArray.size(); i++) {
+//					Device d = (Device)objArray.get(i);
+//					this.hmComponents.put(d.getName(), d);
+//				}
+//
+////				for (String s : objArray.getDeviceNames()) {
+////					this.hmComponents.put(s,
+////							(SavableElement) SymbolTables.get(s));
+////				}
+//			
+//			} else {
+//				this.hmComponents.put(sName, objElement);
+//			}
 		}
 	}
 

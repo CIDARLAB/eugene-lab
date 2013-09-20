@@ -1,34 +1,30 @@
 package org.cidarlab.eugene.rules.tree.predicate;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang3.ArrayUtils;
-import org.cidarlab.eugene.rules.RuleOperator;
-
-import JaCoP.constraints.Constraint;
-import JaCoP.constraints.Or;
-import JaCoP.constraints.PrimitiveConstraint;
-import JaCoP.constraints.XeqC;
-import JaCoP.core.IntVar;
-import JaCoP.core.Store;
 import org.cidarlab.eugene.cache.SymbolTables;
 import org.cidarlab.eugene.dom.components.Component;
 import org.cidarlab.eugene.dom.components.Device;
-import org.cidarlab.eugene.dom.components.Part;
 import org.cidarlab.eugene.dom.components.types.PartType;
 import org.cidarlab.eugene.exception.EugeneException;
+import org.cidarlab.eugene.rules.RuleOperator;
+
+import JaCoP.constraints.Constraint;
+import JaCoP.constraints.Count;
+import JaCoP.core.IntVar;
+import JaCoP.core.Store;
 
 /*
  * ? CONTAINS B
  */
 		
 public class Contains 
-		extends UnaryPredicate {
+		extends CountingPredicate {
 
 	public Contains(long B) 
 			throws EugeneException {
-		super(B);
+		super(-1, B);
 	}
 	
 	public Contains(long A, long B) 
@@ -37,12 +33,7 @@ public class Contains
 	}
 	
 	public boolean evaluate(long[] l) {
-//		System.out.println("[Contains.evaluate] ON "+Arrays.toString(l)+" -> "+this.getB()+" -> "+((-1)!=ArrayUtils.indexOf(l, this.getB())));
-		boolean b = (-1)!=ArrayUtils.indexOf(l, this.getB());
-//		if(!b) {
-//			System.err.println("[Contains] violation of "+this.toString()+"....");
-//		}
-		return b;
+		return (-1)!=ArrayUtils.indexOf(l, this.getB());
 	}
 
 	@Override
@@ -51,11 +42,26 @@ public class Contains
 
 		Component componentB = SymbolTables.getComponent(this.getB());
 		if((null != componentB && (componentB instanceof Device || componentB instanceof PartType))) {
-			
-			int idxB = device.getComponents().indexOf(componentB);
-
-			return idxB != (-1);			
+                        
+                    if(null != device.getComponents()) {
+                        boolean b = false;
+                        for(Component component : device.getComponents()) {
+                            
+                            if(component instanceof Device) {
+                                b = this.evaluate((Device)component);
+                                if(b) {
+                                    return true;
+                                }
+                            } else if (component instanceof PartType) {
+                                if(componentB.getName().equals(component.getName())) {
+                                    return true;
+                                }
+                            }
+                        }
+                        return false;
+                    }
 		}
+                
 		return this.evaluate(SymbolTables.getDeviceComponentIds(device.getName()));
 	}
 
@@ -89,8 +95,6 @@ public class Contains
 			throws EugeneException {
 
 		long[] device_components = SymbolTables.getAllDeviceComponentIds(n);
-		//System.out.println("[Contains.evaluate("+SymbolTables.getNameById(n)+")] -> "+Arrays.toString(device_components));
-		//return true;
 		return this.evaluate(device_components);
 	}
 
@@ -106,34 +110,30 @@ public class Contains
 	}
 
 	@Override
-	public Constraint toJaCoP(Store store, List<Component> components, IntVar[] variables) {
+	public Constraint toJaCoP(
+			Store store, IntVar[] variables, 
+			Device device, List<Component> components) 
+				throws EugeneException {
 		/*
 		 * CONTAINS B
 		 */
-
-		Component componentB = this.getComponentB();
-		PrimitiveConstraint[] pc = null;
-		if(componentB instanceof Part) {
-			//System.out.println("imposing CONTAINS "+componentB+"("+this.getB()+")");
-			
-			for(int p=0; p<components.size(); p++) {
-				// here, we need to check if B is part of parttype components[p]
-				if(components.get(p) instanceof PartType && 
-					((Part)componentB).getPartType().getName().equals(((PartType)components.get(p)).getName())) {
-					
-					if(pc == null) {
-						pc = new PrimitiveConstraint[1];
-						pc[0] = new XeqC(variables[p], (int)this.getB());
-					} else {					
-						pc = ArrayUtils.add(pc, new XeqC(variables[p], (int)this.getB()));
-					}
-				} 
-			}
-		}
 		
-		if(null != pc) {
-			return new Or(pc);
-		}
-		return null;
+		IntVar counter = new IntVar(store, "CONTAINS_"+this.getB()+"-counter", 1, components.size()); 
+		Constraint c = new Count(variables, counter, (int)this.getB());
+		return c;
+	}
+	
+	@Override
+	public Constraint toJaCoPNot(
+			Store store, IntVar[] variables, 
+			Device device, List<Component> components) 
+				throws EugeneException {
+		/*
+		 * NOT CONTAINS B
+		 */
+
+		IntVar counter = new IntVar(store,"NOTCONTAINS_"+this.getB()+"-counter", 0, 0); 
+		Constraint c = new Count(variables, counter, (int)this.getB());
+		return c;
 	}
 }

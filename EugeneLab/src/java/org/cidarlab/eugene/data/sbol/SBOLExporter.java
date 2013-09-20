@@ -25,15 +25,15 @@ package org.cidarlab.eugene.data.sbol;
 import java.io.File;
 import java.io.FileOutputStream;
 
-import org.sbolstandard.core.DnaComponent;
-import org.sbolstandard.core.SBOLDocument;
-import org.sbolstandard.core.SBOLFactory;
-
 import org.cidarlab.eugene.constants.EugeneConstants;
 import org.cidarlab.eugene.data.sbol.mapping.Eugene2SBOL;
 import org.cidarlab.eugene.dom.arrays.ComponentArray;
 import org.cidarlab.eugene.dom.components.Device;
 import org.cidarlab.eugene.exception.EugeneException;
+import org.sbolstandard.core.DnaComponent;
+import org.sbolstandard.core.SBOLDocument;
+import org.sbolstandard.core.SBOLFactory;
+
 
 /**
  * 

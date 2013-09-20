@@ -2,11 +2,14 @@ package org.cidarlab.eugene.rules.tree.predicate;
 
 import java.util.List;
 
+import org.cidarlab.eugene.dom.components.Component;
+import org.cidarlab.eugene.dom.components.Device;
+import org.cidarlab.eugene.exception.EugeneException;
+
 import JaCoP.constraints.Constraint;
+import JaCoP.core.BooleanVar;
 import JaCoP.core.IntVar;
 import JaCoP.core.Store;
-import org.cidarlab.eugene.dom.components.Component;
-import org.cidarlab.eugene.exception.EugeneException;
 
 public abstract class CountingPredicate 
 	extends BinaryPredicate {
@@ -17,6 +20,8 @@ public abstract class CountingPredicate
 	}
 
 	public abstract Constraint toJaCoPNot(
-			Store store, List<Component> components, IntVar[] variables);
+			Store store, IntVar[] variables, 
+			Device device, List<Component> components) 
+				throws EugeneException;
 
 }

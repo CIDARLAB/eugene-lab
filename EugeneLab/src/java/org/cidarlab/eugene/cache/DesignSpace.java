@@ -31,12 +31,6 @@ import java.util.List;
 import java.util.UUID;
 
 import org.apache.commons.lang3.ArrayUtils;
-import org.cidarlab.eugene.fact.Fact;
-import org.cidarlab.eugene.fact.relation.Relation;
-import org.cidarlab.eugene.rules.tree.predicate.BinaryPredicate;
-import org.cidarlab.eugene.rules.tree.predicate.Predicate;
-import org.cidarlab.eugene.rules.tree.predicate.UnaryPredicate;
-
 import org.cidarlab.eugene.dom.NamedElement;
 import org.cidarlab.eugene.dom.StackElement;
 import org.cidarlab.eugene.dom.arrays.DeviceArray;
@@ -47,6 +41,12 @@ import org.cidarlab.eugene.dom.components.types.PartType;
 import org.cidarlab.eugene.dom.relation.Interaction;
 import org.cidarlab.eugene.dom.rules.Rule;
 import org.cidarlab.eugene.exception.EugeneException;
+import org.cidarlab.eugene.fact.Fact;
+import org.cidarlab.eugene.fact.relation.Relation;
+import org.cidarlab.eugene.rules.tree.predicate.BinaryPredicate;
+import org.cidarlab.eugene.rules.tree.predicate.Predicate;
+import org.cidarlab.eugene.rules.tree.predicate.UnaryPredicate;
+
 
 public class DesignSpace {
 
@@ -109,7 +109,9 @@ public class DesignSpace {
 	public void put(String sName, NamedElement objElement)
 			throws Exception {
 
+		
 		if(this.contains(sName)) {
+//			System.out.println("[DesignSpace.put] -> "+objElement);
 			return;
 		}
 		
@@ -134,7 +136,8 @@ public class DesignSpace {
 			} else if(objElement instanceof Device ||
 					objElement instanceof PartType) { 
 			
-				/* ONLY global devices and part types will be put into 
+				/* 
+				 * ONLY global devices and part types will be put into 
 				 * the neo4j database
 				 */
 				if(null == SymbolTables.peek()) {
@@ -155,6 +158,7 @@ public class DesignSpace {
 						//System.out.println(sName+" -> "+nId);
 					}
 				}
+
 				this.jcs.put(sName, objElement);
 				
 			} else if (objElement instanceof Rule) {
@@ -185,7 +189,7 @@ public class DesignSpace {
 			throws EugeneException {
 		
 		// first, get the device and it's components
-		NamedElement element = this.jcs.get(sDeviceName);
+		NamedElement element = this.get(sDeviceName);
 		if(null == element || !(element instanceof Device)) {
 			throw new EugeneException("I don't know any Device named "+sDeviceName);
 		} 		
@@ -219,13 +223,22 @@ public class DesignSpace {
 	
 	public long[][] queryPairs(String relation, Component c1, Component c2) 
 			throws EugeneException {
-		/** let's do it just for part types **/
+		
+		return this.neo4j.queryPairs(relation, c1, c2);
+		
+/***
 		if(this.hmPartTypeIds.containsKey(c1.getName())) {			
 			if(hmPartTypeIds.containsKey(c2.getName())) {
 				return this.neo4j.queryPairs(relation, c1, c2);
 			}
+		} else if(this.hmIds.containsKey(c1.getName())) {			
+			if(this.hmPartTypeIds.containsKey(c2.getName())) {
+				
+				return this.neo4j.queryPairs(relation, c1, c2);
+			}
 		}
 		return null;
+ ***/		
 	}
 	
 	public Device getDevice(long deviceId) {
@@ -640,22 +653,32 @@ public class DesignSpace {
 	/** CLEANUP METHODS **/
 	public void clear() {
 		
-		/* print the id table */
-		//System.out.println("nr of ids: "+this.hmIds.size());
-		//System.out.println("nr of part-types: "+this.hmPartTypeIds.size());
-		/**
-		for(String s : this.hmIds.keySet()) {
-			System.out.println(s+" -> "+this.hmIds.get(s));
-		}
-		**/
-		this.jcs.clear();
+		/*
+		 * clear the id tables
+		 */
+		hmIds = null;
+		hmPartTypeIds = null;		
+		hmPartTypes = null;
 		
-		if(null != neo4j) {
-			neo4j.finalize();
+		/*
+		 * clear the cache
+		 */
+		if(null != this.jcs) {
+			this.jcs.clear();
+			this.jcs = null;
 		}
+		
+		/*
+		 * clear the database
+		 */
+//		if(null != neo4j) {
+//			neo4j.finalize();			
+//		}
 	}
 
 	public void clear(String sGroup) {
-		this.jcs.clear(sGroup);
+		if(null != jcs) {
+			this.jcs.clear(sGroup);
+		}
 	}
 }

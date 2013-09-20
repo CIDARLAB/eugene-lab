@@ -1,29 +1,12 @@
 package org.cidarlab.eugene.rules.tree.predicate;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 
 import org.antlr.runtime.tree.CommonTree;
 import org.antlr.runtime.tree.Tree;
 import org.apache.commons.lang3.ArrayUtils;
-import org.cidarlab.eugene.rules.RuleOperator;
-import org.cidarlab.eugene.rules.tree.Indexer;
-import org.cidarlab.eugene.rules.tree.RuleTreeParser;
-
-import JaCoP.constraints.And;
-import JaCoP.constraints.Constraint;
-import JaCoP.constraints.XeqC;
-import JaCoP.constraints.XeqY;
-import JaCoP.constraints.PrimitiveConstraint;
-import JaCoP.constraints.XgtY;
-import JaCoP.constraints.XlteqY;
-import JaCoP.constraints.XneqC;
-import JaCoP.constraints.XneqY;
-import JaCoP.core.Domain;
-import JaCoP.core.IntDomain;
-import JaCoP.core.IntVar;
-import JaCoP.core.Store;
-import JaCoP.core.ValueEnumeration;
 import org.cidarlab.eugene.cache.SymbolTables;
 import org.cidarlab.eugene.constants.EugeneConstants;
 import org.cidarlab.eugene.dom.NamedElement;
@@ -36,6 +19,29 @@ import org.cidarlab.eugene.dom.components.Property;
 import org.cidarlab.eugene.dom.components.types.PartType;
 import org.cidarlab.eugene.exception.EugeneException;
 import org.cidarlab.eugene.parser.EugeneParser.propertyDeclaration_return;
+import org.cidarlab.eugene.rules.RuleOperator;
+import org.cidarlab.eugene.rules.tree.Indexer;
+import org.cidarlab.eugene.rules.tree.RuleTreeParser;
+
+import JaCoP.constraints.And;
+import JaCoP.constraints.Constraint;
+import JaCoP.constraints.IfThen;
+import JaCoP.constraints.XeqC;
+import JaCoP.constraints.XeqY;
+import JaCoP.constraints.PrimitiveConstraint;
+import JaCoP.constraints.XgtC;
+import JaCoP.constraints.XgtY;
+import JaCoP.constraints.XlteqY;
+import JaCoP.constraints.XneqC;
+import JaCoP.constraints.XneqY;
+import JaCoP.constraints.XplusYgtC;
+import JaCoP.constraints.XplusYplusQgtC;
+import JaCoP.core.BoundDomain;
+import JaCoP.core.Domain;
+import JaCoP.core.IntDomain;
+import JaCoP.core.IntVar;
+import JaCoP.core.Store;
+import JaCoP.core.ValueEnumeration;
 
 /* Example:
  * X + Y > Z
@@ -98,7 +104,9 @@ public class ExpressionPredicate
 
 	@Override
 	public Constraint toJaCoP(
-			Store store, List<Component> components, IntVar[] variables) {
+			Store store, IntVar[] variables, 
+			Device device, List<Component> components) 
+				throws EugeneException {
 		// TODO 
 		
 		//System.out.println("[ExpressionPredicate.toJaCoP] -> "+tree.toStringTree());
@@ -225,53 +233,135 @@ public class ExpressionPredicate
 					 * 1. the part type
 					 */
 					PartType pt = (PartType)this.getComponent(components, (CommonTree)tree.getChild(0));
+				    IntVar promoterVar = (IntVar)store.findVariable(pt.getName());
+					if(null == promoterVar) {
+						throw new EugeneException("I cannot find the variable "+pt.getName());
+					}
 					
-					/*
-					 * 2. the property
-					 */
+					
+					PrimitiveConstraint[] pc = null;
+					
+        			/*
+        			 * WE CAN DO THIS BETTER!
+        			 * 
+        			 * getting the part type's properties and querying every property
+        			 * from every part...
+        			 * then, we also need to iterate over each part's additional properties
+        			 */
+        			
+        			/*
+        			 * and we're also creating varialbes for each part's property values
+        			 */
+					String partTypeName = pt.getName();
 					String sPropertyName = this.getPropertyName((CommonTree)tree.getChild(0));
+//					System.out.println("[ExpressionPredicate] -> "+partTypeName);
+    				Collection<Part> lstParts = SymbolTables.getParts(pt);
+    				for(Part part : lstParts) {
+    					
+    					long partId = SymbolTables.getId(part.getName());
+						IntVar propVar = (IntVar)store.findVariable(partTypeName+"."+sPropertyName);
+						if(null == propVar) {
+        					propVar = new IntVar(store, partTypeName+"."+sPropertyName);
+						} 
+    					
+    					// iterate over the parts properties
+    					Property property = part.getProperty(sPropertyName);
+    					if(null != property) {
+    						
+							PropertyValue pv = part.getPropertyValue(sPropertyName);
+							if(null != pv) {
+								int value;
+	    						if(EugeneConstants.NUM.equals(pv.getType())) {
+	    							value = (int)pv.getNum();
+	    						} else {
+	    							value = pv.getValue().hashCode();
+	    						}
+	    						propVar.addDom(value, value);
+	    						
+	    						/*
+	    						 * TODO:
+	    						 * find out the index of the promoters in the variables' list
+	    						 */
+	    						
+							}
+     					}
+    					
+						if(null == pc) {
+							pc = new PrimitiveConstraint[1];
+							pc[0] = new IfThen(new XgtC(propVar, 1), new XeqC(variables[0], (int)partId));
+						} else {
+							pc = ArrayUtils.add(pc, new IfThen(new XgtC(propVar, 1), new XeqC(variables[0], (int)partId)));
+						}
+
+					}
 					
-					
+
+					return new And(pc);
+							
 					/*
 					 * 3. the index of the part type in the components list
 					 */
 					
-					/*** RIGHT-HAND SITE ***/
-					int d;
-					try { 
-						d = Integer.parseInt(tree.getChild(1).getText());
-					} catch(Exception e) {
-						NamedElement rhsElement = SymbolTables.get(tree.getChild(1).getText());
-						if(null != rhsElement && rhsElement instanceof Variable) {
-							Variable v = (Variable)rhsElement;
-							if(EugeneConstants.NUM.equals(v.getType())) {
-								d = (int)v.getNum();
-							} else {
-								throw new EugeneException(tree.getChild(1).getText()+" is an invalid variable!");
-							}
-						} else {
-							throw new EugeneException(tree.getChild(1).getText()+" is an invalid constant!");
-						}
-					}
-
-					System.out.println("[ExpressionPredicate] -> "+pt.getName()+" . "+sPropertyName+" "+tree.getText()+" "+d);
 					
-					/* get the idx of the part type */
-					PrimitiveConstraint[] pc = new PrimitiveConstraint[1];
-					int idx = 0;
-					for(Component component : components) {
-						if(component.getName().equals(pt.getName())) {
-							/* do some pruning */
+//					/*** RIGHT-HAND SITE ***/
+//					int d;
+//					try { 
+//						d = Integer.parseInt(tree.getChild(1).getText());
+//					} catch(Exception e) {
+//						NamedElement rhsElement = SymbolTables.get(tree.getChild(1).getText());
+//						if(null != rhsElement && rhsElement instanceof Variable) {
+//							Variable v = (Variable)rhsElement;
+//							if(EugeneConstants.NUM.equals(v.getType())) {
+//								d = (int)v.getNum();
+//							} else {
+//								throw new EugeneException(tree.getChild(1).getText()+" is an invalid variable!");
+//							}
+//						} else {
+//							throw new EugeneException(tree.getChild(1).getText()+" is an invalid constant!");
+//						}
+//					}
+//
+//					IntVar D = new IntVar(store, "D", -d, -d);
+//					
+//					System.out.println("[ExpressionPredicate] -> "+pt.getName()+" . "+sPropertyName+" "+tree.getText()+" "+d);
+//					
+//					/* get the idx of the part type */
+//					PrimitiveConstraint[] pc = null;
+//					int idx = 0;
+//					for(Component component : components) {
+//						if(component.getName().equals(pt.getName())) {
+//
+//							// get all parts of the part type
+//							Collection<Part> parts = SymbolTables.getParts(pt);
+//							if(null != parts && !parts.isEmpty()) {
+//								for(Part part : parts) {
+//									PropertyValue pv = part.getPropertyValue(sPropertyName);
+//									if(EugeneConstants.NUM.equals(pv.getType())) {
+//										
+//										IntVar iv = variables[idx];
+//										System.out.println(iv.dom());
+//										System.out.println(part.getName()+" . "+sPropertyName+" -> "+pv.getNum());
+//										IntVar propVal = new IntVar(store, part.getName()+"_"+sPropertyName, (int)pv.getNum(), (int)pv.getNum());
+//										iv.domain.searchConstraints.add(new XplusYplusQgtC(variables[idx], propVal, D, 0));
+//										
+////										if(null == pc) {
+////											pc = new PrimitiveConstraint[1];
+////											pc[0] = new XplusYplusQgtC(variables[idx], propVal, D, 0);
+////										} else {
+////											pc = ArrayUtils.add(pc, new XplusYplusQgtC(variables[idx], propVal, D, 1));
+////										}
+//
+//									}
+//
+//								}
+//							}
+//							
+//						}
+//						idx++;
+//					}
+//					pc = ArrayUtils.remove(pc, 0);
 
-							/*
-							 * HOW CAN THIS SHIT BE DONE???
-							 */
-						}
-						idx++;
-					}
-					pc = ArrayUtils.remove(pc, 0);
-					store.print();
-					return new And(pc);
+//					return new And(pc);
 				}
 
 			}

@@ -25,13 +25,13 @@ package org.cidarlab.eugene.dom.components;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-
 import org.cidarlab.eugene.dom.NamedElement;
 import org.cidarlab.eugene.dom.collection.CollectionElement;
 import org.cidarlab.eugene.dom.relation.Participant;
 import org.cidarlab.eugene.exception.EugeneException;
-import org.cidarlab.eugene.exception.EugeneException;
+
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
 
 /**
  * 

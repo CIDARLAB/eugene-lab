@@ -114,6 +114,94 @@ public class WeyekinPoster {
         }
     }
     
+    public static URI getMyBirdsURL() {
+        DefaultHttpClient httpclient = new DefaultHttpClient();
+//      HttpPost httpPost = new HttpPost("http://128.197.164.27/pigeon1.php");
+      HttpPost httpPost = new HttpPost("http://cidar1.bu.edu:5801/pigeon1.php");
+      List<NameValuePair> nvps = new ArrayList<NameValuePair>();
+      nvps.add(new BasicNameValuePair("desc", mPigeonText));
+      if (!mPigeonBackgroundColorHexString.isEmpty()) {
+          nvps.add(new BasicNameValuePair("bgcolor", mPigeonBackgroundColorHexString));
+      }
+      try {
+          httpPost.setEntity(new UrlEncodedFormEntity(nvps));
+
+          try {
+              HttpResponse response2 = httpclient.execute(httpPost);
+              try {
+//                  System.out.println(response2.getStatusLine());
+                  HttpEntity entity2 = response2.getEntity();
+//                  entity2.writeTo(System.out);
+                  // do something useful with the response body
+//                  System.out.println();
+                  // and ensure it is fully consumed
+                  EntityUtils.consume(entity2);
+              } finally {
+                  httpPost.releaseConnection();
+              }
+          } catch (ClientProtocolException ex) {
+              Logger.getLogger(WeyekinPoster.class.getName()).log(Level.SEVERE, null, ex);
+          } catch (IOException ex) {
+              Logger.getLogger(WeyekinPoster.class.getName()).log(Level.SEVERE, null, ex);
+          }
+      } catch (UnsupportedEncodingException ex) {
+          Logger.getLogger(WeyekinPoster.class.getName()).log(Level.SEVERE, null, ex);
+      }
+
+      try {
+//          httpPost.setURI(new URI("http://128.197.164.27/pigeon.php"));
+          httpPost.setURI(new URI("http://cidar1.bu.edu:5801/pigeon.php"));
+          try {
+              httpPost.setEntity(new UrlEncodedFormEntity(nvps));
+              try {
+                  HttpResponse response2 = httpclient.execute(httpPost);
+                  try {
+                      //System.out.println(response2.getStatusLine());
+                      HttpEntity entity2 = response2.getEntity();
+                      mPigeonString = EntityUtils.toString(entity2);
+                      entity2.writeTo(System.out);
+                      // do something useful with the response body
+                      //System.out.println();
+                      // and ensure it is fully consumed
+                      EntityUtils.consume(entity2);
+                  } finally {
+                      httpPost.releaseConnection();
+                  }
+              } catch (ClientProtocolException ex) {
+                  Logger.getLogger(WeyekinPoster.class.getName()).log(Level.SEVERE, null, ex);
+              } catch (IOException ex) {
+                  Logger.getLogger(WeyekinPoster.class.getName()).log(Level.SEVERE, null, ex);
+              }
+          } catch (UnsupportedEncodingException ex) {
+              Logger.getLogger(WeyekinPoster.class.getName()).log(Level.SEVERE, null, ex);
+          }
+      } catch (URISyntaxException ex) {
+          Logger.getLogger(WeyekinPoster.class.getName()).log(Level.SEVERE, null, ex);
+      }
+      
+      if (!mPigeonString.isEmpty()) {
+    	  return getPigeonURI();
+      }
+      return null;
+    }
+    
+    private static URI getPigeonURI() {
+        String[] split = mPigeonString.split("\n");
+        for (String s : split) {
+            if (s.contains(mPigeonImageIdentifier)) {
+                try {
+                    String path = mPigeonPath + s.substring(s.indexOf("img src =")+9, s.indexOf("alt =")-2);
+                    return new URI(path);
+//                    launchPage(mPigeonURI);
+                } catch (URISyntaxException ex) {
+                    Logger.getLogger(WeyekinPoster.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+        return null;
+    }
+
+    
     public static void postMyBird() {
         DefaultHttpClient httpclient = new DefaultHttpClient();
 //        HttpPost httpPost = new HttpPost("http://128.197.164.27/pigeon1.php");

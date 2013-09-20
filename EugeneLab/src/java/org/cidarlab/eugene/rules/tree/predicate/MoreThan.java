@@ -4,21 +4,23 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang3.ArrayUtils;
-import org.cidarlab.eugene.rules.RuleOperator;
-
-import JaCoP.constraints.Constraint;
-import JaCoP.constraints.Count;
-import JaCoP.constraints.Or;
-import JaCoP.constraints.PrimitiveConstraint;
-import JaCoP.constraints.XeqC;
-import JaCoP.core.IntVar;
-import JaCoP.core.Store;
 import org.cidarlab.eugene.cache.SymbolTables;
 import org.cidarlab.eugene.dom.components.Component;
 import org.cidarlab.eugene.dom.components.Device;
 import org.cidarlab.eugene.dom.components.Part;
 import org.cidarlab.eugene.dom.components.types.PartType;
 import org.cidarlab.eugene.exception.EugeneException;
+import org.cidarlab.eugene.rules.RuleOperator;
+
+import JaCoP.constraints.Constraint;
+import JaCoP.constraints.Count;
+import JaCoP.constraints.Or;
+import JaCoP.constraints.PrimitiveConstraint;
+import JaCoP.constraints.Reified;
+import JaCoP.constraints.XeqC;
+import JaCoP.core.BooleanVar;
+import JaCoP.core.IntVar;
+import JaCoP.core.Store;
 
 public class MoreThan 
 	extends CountingPredicate {
@@ -95,58 +97,59 @@ public class MoreThan
 
 	@Override
 	public Constraint toJaCoP(
-			Store store, List<Component> components, IntVar[] variables) {
+			Store store, IntVar[] variables, 
+			Device device, List<Component> components) 
+				throws EugeneException {
 		
+//		System.out.println("imposing "+this.getA()+" MORETHAN "+this.getB());
+
 		// impose contains
 		this.imposeContains(store, components, variables);
 		
 		// a MORETHAN N
-		IntVar count = new IntVar(store, "counter", (int)(this.getB()+1), variables.length); 
+		IntVar count = new IntVar(store, this.getA()+"_MORETHAN_"+this.getB()+"-counter", (int)(this.getB()+1), variables.length); 
 		return new Count(variables, count, (int)this.getA());
 	}
 
 	@Override
 	public Constraint toJaCoPNot(
-			Store store, List<Component> components, IntVar[] variables) {
-		//System.out.println("imposing "+this.getA()+" NOTMORETHAN "+this.getB());
+			Store store, IntVar[] variables, 
+			Device device, List<Component> components) 
+				throws EugeneException {
+//		System.out.println("imposing "+this.getA()+" NOTMORETHAN "+this.getB());
 
-		if(this.getB() > 0) {
-			// impose contains
-			this.imposeContains(store, components, variables);
-		}
+//		if(this.getB() > 0) {
+//			// impose contains
+//			this.imposeContains(store, components, variables);
+//		}
 		
 		// a NOTMORETHAN N
-		IntVar count = new IntVar(store, "counter", 0, (int)this.getB()); 
+		IntVar count = new IntVar(store, this.getA()+"_NOTMORETHAN_"+this.getB()+"-counter", 0, (int)this.getB()); 
 		return new Count(variables, count, (int)this.getA());
 	}
 
 	public void imposeContains(
 			Store store, List<Component> components, IntVar[] variables) {
+		int A = (int)this.getA();
 		Component componentA = this.getComponentA();
-		PrimitiveConstraint[] pc = null;
+
 		if(componentA instanceof Part) {
-			//System.out.println("imposing CONTAINS "+componentB+"("+this.getB()+")");
 			
-			for(int p=0; p<components.size(); p++) {
-				// here, we need to check if B is part of parttype components[p]
-				if(components.get(p) instanceof PartType && 
-					((Part)componentA).getPartType().getName().equals(((PartType)components.get(p)).getName())) {
+			BooleanVar bVar = new BooleanVar(store);
+			int k=0;
+			for(Component component : components) {
+
+				if(component instanceof PartType && 
+					((Part)componentA).getPartType().getName().equals(component.getName())) {
 					
-					if(pc == null) {
-						pc = new PrimitiveConstraint[1];
-						pc[0] = new XeqC(variables[p], (int)this.getA());
-					} else {					
-						pc = ArrayUtils.add(pc, new XeqC(variables[p], (int)this.getA()));
-					}
+					store.impose(new Reified(new XeqC(variables[k], A), bVar));
 				} 
+				
+				k++;
 			}
 		}
-		
-		if(null != pc) {
-			store.impose(new Or(pc));
-		}
-
 	}
+	
 	@Override
 	public boolean evaluate(Device device) 
 				throws EugeneException {

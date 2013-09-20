@@ -22,9 +22,10 @@ ENHANCEMENTS, OR MODIFICATIONS.
 
 package org.cidarlab.eugene.dom;
 
-import scala.util.parsing.json.JSONObject;
 import org.cidarlab.eugene.constants.EugeneConstants;
 import org.cidarlab.eugene.dom.components.Part;
+
+import scala.util.parsing.json.JSONObject;
 
 /**
  * 

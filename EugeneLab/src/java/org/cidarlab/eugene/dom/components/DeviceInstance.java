@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import org.cidarlab.eugene.dom.NamedElement;
 import org.cidarlab.eugene.dom.components.types.PartType;
 import org.cidarlab.eugene.exception.EugeneException;
-import org.cidarlab.eugene.exception.EugeneException;
+
 
 public class DeviceInstance extends Device {
 

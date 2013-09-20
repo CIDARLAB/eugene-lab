@@ -22,21 +22,30 @@ ENHANCEMENTS, OR MODIFICATIONS.
 
 package org.cidarlab.eugene;
 
+import java.awt.Component;
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 import java.util.logging.LogManager;
 
 import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
-
+import org.cidarlab.eugene.data.pigeon.Pigeon;
 import org.cidarlab.eugene.dom.SavableElement;
+import org.cidarlab.eugene.dom.arrays.DeviceArray;
+import org.cidarlab.eugene.dom.components.Device;
 import org.cidarlab.eugene.output.ResultSet;
 import org.cidarlab.eugene.parser.EugeneLexer;
 import org.cidarlab.eugene.parser.EugeneParser;
 import org.cidarlab.eugene.util.EugeneUtil;
+import org.json.JSONObject;
+
 
 public class EugeneExecutor {
 
@@ -83,6 +92,33 @@ public class EugeneExecutor {
 					}
 				}
 			}
+		} else if(nReturn == 3) {
+			ResultSet rs = parser.getResultSet();
+			results = new HashSet<JSONObject>();
+			
+			if (null != rs) {
+				HashMap<String, SavableElement> hmComponents = rs.getResults();
+				
+				// pigeonize every device
+				Iterator<String> it = hmComponents.keySet().iterator();
+
+				while (it.hasNext()) {
+					
+					SavableElement se = hmComponents.get(it.next());
+					if(se instanceof DeviceArray) {
+						int nSize = ((DeviceArray)se).size();
+						for(int i=0; i<nSize; i++) {
+							try {
+                                                            JSONObject json = new JSONObject();
+                                                            json.put("pigeon-uri", Pigeon.visualize((Device)((DeviceArray)se).get(i)));
+                                                            ((HashSet<JSONObject>)results).add(json);
+							} catch(Exception e) {
+								e.printStackTrace();
+							}
+						}
+					}
+				}				
+			}			
 		}
 
 		// clean up the symbol tables
@@ -97,6 +133,8 @@ public class EugeneExecutor {
 	public static Object execute(File fScript, int nReturn)
 			throws RecognitionException, IOException {
 		// read the file's content
-		return EugeneExecutor.execute(EugeneUtil.readFile(fScript), nReturn);
+		return EugeneExecutor.execute(
+				EugeneUtil.readFile(fScript), 
+				nReturn);
 	}
 }

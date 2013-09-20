@@ -26,6 +26,7 @@ import org.cidarlab.eugene.dom.NamedElement;
 import org.cidarlab.eugene.dom.collection.CollectionElement;
 import org.cidarlab.eugene.exception.EugeneException;
 
+
 public class Property 
 	extends CollectionElement {
 
