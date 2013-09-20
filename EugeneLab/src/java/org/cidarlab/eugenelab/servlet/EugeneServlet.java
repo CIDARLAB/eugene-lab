@@ -57,8 +57,6 @@ import org.cidarlab.eugene.builder.EugeneBuilder;
 import org.cidarlab.weyekin.WeyekinPoster;
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.clothocad.client.Clotho;
-import org.clothocad.client.ClothoFactory;
 import org.json.JSONObject;
 
 /**
@@ -66,9 +64,6 @@ import org.json.JSONObject;
  * @author Admin
  */
 public class EugeneServlet extends HttpServlet {
-
-//    /* here is our Clotho instance */
-    private Clotho clotho;
 
     @Override
     public void init()

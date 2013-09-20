@@ -16,8 +16,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import org.clothocad.client.Clotho;
-import org.clothocad.client.ClothoFactory;
 import org.json.JSONObject;
 
 /**
