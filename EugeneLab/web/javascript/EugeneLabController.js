@@ -47,7 +47,6 @@ $(document).ready(function() {
                         format: "FreeForm",
                         type: part["type"],
                         riskGroup: 0,
-                        showDetail: true
                     }
                     ));
                 }
@@ -91,7 +90,6 @@ $(document).ready(function() {
                                 format: "FreeForm",
                                 type: basicPart["type"],
                                 riskGroup: 0,
-                                showDetail: true
                             })
                                     );
                         }
@@ -123,7 +121,6 @@ $(document).ready(function() {
                         format: "FreeForm",
                         type: "composite",
                         riskGroup: 0,
-                        showDetail: true
                     }
                     ));
                 }
