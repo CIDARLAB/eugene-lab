@@ -559,7 +559,7 @@ $(document).ready(function() {
 
 
     /********Clotho Functions and Variables********/
-    var _connection = new WebSocket('ws://localhost:8080/websocket');
+    var _connection = new WebSocket('wss://localhost:8443/websocket');
 
     var _requestCommand = {}; //key request id, value: callback function
     var _requestID = 0;
@@ -572,7 +572,7 @@ $(document).ready(function() {
             _connection.send(message);
             _requestID++;
         } else {
-            _connection = new WebSocket('ws://localhost:8080/websocket');
+            _connection = new WebSocket('wss://localhost:8443/websocket');
         }
     };
     _connection.onmessage = function(e) {
