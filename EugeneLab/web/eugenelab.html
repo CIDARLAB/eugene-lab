@@ -41,12 +41,7 @@
                     <li><a href="documentation.html">How to</a></li>
                     <li><a href="contact.html">Contact</a></li>
                 </ul>
-                <div id="loginArea"><form id="loginForm" class="navbar-form pull-right" action="AuthenticationServlet" method="POST">
-                        <input name="user" type="text" class="span2" placeholder="Login">
-                        <input name="password" type="password" class="span2" placeholder="Password">
-                        <input type="submit" value="Login" class="btn"/>
-                    </form>
-                </div>
+                <p class="pull-right">You are logged in as <strong>jenhan</strong> <a id="logout">Log Out</a></p>
             </div>
         </div>
         <div class="page-header" style="margin-top:50px">
@@ -56,26 +51,14 @@
             <div class="span2 well">
                 <div class="tabbable">
                     <ul id="leftTabHeader" class="nav nav-tabs">
-                        <li ><a href="#partsTab" data-toggle="tab">Parts</a></li>
+                        <li><a href="#partsTab" data-toggle="tab">Parts</a></li>
                         <li class="active"><a  href="#filesTab" data-toggle="tab">Files</a></li>
+                        <li class="pull-right"><button id="refreshButton"><i class="icon-refresh"></i></button></li>
                     </ul>
 
                     <div id="leftTabs" class="tab-content">
-                        <div class="tab-pane" id="partsTab">
-                            <h4>Parts List</h4>
-                            <hr/>
-                            <div style="height:400px;overflow:auto" id="partsListArea">
-                                <hr/>
-                                <button class="btn" data-toggle="collapse" data-target="#uploadArea">Add More Parts</button>
-                                <div id="uploadArea" class="collapse out">
-                                    <form id="file_upload" action="EugeneServlet" method="POST" enctype="multipart/form-data">
-                                        <input id="file_1" type="file" name="file_1" multiple/>
-                                        <br>
-                                        <button id="uploadButton" data-toggle="collapse" data-target="#uploadArea">Upload</button>
-                                    </form>
-                                </div>
-                            </div>
-                            <div id="partsList"></div>
+                        <div class="tab-pane" id="partsTab">                          
+                            <div id="partsListArea"></div>
                             <hr/>
                         </div>
                         <div class="tab-pane active" id="filesTab">
@@ -86,9 +69,9 @@
                             <br/>
                             <div class="row-fluid">
                                 <div class="btn-group btn-group-vertical">
-                                    <button id="loadButton" class="btn btn-primary" style="width:100%">Load File</button>
-                                    <a href="#newFileModal" role="button" class="btn btn-success" data-toggle="modal">New File</a>
-                                    <button id="deleteButton" class="btn-danger" style="width:100%">Delete File</button>
+                                    <button id="loadButton" class="btn btn-primary" style="width:100px">Load File</button>
+                                    <a href="#newFileModal" role="button" class="btn btn-success" data-toggle="modal" style="width:100px">New File</a>
+                                    <a href="#deleteFileModal" id="deleteModalButton" class="btn btn-danger" style="width:100px" role="button" data-toggle="modal">Delete File</a>
                                 </div>
                             </div>
                             <div id="newFileModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="newFileModalLabel" aria-hidden="true">
@@ -97,11 +80,13 @@
                                     <h4 id="newFileModalLabel">New File</h4>
                                 </div>
                                 <div class="modal-body">
-                                    <form method="POST" action="EugeneServlet" enctype="multipart/form-data" target="hiddenIFrame">
-                                        <p>You can either upload an existing file.</p>
-                                        <input type="file" name="file" id="file" />
-                                        <p>Or....</p>
+                                    <p>You can either upload an existing file.</p>
+
+                                    <form id="uploadForm" method="POST" action="EugeneServlet" enctype="multipart/form-data">
+                                        <input type="file" name="file" id="file" multiple/>
+                                        <input type="submit" value="Upload File" name="upload" id="uploadFileButton" class="btn" style="width:150px" />
                                     </form>
+                                    <p>Or....</p>
                                     <p>Create a new file</p>
                                     <input id="newFileNameInput" placeholder="New File Name"/>
                                     <br>
@@ -110,8 +95,22 @@
                                     <input type="radio" name="file-type" value="sbol"> SBOL File
                                 </div>
                                 <div class="modal-footer">
-                                    
-                                    <button id="createNewButton" class="btn" data-dismiss="modal" aria-hidden="true">Create New File</button>
+                                    <button id="createNewButton" class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Create New File</button>
+                                    <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+                                </div>
+                            </div>
+
+                            <div id="deleteFileModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="deleteFileModalLabel" aria-hidden="true">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                                    <h4 id="deleteFileModalLabel">Delete File</h4>
+                                </div>
+                                <div class="modal-body">                                      
+                                    <p id="toDeleteName"></p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button id="deleteButton" class="btn btn-danger" data-dismiss="modal" aria-hidden="true">Delete File</button>
+                                    <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
                                 </div>
                             </div>
                         </div>
@@ -137,12 +136,12 @@
                             </div>
                         </div>
                         <div class="tab-pane active" id="textEditorTab">
-                            <div class="accordion" id="accordion2">
+                            <div class="accordion" id="accoridion">
                                 <div class="accordion-group">
                                     <div class="accordion-heading">
-                                        <h5><a class="accordion-toggle" data-toggle="collapse" data-target="#editorArea" href="#editorArea">
-                                            Editor
-                                        </a>
+                                        <h5><a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#editorArea">
+                                                Editor
+                                            </a>
                                         </h5>
                                     </div>
                                     <div id="editorArea" class="accordion-body collapse in">
@@ -155,14 +154,30 @@
                                 <div class="accordion-group">
                                     <div class="accordion-heading">
                                         <h5>
-                                            <a class="accordion-toggle" data-toggle="collapse" data-target="#outputArea" href="#outputArea">
+                                            <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#outputArea">
                                                 Output 
                                             </a>
                                         </h5>
                                     </div>
-                                    <div id="outputArea" class="accordion-body collapse">
-                                        <div class="accordion-inner">
-                                            <textarea id="console" readonly style="width:95%">Output Goes Here</textarea>
+                                    <div id="outputArea" class="accordion-body collapse out">
+                                        <div class= "accordion-inner">
+                                            <div id="output" class="well">
+                                                <div class="tabbable">
+                                                    <ul class="nav nav-tabs" id="outputTabs">
+                                                        <li class="active"><a href="#outputImageTab" data-toggle="tab">Pigeon Images</a></li>
+                                                        <li><a href="#outputListTab" data-toggle="tab">Generated Parts</a></li>
+                                                    </ul>
+
+                                                    <div class="tab-content">
+                                                        <div class="tab-pane active" id="outputImageTab">
+                                                            <div id="outputImageArea"></div>
+                                                        </div>
+                                                        <div class="tab-pane" id="outputListTab">
+                                                            <div id="outputListArea"></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -185,13 +200,13 @@
         </iframe>
         <script src="jsLibraries/jquery.dataTables.min.js"></script>
         <script src="jsLibraries/bootstrap.min.js"></script>
+        <script src="javascript/ObjectIDGenerator.js"></script>
         <script src="javascript/EugeneLabController.js"></script>
         <script src="jsLibraries/codemirror.js"></script>
-        <script src="jsLibraries/active-line.js"></script>
         <script src="jsLibraries/jquery.dynatree.min.js"></script>
-        <script src="jsLibraries/jquery.cookie.js"></script>
-
+        <!--<script src="jsLibraries/jquery.cookie.js"></script>-->
         <script src="jsLibraries/eugene.js"></script>
+
         <div id="tester"></div>
         <footer>
             <div class="container" align="center">
