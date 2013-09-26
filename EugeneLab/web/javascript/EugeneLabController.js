@@ -202,6 +202,9 @@ $(document).ready(function() {
                     // Note: we also get this event, if persistence is on, and the page is reloaded.
 //                alert("You activated " + node.data.title);
                 },
+                onDblClick: function() {
+                    loadFile();
+                },
                 persist: false,
                 children: children
             });
@@ -281,16 +284,20 @@ $(document).ready(function() {
     };
 
     var loadFile = function() {
-        var node = getActiveNode();
+        var node = $("#filesArea").dynatree("getActiveNode");
         if (node.data.isFolder) {
             //do nothing i guess...
         } else {
-            $('#fileName').text(node.data.title);
-            var fileName = getActiveNodeExtension();
-            setCurrentFileExtension(fileName);
+            var fileName = node.data.title;
+            setCurrentFileExtension(getActiveNodeExtension());
+            $('#fileName').text(fileName);
+            var parent = node.getParent();
+            while (parent.data.title !== null) {
+                fileName = parent.data.title + "/" + fileName;
+                parent = parent.getParent();
+            }
             $.get("EugeneServlet", {"command": "getFileContent", "fileName": fileName}, function(response) {
                 editor.setValue(response);
-
             });
         }
     };
@@ -346,22 +353,7 @@ $(document).ready(function() {
     });
 
     $('#loadButton').click(function() {
-        var node = $("#filesArea").dynatree("getActiveNode");
-        if (node.data.isFolder) {
-            //do nothing i guess...
-        } else {
-            var fileName = node.data.title;
-            setCurrentFileExtension(getActiveNodeExtension());
-            $('#fileName').text(fileName);
-            var parent = node.getParent();
-            while (parent.data.title !== null) {
-                fileName = parent.data.title + "/" + fileName;
-                parent = parent.getParent();
-            }
-            $.get("EugeneServlet", {"command": "getFileContent", "fileName": fileName}, function(response) {
-                editor.setValue(response);
-            });
-        }
+        loadFile();
     });
 
     $('#deleteButton').click(function() {
