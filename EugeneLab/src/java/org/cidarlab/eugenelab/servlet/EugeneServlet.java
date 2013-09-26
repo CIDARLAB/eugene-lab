@@ -266,16 +266,22 @@ public class EugeneServlet extends HttpServlet {
                 }
                 out.write(result);
             } else if(command.equals("executeGenBank")) {
-                response.setContentType("text/plain");
-                String result;
+                //response.setContentType("text/plain");
+                String result = "{\"results\":[";
                 String fileName = request.getParameter("input");
                 fileName = getFileExtension(fileName, true);
                 try {
                     Component c = loadGenBank(new File(fileName));
-                    result = c.toString();
+                    
+                    for(Component p : ((Device)c).getAllComponents()) {
+                        result += toJSON((Part) p).toString() + ",";
+                    }
+                    result = result.substring(0, result.length() - 1); //Remove last comma
                 } catch(Exception e) {
                     result = e.toString();
                 }
+                
+                result += "],\"status\":\"good\"}";
                 out.write(result);
                 //try {
                     /*String fileName = request.getParameter("input");
@@ -625,6 +631,13 @@ public class EugeneServlet extends HttpServlet {
             e.printStackTrace();
         }
         return null;
+    }
+    
+    private JSONObject toJSON(Part part) throws JSONException {
+        JSONObject partJSON = new JSONObject();
+        partJSON.put("name", part.getName());
+        partJSON.put("Schema", part.getClass());
+        return partJSON;
     }
     
     private JSONObject toJSON(Device objDevice)
