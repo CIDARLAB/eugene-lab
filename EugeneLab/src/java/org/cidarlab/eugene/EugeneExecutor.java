@@ -22,7 +22,6 @@ ENHANCEMENTS, OR MODIFICATIONS.
 
 package org.cidarlab.eugene;
 
-import java.awt.Component;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -39,11 +38,14 @@ import org.antlr.runtime.RecognitionException;
 import org.cidarlab.eugene.data.pigeon.Pigeon;
 import org.cidarlab.eugene.dom.SavableElement;
 import org.cidarlab.eugene.dom.arrays.DeviceArray;
+import org.cidarlab.eugene.dom.components.Component;
 import org.cidarlab.eugene.dom.components.Device;
 import org.cidarlab.eugene.output.ResultSet;
 import org.cidarlab.eugene.parser.EugeneLexer;
 import org.cidarlab.eugene.parser.EugeneParser;
 import org.cidarlab.eugene.util.EugeneUtil;
+import org.cidarlab.eugenelab.servlet.EugeneServlet;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 
@@ -109,8 +111,10 @@ public class EugeneExecutor {
 						int nSize = ((DeviceArray)se).size();
 						for(int i=0; i<nSize; i++) {
 							try {
-                                                            JSONObject json = new JSONObject();
-                                                            json.put("pigeon-uri", Pigeon.visualize((Device)((DeviceArray)se).get(i)));
+                                                            JSONObject json;
+                                                            Device device = (Device)((DeviceArray)se).get(i);
+                                                            json = EugeneServlet.toJSON(device);
+                                                            json.put("pigeon-uri", Pigeon.visualize(device));
                                                             ((HashSet<JSONObject>)results).add(json);
 							} catch(Exception e) {
 								e.printStackTrace();
