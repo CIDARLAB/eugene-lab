@@ -43,6 +43,18 @@ public class EugeneJSON {
         return ptJSON;
     }
     
+    public static JSONObject toJSON(Component c) throws Exception {
+        if(c instanceof Device) {
+            return toJSON((Device) c);
+        } else if (c instanceof Part) {
+            return toJSON((Part) c);
+        } else if (c instanceof PartType) {
+            return toJSON((PartType) c);
+        } else {
+            return null;
+        }
+    }
+    
     public static JSONArray toJSONPartArray(Component c) throws JSONException {
         List componentList = new ArrayList<Component>();
         componentList.add(c);

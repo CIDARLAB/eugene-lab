@@ -482,7 +482,6 @@ $(document).ready(function() {
 
             $.post("EugeneServlet", command, function(response) {
                 $('#runButton').removeAttr("disabled");
-                alert(JSON.stringify(response));
                 if ("good" === response["status"]) {
                     if (response["results"] !== undefined) {
                         var pigeonLinks = [];
@@ -549,7 +548,7 @@ $(document).ready(function() {
                             $(this).addClass("disabled");
                         });
                         $('#outputArea').collapse('show');
-                        drawPartsList()
+                        drawPartsList();
                     }
                 } else {
                     console.log(response["error"]);

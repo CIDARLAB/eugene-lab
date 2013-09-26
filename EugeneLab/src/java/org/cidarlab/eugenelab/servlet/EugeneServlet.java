@@ -248,40 +248,47 @@ public class EugeneServlet extends HttpServlet {
                     String fileName = request.getParameter("input");
                     fileName = getFileExtension(fileName, true);
                     NamedElement eugeneConversion;
-                    String result = "{\"results\":";
+                    JSONObject toWrite = new JSONObject();
                     try {
                         eugeneConversion = convertSBOL(fileName);
-                        if(eugeneConversion instanceof Component)
-                            result += EugeneJSON.toJSONPartArray((Component)eugeneConversion);
-                        else if(eugeneConversion instanceof Collection) {
+                        if(eugeneConversion instanceof Component) {
+                            //result = EugeneJSON.toJSON((Component)eugeneConversion); //@TODO: Get Example file
+                        } else if(eugeneConversion instanceof Collection) {
                             List<Device> deviceList = ((Collection) eugeneConversion).getDevices();
-                            List<Component> componentList = new ArrayList<Component>();
+                            JSONArray resultsArray = new JSONArray();
                             for(Device d: deviceList) {
-                                Component c = d;
-                                componentList.add(c);
+                                resultsArray.put(EugeneJSON.toJSON(d));
                             }
-                            result += EugeneJSON.toJSONPartArray(componentList);
+                            toWrite.put("results", resultsArray);
+                            toWrite.put("status", "good");
                         }
-                        result += ",\"status\":\"good\"}";
                     } catch (Exception e) {
-                        e.printStackTrace();
                         String exceptionAsString = e.toString().replaceAll("[\r\n\t]+", " ");
                         exceptionAsString = exceptionAsString.replaceAll("[\"]+", "'");
-                        result = "{\"result\":\"" + exceptionAsString + "\",\"status\":\"bad\"}";
+                        toWrite.put("results", exceptionAsString);
+                        toWrite.put("status","bad");
                     }
-                    out.write(result);
+                    out.write(toWrite.toString());
                 } else if (command.equals("executeGenBank")) {
-                    String result = "{\"results\":";
+                    //response.setContentType("text/plain");
+                    JSONObject toWrite = new JSONObject();
                     String fileName = request.getParameter("input");
                     fileName = getFileExtension(fileName, true);
                     try {
                         Component c = loadGenBank(new File(fileName));
-                        result += EugeneJSON.toJSONPartArray(c);
-                        result += ",\"status\":\"good\"}";
+                        JSONArray componentArray = EugeneJSON.toJSONPartArray(c);
+                        JSONObject results = new JSONObject();
+                        results.put("name", ((Device)c).getName());
+                        results.put("type", "PartCollection");
+                        results.put("components", componentArray);
+                        JSONArray resultsArray = new JSONArray();
+                        resultsArray.put(results);
+                        toWrite.put("results", resultsArray);
+                        toWrite.put("status","good");
                     } catch (Exception e) {
-                        result = e.toString();
+                        toWrite.put("status", "bad");
                     }
-                    out.write(result);
+                    out.write(toWrite.toString());
 
                 }
             } catch (Exception e) {
