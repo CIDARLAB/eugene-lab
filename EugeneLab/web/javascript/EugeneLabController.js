@@ -165,22 +165,24 @@ $(document).ready(function() {
         });
         $('tr').dblclick(function() {
             var type = $(this).children("td:last").text();
-            var name = $(this).children("td:first").text();
+            var originalName = $(this).children("td:first").text();
+            var name = originalName.replace(/\s+/g, '');
             if (_partTypes[type] === undefined) {
                 _partTypes[type] = "added";
                 newLine = 'PartType ' + type + '(Name, Sequence);\n' + newLine;
             }
             var sequence = "";
-            if (typeof _parts[name].sequence === "string") {
+            if (typeof _parts[originalName].sequence === "string") {
                 sequence = _parts[name].sequence;
             } else {
-                if (_parts[name].sequence === undefined) {
+                if (_parts[originalName].sequence === undefined) {
                     sequence = "";
                 } else {
-                    sequence = _parts[name].sequence.sequence;
+                    sequence = _parts[originalName].sequence.sequence;
                 }
             }
-            var newLine = type + ' ' + name + '(.Name("' + name + '"),.Sequence("' + sequence + '"));\n';
+            var pigeon = 'p ' + name + ' 10' ;
+            var newLine = type + ' ' + name + '("' + originalName + '","' + pigeon + '");\n';
             var line = editor.getCursor("start")["line"];
             var currentLine = editor.getLine(line);
             editor.setLine(line, newLine + currentLine);
