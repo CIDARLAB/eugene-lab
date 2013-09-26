@@ -351,6 +351,7 @@ $(document).ready(function() {
             //do nothing i guess...
         } else {
             var fileName = node.data.title;
+            setCurrentFileExtension(getActiveNodeExtension());
             $('#fileName').text(fileName);
             var parent = node.getParent();
             while (parent.data.title !== null) {
@@ -470,10 +471,26 @@ $(document).ready(function() {
 
             var input = editor.getValue();
             $('#runButton').attr("disabled", "disabled");
+            
+             var command;
+                // Get file type to determine command
+                var fileType = getFileType();
+                var fileExtension = getCurrentFileExtension();
+                
+                // Command is based on the file type
+                if(fileType === 'eug') {
+                    command = {"input": editor.getValue(), "command":"execute"};
+                } else if(fileType === 'sbol') {
+                    command = {"input":fileExtension, "command":"executeSBOL"};
+                } else if(fileType === 'gbk'|| fileType === 'gb') {
+                    command = {"input":fileExtension, "command":"executeGenBank"};
+                } else {
+                    // @TODO: Add other file types
+                }
 
-            $.post("EugeneServlet", {"command": "execute", "input": input}, function(response) {
+            $.post("EugeneServlet", command, function(response) {
                 $('#runButton').removeAttr("disabled");
-
+                alert(JSON.stringify(response));
                 if ("good" === response["status"]) {
                     if (response["results"] !== undefined) {
                         var pigeonLinks = [];
