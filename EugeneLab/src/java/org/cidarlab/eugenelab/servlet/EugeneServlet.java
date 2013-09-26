@@ -61,7 +61,7 @@ public class EugeneServlet extends HttpServlet {
 
 //    /* here is our Clotho instance */
     private Clotho clotho;
-
+/*
     @Override
     public void init()
             throws ServletException {
@@ -69,7 +69,7 @@ public class EugeneServlet extends HttpServlet {
         super.init();
         this.clotho = ClothoFactory.getAPI("ws://localhost:8080/websocket");
     }
-
+*/
     /**
      * Processes requests for both HTTP
      * <code>GET</code> and

@@ -272,25 +272,28 @@ $(document).ready(function() {
     };
 
 
-    var currentFileExtension;
+    var _currentFileExtension;
     var setCurrentFileExtension = function(fileExtension) {
-        currentFileExtension = fileExtension;
+        _currentFileExtension = fileExtension;
     };
     var getCurrentFileExtension = function() {
-        return currentFileExtension;
+        return _currentFileExtension;
     };
 
     var loadFile = function() {
-        var node = getActiveNode();
+        var node = $("#filesArea").dynatree("getActiveNode");
         if (node.data.isFolder) {
             //do nothing i guess...
         } else {
-            $('#fileName').text(node.data.title);
-            var fileName = getActiveNodeExtension();
-            setCurrentFileExtension(fileName);
+            var fileName = node.data.title;
+            $('#fileName').text(fileName);
+            var parent = node.getParent();
+            while (parent.data.title !== null) {
+                fileName = parent.data.title + "/" + fileName;
+                parent = parent.getParent();
+            }
             $.get("EugeneServlet", {"command": "getFileContent", "fileName": fileName}, function(response) {
                 editor.setValue(response);
-
             });
         }
     };
@@ -351,6 +354,7 @@ $(document).ready(function() {
             //do nothing i guess...
         } else {
             var fileName = node.data.title;
+            setCurrentFileExtension(getActiveNodeExtension());
             $('#fileName').text(fileName);
             var parent = node.getParent();
             while (parent.data.title !== null) {
@@ -493,10 +497,27 @@ $(document).ready(function() {
 =======
             var input = editor.getValue();
             $('#runButton').attr("disabled", "disabled");
+            
+            // Get file type to determine command
+                var fileType = getFileType();
+                var fileExtension = getCurrentFileExtension();
+                
+                // Command is based on the file type
+                if(fileType === 'eug') {
+                    command = {"input": input, "command":"execute"};
+                } else if(fileType === 'sbol') {
+                    command = {"input":fileExtension, "command":"executeSBOL"};
+                } else if(fileType === 'gbk'|| fileType === 'gb') {
+                    command = {"input":fileExtension, "command":"executeGenBank"};
+                } else {
+                    // @TODO: Add other file types
+                }
+                alert(fileType)
+                alert(_currentFileExtension);
 
-            $.post("EugeneServlet", {"command": "execute", "input": input}, function(response) {
+            $.post("EugeneServlet", command, function(response) {
                 $('#runButton').removeAttr("disabled");
-
+                alert(JSON.stringify(response));
                 if ("good" === response["status"]) {
                     if (response["results"] !== undefined) {
                         var pigeonLinks = [];
