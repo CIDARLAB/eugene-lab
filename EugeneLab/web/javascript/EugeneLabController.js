@@ -595,14 +595,6 @@ $(document).ready(function() {
 
     });
 
-
-
-
-
-
-
-
-
     /********Clotho Functions and Variables********/
     var _connection = new WebSocket('ws://localhost:8080/websocket');
 
