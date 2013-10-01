@@ -64,7 +64,6 @@ RBS B0032m(
 	.Sequence("AGAGTCACACAGGAAAGTACTA"), 
 	.Strength(3), 
 	.Pigeon("r B0032m"));
-/**	
 RBS B0033m(
 	.Name("B0033m"), 
 	.Sequence("AGAGTCACACAGGACTACTA"), 
@@ -75,7 +74,7 @@ RBS B0034m1(
 	.Sequence("AGAGAAAGAGGAGAAATACTA"), 
 	.Strength(1), 
 	.Pigeon("r B0034m_BC"));
- **/ 
+
 Repressor C0040(
 	.Name("C0040"), 
 	.Sequence("ATGTCCAGATTAGATAAAAGTAAAGTGATTAACAGCGCATT
@@ -91,7 +90,6 @@ TAACACTGATAGTGCTAGTGTAGATCAC"),
 	.Represses("R0040"),
 	.Pigeon("c C0040 5"));
 	
-/**
 Repressor C0012(
 	.Name("C0012"), 
 	.Sequence("ATGGTGAATGTGAAACCAGTAACGTTATACGATGTCGCAGAGTAT
@@ -128,7 +126,6 @@ GACGATCAACTCTATTTCTCGCGAGTATTTAAAAAATGCACCGGGGCCAGCCCGAGCGAGTTCCGTGCCGGTTGTGAAGA
 AAAGTGAATGATGTAGCCGTCAAGTTGTCAGCTGCAAACGACGAAAACTACGCTTTAGTAGCTTAATAA"), 
 	.Represses("I13453"),
 	.Pigeon("c C0080 7"));
-**/
 
 Repressor C0051(
 	.Name("C0051"), 
@@ -146,7 +143,7 @@ TTTAGTAGCTTAATAACGCTGATAGTGCTAGTGTAGATCGC"),
 	.Represses("R0051"),
 	.Pigeon("c C0051 7"));
 
-/*** 
+
 Inducer C0062(
 	.Name("C0062"), 
 	.Sequence("atgaaaaacataaatgccgacgacacatacagaataattaata
@@ -161,7 +158,6 @@ tgcgaaggaaaaagctcttgggatatttcaaaaatattaggttgcagtgagcgtactgtcactttccatttaaccaa
 tgcgcaaatgaaactcaatacaacaaaccgctgccaaagtatttctaaagcaattttaacaggagcaattgattgcc
 catactttaaaaattaataa"),
 	.Induces("R0062"));
-**/
 
 Reporter E1010m(
 	.Name("E1010m"), 
@@ -202,16 +198,16 @@ TCTGCGTTTATA"),
 
 
 //Intermediate Devices (Transcriptional Units)
-Device Inverter = 
-	ConstPr + RBS + Repressor + B0015 +
-	RepPr + RBS + Repressor + B0015 + 
-	RepPr + RBS + Reporter + B0015 +
-	RepPr + RBS + Reporter + B0015;
+Device Inverter ( 
+	ConstPr, RBS, Repressor, Terminator,
+	RepPr, RBS, Repressor, Terminator,
+	RepPr, RBS, Reporter, Terminator,
+	RepPr, RBS, Reporter, Terminator);
 
 Rule rTmp (
 	ON Inverter:
-	 		// Represses relationships
-			Inverter[2].Represses EQUALS Inverter[4].Name 
+	 	// Represses relationships
+		Inverter[2].Represses EQUALS Inverter[4].Name 
 				AND
         	Inverter[2].Represses EQUALS Inverter[8].Name 
         		AND
@@ -242,25 +238,6 @@ Rule rTmp (
 		
 );
 
-function toPigeon(Device d) {
-    num n = 1;
-	for(num i=0; i<d.size(); i++) {
-		println(d[i].Pigeon);
-		if(n == 4) {
-		   println(".");
-		   n = 1;
-		} else {
-		   n++;
-		}		
-		
-	}
-	println("# Arcs");
-	for (num i=0; i<d.size(); i++) {
-	    if(d[i] INSTANCEOF Repressor) {
-	        println(d[i].Name, " rep ", d[i].Represses);
-	    }
-	}
-}
 
 Device[] lst = product(Inverter, strict);
 

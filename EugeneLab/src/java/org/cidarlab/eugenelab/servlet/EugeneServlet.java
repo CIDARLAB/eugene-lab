@@ -1,15 +1,17 @@
 package org.cidarlab.eugenelab.servlet;
 
-import eugene.EugeneExecutor;
-import eugene.data.sbol.SBOLImporter;
-import eugene.dom.NamedElement;
-import eugene.dom.SavableElement;
-import eugene.dom.collection.Collection;
-import eugene.dom.components.Component;
-import eugene.dom.components.Device;
-import eugene.dom.components.Part;
-import eugene.dom.components.types.PartType;
-import eugene.exception.InvalidEugeneAssignmentException;
+import org.cidarlab.eugene.EugeneExecutor;
+import org.cidarlab.eugene.data.genbank.GenbankImporter;
+import org.cidarlab.eugene.data.sbol.SBOLImporter;
+import org.cidarlab.eugene.dom.NamedElement;
+import org.cidarlab.eugene.dom.PropertyValue;
+import org.cidarlab.eugene.dom.SavableElement;
+import org.cidarlab.eugene.dom.components.Component;
+import org.cidarlab.eugene.dom.components.Device;
+import org.cidarlab.eugene.dom.components.Part;
+import org.cidarlab.eugene.dom.components.Property;
+import org.cidarlab.eugene.dom.components.types.PartType;
+import org.cidarlab.eugene.exception.EugeneException;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -26,9 +28,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
@@ -45,11 +49,12 @@ import org.biojava.bio.seq.Feature;
 import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.SequenceIterator;
 import org.biojava.bio.seq.io.SeqIOTools;
+
+import org.cidarlab.eugene.builder.EugeneBuilder;
+
 import org.cidarlab.weyekin.WeyekinPoster;
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.clothocad.client.Clotho;
-import org.clothocad.client.ClothoFactory;
 import org.json.JSONObject;
 
 /**
@@ -58,15 +63,12 @@ import org.json.JSONObject;
  */
 public class EugeneServlet extends HttpServlet {
 
-//    /* here is our Clotho instance */
-    private Clotho clotho;
-
     @Override
     public void init()
             throws ServletException {
 
         super.init();
-        this.clotho = ClothoFactory.getAPI("ws://localhost:8080/websocket");
+        //this.clotho = ClothoFactory.getAPI("ws://localhost:8080/websocket");
     }
 
     /**
@@ -336,38 +338,15 @@ public class EugeneServlet extends HttpServlet {
     }
 
     public JSONObject executeEugene(String input) {
-        HashMap<String, SavableElement> results = new HashMap<String, SavableElement>();
 
         JSONObject returnJSON = new JSONObject();
         try {
-            results = (HashMap<String, SavableElement>) EugeneExecutor.execute(input, 2);
-
+            Set<JSONObject> results = (HashSet<JSONObject>) EugeneExecutor.execute(input, 3);
+            List<JSONObject> lstUriJSON = new ArrayList<JSONObject>();
             if (null != results && !results.isEmpty()) {
-
-                List<JSONObject> lstDeviceJSON = new ArrayList<JSONObject>();
-                for (String s : results.keySet()) {
-                    SavableElement objElement = results.get(s);
-                    if (objElement instanceof Device) {
-
-                        Device objDevice = (Device) objElement;
-
-                        JSONObject deviceJSON = EugeneJSON.toJSON(objDevice);
-
-                        // now, we could store it in the Clotho DB...
-                        WeyekinPoster.setPigeonText(
-                                deviceJSON.get("Pigeon").toString());
-                        deviceJSON.put("pigeon-uri", WeyekinPoster.postMyBird());
-                        lstDeviceJSON.add(deviceJSON);
-
-                        /**
-                         * clotho.create(deviceJSON); *
-                         */
-                    }
-                }
-
-                returnJSON.put("results", lstDeviceJSON);
+                lstUriJSON.addAll(results);
             }
-
+            returnJSON.put("results", lstUriJSON);
             returnJSON.put("status", "good");
 
         } catch (Exception e) {
@@ -510,8 +489,11 @@ public class EugeneServlet extends HttpServlet {
                 }
             }
 
+            // pigeon-url ... 
+            
             JSONObject resultJSON = new JSONObject();
             resultJSON.put("result", lstParts);
+
             //System.out.println(dataJSON);
 
             return resultJSON;
@@ -529,7 +511,8 @@ public class EugeneServlet extends HttpServlet {
 
     // Interface that loads a GenBank component straight from the website
     private Component loadGenBank(String componentName) throws MalformedURLException, IOException,
-            NoSuchElementException, BioException, InvalidEugeneAssignmentException {
+            NoSuchElementException, BioException, EugeneException {
+
         URL url = new URL("http:www.ncbi.nlm.nih.gov/nuccore/" + componentName);
         BufferedReader br = new BufferedReader(new InputStreamReader(url.openStream()));
         return readGenBankComponent(br);
@@ -537,7 +520,7 @@ public class EugeneServlet extends HttpServlet {
 
     // Interface that loads a GenBank component from a file
     private Component loadGenBank(File file) throws FileNotFoundException,
-            NoSuchElementException, BioException, InvalidEugeneAssignmentException {
+            NoSuchElementException, BioException, EugeneException {
         BufferedReader br = new BufferedReader(new FileReader(file));
         return readGenBankComponent(br);
     }
@@ -545,9 +528,9 @@ public class EugeneServlet extends HttpServlet {
     // Converts a GenBank component to a Eugene component
     // Do not call directly; use above APIs
     private Component readGenBankComponent(BufferedReader br) throws
-            NoSuchElementException, BioException, InvalidEugeneAssignmentException {
+            NoSuchElementException, BioException, EugeneException {
         SequenceIterator sequences = SeqIOTools.readGenbank(br);
-        List<Feature> features = new ArrayList<Feature>();
+        List<Component> parts = new ArrayList<Component>();
         String deviceName = "UnnamedDevice";
         // Should only have one sequence
         boolean firstPass = true;
@@ -557,10 +540,81 @@ public class EugeneServlet extends HttpServlet {
             if (firstPass) {
                 deviceName = seq.getName();
                 firstPass = false;
+
             } else {
                 deviceName += "|" + seq.getName();
             }
             Iterator it = seq.features();
+
+            while(it.hasNext()) {
+                Feature feature = (Feature) it.next();
+                parts.add(buildPart(feature));
+            }
+        }
+        if(parts.isEmpty()) {
+            return null;
+        } else if(parts.size() == 1) {
+            // Size 1 imples just one part
+            return parts.get(0);
+        } else {
+            //@TODO: get a real device name
+            return new Device(deviceName, parts);
+            //return EugeneBuilder.buildDevice(deviceName, parts);
+        }
+    }
+    
+    private Part buildPart(Feature feature) 
+                throws EugeneException {
+        PartType partType = new PartType(feature.getType());
+        String partName = getPartName(feature);
+        Part part = new Part(partType, partName);
+        part.setSequence(feature.getSequence().seqString());
+        return part;     
+    }
+    
+    private String getPartName(Feature feature) {
+        return feature.getType() + "_at_" + feature.getLocation().getMin();
+    }
+    
+    /* Temporarily saved for reference
+    private Component importGenbankComponent(String sFileName) throws MalformedURLException, IOException, 
+            NoSuchElementException, BioException, InvalidEugeneAssignmentException {
+        //Website has files embedded in the website so need to find a way to isolate the file from the rest of the website
+        //Currently using direct file upload to test
+	//URL url = new URL("http://www.ncbi.nlm.nih.gov/nuccore/" + sFileName);
+	BufferedReader in = new BufferedReader(new FileReader(sFileName));//new InputStreamReader(url.openStream()));
+	SequenceIterator sequences = SeqIOTools.readGenbank(in);
+        List<Component> parts = new ArrayList<Component>();
+        int i = 0;
+	// Can this lead to multiple devices?
+        while(sequences.hasNext()) {
+            Sequence seq = sequences.nextSequence();
+            Iterator it = seq.features();
+            while(it.hasNext()) {
+                Feature feature = (Feature) it.next();
+                //Feature is essentially the Genbank version of a part
+                PartType partType = new PartType(feature.getType());
+                // Still need a part name
+                String partName = feature.getType() + "_part" + i;
+                Part part = new Part(partType, partName);
+                // Add the sequence to the part
+                Property property = new Property("sequence", "txt");
+                PropertyValue propertyValue = new PropertyValue("sequence", "txt");
+                propertyValue.setTxt(feature.getSequence().seqString());
+                part.setValue(property, propertyValue);
+                parts.add(part);
+                i++;
+            }
+	}
+        if(parts.isEmpty()) {
+            return null;
+        } else if(parts.size() == 1) {
+            // File is just a device
+            return parts.get(0);
+        } else {
+            //Will be able to get actual device name when website file upload works
+            return Device.newInstance("DeviceName", parts);
+=======
             while (it.hasNext()) {
                 Feature feature = (Feature) it.next();
                 features.add(feature);
@@ -581,8 +635,10 @@ public class EugeneServlet extends HttpServlet {
         } else {
             return Device.newInstance(deviceName, parts);
         }
+		
     }
-
+    * */
+    
     private void removeOverlap(List<Feature> features) {
         // Sort the features based on when they start in the sequence
         Collections.sort(features, new Comparator<Feature>() {
@@ -631,18 +687,6 @@ public class EugeneServlet extends HttpServlet {
                 && a.getLocation().getMax() >= b.getLocation().getMax();
     }
 
-    private Part buildPart(Feature feature) throws InvalidEugeneAssignmentException {
-        PartType partType = new PartType(feature.getType());
-        String partName = getPartName(feature);
-        Part part = new Part(partType, partName);
-        part.setSequence(feature.getSequence().seqString());
-        return part;
-    }
-
-    private String getPartName(Feature feature) {
-        //@TODO: Improve part naming system
-        return feature.getType() + "_at_" + feature.getLocation().getMin();
-    }
 
     // Takes a device and stores it in Clotho
     private boolean toClotho(NamedElement element) {

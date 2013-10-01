@@ -4,7 +4,6 @@
 
 
 $(document).ready(function() {
-    /********"Field" Variables********/
     var deviceCount = 0;
     var _properties = {};
     var _partTypes = {};
@@ -508,6 +507,7 @@ $(document).ready(function() {
                         var toAppend = '<table class="table table-bordered table-hover" id="outputList"><thead><tr><th>Name</th><th>Type</th><th></th></tr></thead><tbody>';
                         //handle each device
                         var newParts = {};
+
                         $.each(response["results"], function() {
                             if (newParts[this["name"]] !== "added") {
                                 _newParts[this["name"]] = this;
