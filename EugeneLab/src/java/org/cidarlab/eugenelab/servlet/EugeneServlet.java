@@ -1,6 +1,5 @@
 package org.cidarlab.eugenelab.servlet;
 
-
 import org.cidarlab.eugene.EugeneExecutor;
 import org.cidarlab.eugene.data.genbank.GenbankImporter;
 import org.cidarlab.eugene.data.sbol.SBOLImporter;
@@ -13,7 +12,6 @@ import org.cidarlab.eugene.dom.components.Part;
 import org.cidarlab.eugene.dom.components.Property;
 import org.cidarlab.eugene.dom.components.types.PartType;
 import org.cidarlab.eugene.exception.EugeneException;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -252,30 +250,47 @@ public class EugeneServlet extends HttpServlet {
                     String fileName = request.getParameter("input");
                     fileName = getFileExtension(fileName, true);
                     NamedElement eugeneConversion;
-                    String result;
+                    JSONObject toWrite = new JSONObject();
                     try {
                         eugeneConversion = convertSBOL(fileName);
-                        result = eugeneConversion.toString().replaceAll("[\r\n\t]+", " ");
-                        result = "{\"results\":\"" + result + "\", \"status\":\"good\"}";
+                        if(eugeneConversion instanceof Component) {
+                            //result = EugeneJSON.toJSON((Component)eugeneConversion); //@TODO: Get Example file
+                        } else if(eugeneConversion instanceof Collection) {
+                            List<Device> deviceList = ((Collection) eugeneConversion).getDevices();
+                            JSONArray resultsArray = new JSONArray();
+                            for(Device d: deviceList) {
+                                resultsArray.put(EugeneJSON.toJSON(d));
+                            }
+                            toWrite.put("results", resultsArray);
+                            toWrite.put("status", "good");
+                        }
                     } catch (Exception e) {
-                        e.printStackTrace();
                         String exceptionAsString = e.toString().replaceAll("[\r\n\t]+", " ");
                         exceptionAsString = exceptionAsString.replaceAll("[\"]+", "'");
-                        result = "{\"result\":\"" + exceptionAsString + "\",\"status\":\"bad\"}";
+                        toWrite.put("results", exceptionAsString);
+                        toWrite.put("status","bad");
                     }
-                    out.write(result);
+                    out.write(toWrite.toString());
                 } else if (command.equals("executeGenBank")) {
-                    response.setContentType("text/plain");
-                    String result;
+                    //response.setContentType("text/plain");
+                    JSONObject toWrite = new JSONObject();
                     String fileName = request.getParameter("input");
                     fileName = getFileExtension(fileName, true);
                     try {
                         Component c = loadGenBank(new File(fileName));
-                        result = c.toString();
+                        JSONArray componentArray = EugeneJSON.toJSONPartArray(c);
+                        JSONObject results = new JSONObject();
+                        results.put("name", ((Device)c).getName());
+                        results.put("type", "PartCollection");
+                        results.put("components", componentArray);
+                        JSONArray resultsArray = new JSONArray();
+                        resultsArray.put(results);
+                        toWrite.put("results", resultsArray);
+                        toWrite.put("status","good");
                     } catch (Exception e) {
-                        result = e.toString();
+                        toWrite.put("status", "bad");
                     }
-                    out.write(result);
+                    out.write(toWrite.toString());
 
                 }
             } catch (Exception e) {
@@ -487,53 +502,6 @@ public class EugeneServlet extends HttpServlet {
             e.printStackTrace();
         }
         return null;
-    }
-
-    private JSONObject toJSON(Device objDevice)
-            throws Exception {
-        String NEWLINE = System.getProperty("line.separator");
-        StringBuilder sbPigeon = new StringBuilder();
-        StringBuilder sbPigeonArcs = new StringBuilder();
-
-        sbPigeonArcs.append("# Arcs").append(NEWLINE);
-
-        JSONObject deviceJSON = new JSONObject();
-        deviceJSON.put("name", objDevice.getName());
-        deviceJSON.put("schema", "CompositePart");
-        deviceJSON.put("type", "composite");
-        List<Component> lstComponents = objDevice.getAllComponents();
-        List<JSONObject> lstComponentsJSON = new ArrayList<JSONObject>();
-
-        for (Component component : lstComponents) {
-            JSONObject componentJSON = new JSONObject();
-            componentJSON.put("name", component.getName());
-            componentJSON.put("schema", "BasicPart");
-            if (component instanceof Device) {
-                componentJSON = this.toJSON((Device) component);
-            } else if (component instanceof PartType) {
-                //componentJSON.put("name", lstComponents)
-            } else if (component instanceof Part) {
-                Part objPart = (Part) component;
-                List<JSONObject> lstPropertyValuesJSON = new ArrayList<JSONObject>();
-                componentJSON.put("Pigeon", objPart.get("Pigeon"));
-                sbPigeon.append(objPart.get("Pigeon")).append(NEWLINE);
-                componentJSON.put("sequence", objPart.get("Sequence").toString().replaceAll("\n", ""));
-                componentJSON.put("type", objPart.getPartType().getName());
-                if (null != objPart.get("Represses")) {
-                    sbPigeonArcs.append(objPart.getName())
-                            .append(" rep ")
-                            .append(objPart.get("Represses"))
-                            .append(NEWLINE);
-                }
-            }
-            lstComponentsJSON.add(componentJSON);
-        }
-        deviceJSON.put("components", lstComponentsJSON);
-
-        String sPigeon = sbPigeon.toString() + sbPigeonArcs.toString();
-        deviceJSON.put("Pigeon", sPigeon);
-
-        return deviceJSON;
     }
 
     // Takes an SBOL file and converts it into a eugene device

@@ -201,6 +201,9 @@ $(document).ready(function() {
                     // Note: we also get this event, if persistence is on, and the page is reloaded.
 //                alert("You activated " + node.data.title);
                 },
+                onDblClick: function() {
+                    loadFile();
+                },
                 persist: false,
                 children: children
             });
@@ -280,16 +283,20 @@ $(document).ready(function() {
     };
 
     var loadFile = function() {
-        var node = getActiveNode();
+        var node = $("#filesArea").dynatree("getActiveNode");
         if (node.data.isFolder) {
             //do nothing i guess...
         } else {
-            $('#fileName').text(node.data.title);
-            var fileName = getActiveNodeExtension();
-            setCurrentFileExtension(fileName);
+            var fileName = node.data.title;
+            setCurrentFileExtension(getActiveNodeExtension());
+            $('#fileName').text(fileName);
+            var parent = node.getParent();
+            while (parent.data.title !== null) {
+                fileName = parent.data.title + "/" + fileName;
+                parent = parent.getParent();
+            }
             $.get("EugeneServlet", {"command": "getFileContent", "fileName": fileName}, function(response) {
                 editor.setValue(response);
-
             });
         }
     };
@@ -345,21 +352,7 @@ $(document).ready(function() {
     });
 
     $('#loadButton').click(function() {
-        var node = $("#filesArea").dynatree("getActiveNode");
-        if (node.data.isFolder) {
-            //do nothing i guess...
-        } else {
-            var fileName = node.data.title;
-            $('#fileName').text(fileName);
-            var parent = node.getParent();
-            while (parent.data.title !== null) {
-                fileName = parent.data.title + "/" + fileName;
-                parent = parent.getParent();
-            }
-            $.get("EugeneServlet", {"command": "getFileContent", "fileName": fileName}, function(response) {
-                editor.setValue(response);
-            });
-        }
+        loadFile();
     });
 
     $('#deleteButton').click(function() {
@@ -469,10 +462,25 @@ $(document).ready(function() {
 
             var input = editor.getValue();
             $('#runButton').attr("disabled", "disabled");
+            
+             var command;
+                // Get file type to determine command
+                var fileType = getFileType();
+                var fileExtension = getCurrentFileExtension();
+                
+                // Command is based on the file type
+                if(fileType === 'eug') {
+                    command = {"input": editor.getValue(), "command":"execute"};
+                } else if(fileType === 'sbol') {
+                    command = {"input":fileExtension, "command":"executeSBOL"};
+                } else if(fileType === 'gbk'|| fileType === 'gb') {
+                    command = {"input":fileExtension, "command":"executeGenBank"};
+                } else {
+                    // @TODO: Add other file types
+                }
 
-            $.post("EugeneServlet", {"command": "execute", "input": input}, function(response) {
+            $.post("EugeneServlet", command, function(response) {
                 $('#runButton').removeAttr("disabled");
-
                 if ("good" === response["status"]) {
                     if (response["results"] !== undefined) {
                         var pigeonLinks = [];
@@ -540,7 +548,7 @@ $(document).ready(function() {
                             $(this).addClass("disabled");
                         });
                         $('#outputArea').collapse('show');
-                        drawPartsList()
+                        drawPartsList();
                     }
                 } else {
                     console.log(response["error"]);
