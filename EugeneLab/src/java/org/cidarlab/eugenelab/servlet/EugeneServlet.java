@@ -24,6 +24,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -122,11 +123,11 @@ public class EugeneServlet extends HttpServlet {
 
                 /* option 2:
                  * load the parts from a Eugene script
-                 */
                 JSONObject json = this.getData();
                 if (null != json) {
                     out.write(this.getData().toString());
                 }
+                 */
 
 //                out.write(simulateReadingPartsFromClotho());
 //                out.write(readFiles());
@@ -202,7 +203,8 @@ public class EugeneServlet extends HttpServlet {
                 response.setContentType("application/json");
                 response.sendRedirect("eugenelab.html");
                 List<FileItem> items = uploadHandler.parseRequest(request);
-                String uploadFilePath = this.getServletContext().getRealPath("/") + "/data/" + getCurrentUser() + "/";
+                //String uploadFilePath = this.getServletContext().getRealPath("/") + "/data/" + getCurrentUser() + "/";
+                String uploadFilePath = Paths.get(this.getServletContext().getRealPath(""), "data", getCurrentUser()).toString();        
                 new File(uploadFilePath).mkdir();
                 ArrayList<File> toLoad = new ArrayList();
                 for (FileItem item : items) {
@@ -320,7 +322,7 @@ public class EugeneServlet extends HttpServlet {
 
     private String readImageFiles() {
         //get path relative to servlet; ie the /web directory
-        String imagePath = this.getServletContext().getRealPath("/") + "images/sbol_visual_jpeg/";
+        String imagePath = Paths.get(this.getServletContext().getRealPath(""), "images", "sbol_visual_jpeg").toString();
         String toReturn = "[";
         File[] filesInDirectory = new File(imagePath).listFiles();
         if (filesInDirectory != null) {
@@ -366,15 +368,22 @@ public class EugeneServlet extends HttpServlet {
     // Returns a JSON Array with the name of a file/directory and if it is a file
     // {"name": name, "isFile", isFile}
     private String getFileTree() {
-        String currentFolderExtension = this.getServletContext().getRealPath("/") + "data/" + getCurrentUser() + "/";
+       //String currentFolderExtension = this.getServletContext().getRealPath("/") + "/data/" + getCurrentUser() + "/";
+       String currentFolderExtension = Paths.get(this.getServletContext().getRealPath(""), "data", getCurrentUser()).toString();        
+       System.out.println("[EugeneServlet.getFileTree] -> "+currentFolderExtension);
+       
         File rootFolder = new File(currentFolderExtension);
         ArrayList<File> queue = new ArrayList();
         ArrayList<JSONArray> folders = new ArrayList();
         ArrayList<Integer> folderSizes = new ArrayList();
         File[] rootFiles = rootFolder.listFiles();
+        if(null == rootFiles) {
+            return "";
+        }
         for (int i = 0; i < rootFiles.length; i++) {
             queue.add(rootFiles[i]);
         }
+
         JSONArray rootArray = new JSONArray();
         JSONArray currentArray = rootArray;
         boolean switchFolder = false;
@@ -453,19 +462,21 @@ public class EugeneServlet extends HttpServlet {
 
 
     private String getFileExtension(String localExtension, boolean isFile) {
-        String extension = this.getServletContext().getRealPath("/") + "data/" + getCurrentUser() + "/" + localExtension;
+        //String extension = this.getServletContext().getRealPath("/") + "/data/" + getCurrentUser() + "/" + localExtension;
+        String extension = Paths.get(this.getServletContext().getRealPath(""), "data", getCurrentUser(), localExtension).toString();        
         if (!isFile) {
             extension += "/";
         }
         return extension;
     }
 
+    /**
     public JSONObject getData() {
         List<JSONObject> lstParts = new ArrayList<JSONObject>();
 
         try {
             File f = new File(this.getServletContext().getRealPath("/")
-                    + "eugene-examples/inverter_data.eug");
+                    + "/eugene-examples/inverter_data.eug");
 
             HashMap<String, SavableElement> hm =
                     (HashMap<String, SavableElement>) EugeneExecutor.execute(f, 2);
@@ -504,7 +515,8 @@ public class EugeneServlet extends HttpServlet {
         }
         return null;
     }
-
+    **/
+    
     // Takes an SBOL file and converts it into a eugene device
     private NamedElement convertSBOL(String sbolFileName) throws Exception {
         return SBOLImporter.importSBOL(sbolFileName);
