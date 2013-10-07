@@ -207,5 +207,5 @@ Rule validInverter(
 		C0040 BEFORE C0012
 );
 
-Device[] lstInverters = product(Inverter, strict);
+Device[] lstInverters = product(Inverter, strict, 2);
 save(lstInverters);

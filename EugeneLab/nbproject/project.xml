@@ -24,10 +24,6 @@
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
                 <library dirs="200">
-                    <file>${file.reference.clotho3-client-1.0-SNAPSHOT-jar-with-dependencies.jar}</file>
-                    <path-in-war>WEB-INF/lib</path-in-war>
-                </library>
-                <library dirs="200">
                     <file>${file.reference.collections-0.1.4.jar}</file>
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
@@ -179,10 +175,14 @@
                     <file>${file.reference.xerces.jar}</file>
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
+                <library dirs="200">
+                    <file>${file.reference.json-20090211.jar}</file>
+                    <path-in-war>WEB-INF/lib</path-in-war>
+                </library>
             </web-module-libraries>
             <web-module-additional-libraries/>
             <source-roots>
-                <root id="src.java.dir" name="Source Packages"/>
+                <root id="src.java.dir"/>
             </source-roots>
             <test-roots>
                 <root id="test.src.dir"/>

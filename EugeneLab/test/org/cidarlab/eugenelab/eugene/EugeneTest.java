@@ -27,9 +27,9 @@ public class EugeneTest {
     public static void main(String[] args)
             throws Exception {
         //new EugeneTest().testInverters();
-        //new EugeneTest().testNORGates();
+        new EugeneTest().testNORGates();
         //new EugeneTest().testInvertaseNOR();
-        new EugeneTest().testNiF();
+        //new EugeneTest().testNiF();
         System.exit(0);
     }
 
