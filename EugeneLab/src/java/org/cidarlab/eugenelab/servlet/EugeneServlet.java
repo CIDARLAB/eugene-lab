@@ -51,6 +51,7 @@ import org.biojava.bio.seq.SequenceIterator;
 import org.biojava.bio.seq.io.SeqIOTools;
 
 import org.cidarlab.eugene.builder.EugeneBuilder;
+import org.cidarlab.eugene.dom.collection.EugeneCollection;
 
 import org.cidarlab.weyekin.WeyekinPoster;
 import org.json.JSONArray;
@@ -255,8 +256,8 @@ public class EugeneServlet extends HttpServlet {
                         eugeneConversion = convertSBOL(fileName);
                         if(eugeneConversion instanceof Component) {
                             //result = EugeneJSON.toJSON((Component)eugeneConversion); //@TODO: Get Example file
-                        } else if(eugeneConversion instanceof Collection) {
-                            List<Device> deviceList = ((Collection) eugeneConversion).getDevices();
+                        } else if(eugeneConversion instanceof EugeneCollection) {
+                            Set<Device> deviceList = ((EugeneCollection) eugeneConversion).getDevices();
                             JSONArray resultsArray = new JSONArray();
                             for(Device d: deviceList) {
                                 resultsArray.put(EugeneJSON.toJSON(d));
