@@ -208,5 +208,4 @@ Rule validInverter(
 );
 
 Device[] lstInverters = product(Inverter, strict);
-println(lstInverters.size);
 save(lstInverters);

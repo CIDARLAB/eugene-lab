@@ -537,11 +537,6 @@ public TreeAdaptor getTreeAdaptor() {
 
     public void cleanUp(int nExitCode) {
         this.cleanUpNoExit();
-        
-        Runtime.getRuntime().halt(nExitCode);
-
-        // and exit
-        //System.exit(nExitCode);
     }
 
     public void cleanUpNoExit() {

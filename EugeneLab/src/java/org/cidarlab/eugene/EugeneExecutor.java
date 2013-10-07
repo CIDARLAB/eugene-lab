@@ -40,6 +40,7 @@ import org.cidarlab.eugene.data.pigeon.Pigeon;
 import org.cidarlab.eugene.dom.SavableElement;
 import org.cidarlab.eugene.dom.arrays.DeviceArray;
 import org.cidarlab.eugene.dom.components.Device;
+import org.cidarlab.eugene.exception.EugeneException;
 import org.cidarlab.eugene.output.ResultSet;
 import org.cidarlab.eugene.parser.EugeneLexer;
 import org.cidarlab.eugene.parser.EugeneParser;
@@ -62,8 +63,8 @@ public class EugeneExecutor {
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
 
 		EugeneParser parser = new EugeneParser(tokens);
-		parser.initSymbolTables();
-		parser.prog();
+                parser.initSymbolTables();
+                parser.prog();
 
 		Object results = null;
 		if (nReturn == 1 || nReturn == 2) {
