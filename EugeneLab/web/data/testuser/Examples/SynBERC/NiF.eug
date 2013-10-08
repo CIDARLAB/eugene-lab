@@ -10,8 +10,8 @@ Part Gene(Name, Pigeon);
 // PARTS library begin
 // Put your parts here
 
-PromoterInternal iP0("iP0", "s P0 14");
-TerminatorInternal iT0("iT0", "s T0 14");
+PromoterInternal iP0("iP0", "s P0 13");
+TerminatorInternal iT0("iT0", "s T0 13");
 PromoterInternal iP1("iP1", "s P1 1");
 PromoterInternal iP2("iP2", "s P2 3");
 PromoterInternal iP3("iP3", "s P3 5");

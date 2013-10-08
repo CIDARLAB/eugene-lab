@@ -33,6 +33,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Random;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -517,6 +518,79 @@ public class EugeneServlet extends HttpServlet {
     }
     **/
     
+
+    private static String getRandomSequence(){
+        StringBuilder sb = new StringBuilder();
+        Random random = new Random();
+        for (int i = 0; i < 50; i++){
+            switch(random.nextInt(4)){
+                case 0:
+                    sb.append("A");
+                    break;
+                case 1:
+                    sb.append("T");
+                    break;
+                case 2:
+                    sb.append("C");
+                    break;
+                case 3:
+                    sb.append("G");
+                    break;
+            }
+        }
+        return sb.toString();
+    }
+    
+    public static JSONObject toJSON(Device objDevice)
+            throws Exception {
+        String NEWLINE = System.getProperty("line.separator");
+        StringBuilder sbPigeon = new StringBuilder();
+        StringBuilder sbPigeonArcs = new StringBuilder();
+
+        sbPigeonArcs.append("# Arcs").append(NEWLINE);
+
+        JSONObject deviceJSON = new JSONObject();
+        deviceJSON.put("name", objDevice.getName());
+        deviceJSON.put("schema", "CompositePart");
+        deviceJSON.put("type", "composite");
+        List<Component> lstComponents = objDevice.getAllComponents();
+        List<JSONObject> lstComponentsJSON = new ArrayList<JSONObject>();
+
+        for (Component component : lstComponents) {
+            JSONObject componentJSON = new JSONObject();
+            componentJSON.put("name", component.getName());
+            componentJSON.put("schema", "BasicPart");
+            if (component instanceof Device) {
+                componentJSON = toJSON((Device) component);
+            } else if (component instanceof PartType) {
+                //componentJSON.put("name", lstComponents)
+            } else if (component instanceof Part) {
+                Part objPart = (Part) component;
+                List<JSONObject> lstPropertyValuesJSON = new ArrayList<JSONObject>();
+                componentJSON.put("Pigeon", objPart.get("Pigeon"));
+                sbPigeon.append(objPart.get("Pigeon")).append(NEWLINE);
+                if (objPart.get("Sequence")!= null) componentJSON.put("sequence", objPart.get("Sequence").toString().replaceAll("\n", ""));
+                //XXX: this is a tremendous atrocity against science
+                // aka it is a hack for a demo video
+                else componentJSON.put("sequence", getRandomSequence());
+                componentJSON.put("type", objPart.getPartType().getName());
+                if (null != objPart.get("Represses")) {
+                    sbPigeonArcs.append(objPart.getName())
+                            .append(" rep ")
+                            .append(objPart.get("Represses"))
+                            .append(NEWLINE);
+                }
+            }
+            lstComponentsJSON.add(componentJSON);
+        }
+        deviceJSON.put("components", lstComponentsJSON);
+
+        String sPigeon = sbPigeon.toString() + sbPigeonArcs.toString();
+        deviceJSON.put("Pigeon", sPigeon);
+
+        return deviceJSON;
+    }
+
     // Takes an SBOL file and converts it into a eugene device
     private NamedElement convertSBOL(String sbolFileName) throws Exception {
         return SBOLImporter.importSBOL(sbolFileName);
