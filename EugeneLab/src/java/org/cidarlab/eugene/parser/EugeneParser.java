@@ -532,7 +532,7 @@ public TreeAdaptor getTreeAdaptor() {
     }
 
     public void initSymbolTables() {
-        SymbolTables.init();
+            SymbolTables.init();
     }
 
     public void cleanUp(int nExitCode) {

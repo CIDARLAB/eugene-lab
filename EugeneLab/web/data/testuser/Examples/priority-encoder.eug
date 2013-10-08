@@ -6,12 +6,12 @@ Property PartsRegistryName(txt);
 Property Pigeon(txt);
 
 /** PART TYPES ***/
-Part InduciblePromoter(Name, Sequence, PartsRegistryName, Pigeon);
-Part RepressiblePromoter(Name, Sequence, PartsRegistryName, Pigeon);
-Part RBS (Name, Sequence, PartsRegistryName, Pigeon);
-Part Repressor(Name, Sequence, PartsRegistryName, Pigeon);
-Part Terminator(Name, Sequence, PartsRegistryName, Pigeon);
-Part Reporter(Name, Sequence, PartsRegistryName, Pigeon);
+PartType InduciblePromoter(Name, Sequence, PartsRegistryName, Pigeon);
+PartType RepressiblePromoter(Name, Sequence, PartsRegistryName, Pigeon);
+PartType RBS (Name, Sequence, PartsRegistryName, Pigeon);
+PartType Repressor(Name, Sequence, PartsRegistryName, Pigeon);
+PartType Terminator(Name, Sequence, PartsRegistryName, Pigeon);
+PartType Reporter(Name, Sequence, PartsRegistryName, Pigeon);
 
 
 //***************************
@@ -211,7 +211,10 @@ accttcgggtgggcctttctgcgtttata",
 "BBa_B0015",
 "t B0015 14");
 
-/** ABSTRACT DEVICES **/
+/*
+ * DEVICE SPECIFICATIONS
+ */
+
 /* An InducibleCassette receives the input signals and starts with two inducible promoters */
 Device InducibleCassette (InduciblePromoter, InduciblePromoter, RBS, Repressor, Terminator);
 
@@ -235,9 +238,6 @@ Device Out1 (InducibleCassette, RepressibleTU, ReportingCassette);
 Device Out0 (MixedCassette, InducibleCassette, RepressibleCassette, ReportingCassette);
 
 Device PriorityEncoder(Out1, Out0);
-
-//lstAll = product(PriorityEncoder);
-//println(lstAll.size);
 
 // let's define some rules
 Rule r(

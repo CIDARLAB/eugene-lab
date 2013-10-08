@@ -1,11 +1,11 @@
 Property Name(txt);
 Property Pigeon(txt);
 
-Part PromoterInternal(Name, Pigeon);
-Part TerminatorInternal(Name, Pigeon);
-Part Promoter(Name, Pigeon);
-Part Terminator(Name, Pigeon);
-Part Gene(Name, Pigeon);
+PartType PromoterInternal(Name, Pigeon);
+PartType TerminatorInternal(Name, Pigeon);
+PartType Promoter(Name, Pigeon);
+PartType Terminator(Name, Pigeon);
+PartType Gene(Name, Pigeon);
 
 // PARTS library begin
 // Put your parts here
@@ -74,7 +74,7 @@ function buildDevicesRecursively(Device d, num k) {
       d.add(lst[i]);
 
       // check if the current device has 5 genes
-      Rule r(ON d: Gene EXACTLY 5 );            
+      Rule r(ON d: Gene EXACTLY 5);            
       if(r) {
         createValidDevices(d);
       }

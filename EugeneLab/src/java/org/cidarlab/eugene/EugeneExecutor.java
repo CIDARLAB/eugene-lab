@@ -35,6 +35,7 @@ import java.util.logging.LogManager;
 import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
+import org.cidarlab.eugene.cache.SymbolTables;
 import org.cidarlab.eugene.data.pigeon.Pigeon;
 import org.cidarlab.eugene.dom.SavableElement;
 import org.cidarlab.eugene.dom.arrays.DeviceArray;
@@ -44,6 +45,7 @@ import org.cidarlab.eugene.exception.EugeneException;
 import org.cidarlab.eugene.output.ResultSet;
 import org.cidarlab.eugene.parser.EugeneLexer;
 import org.cidarlab.eugene.parser.EugeneParser;
+import org.cidarlab.eugene.stats.EugeneStats;
 import org.cidarlab.eugene.util.EugeneUtil;
 import org.cidarlab.eugenelab.servlet.EugeneServlet;
 import org.json.JSONArray;
@@ -52,11 +54,18 @@ import org.json.JSONObject;
 
 public class EugeneExecutor {
 
+    private String sessionId;
+    public EugeneExecutor(String sessionId) {
+        
+        this.sessionId = sessionId;
+        
+    }
+    
 	// nOutput indicates how the devices should be printed
 	// nReturn == 0 -> no return (default)
 	// nReturn == 1 -> Strings
 	// nReturn == 2 -> Eugene Components
-	public static Object execute(String sScript, int nReturn)
+	public Object execute(String sScript, int nReturn)
 			throws RecognitionException {
 
 		LogManager.getLogManager().reset();
@@ -64,7 +73,16 @@ public class EugeneExecutor {
 		EugeneLexer lexer = new EugeneLexer(new ANTLRStringStream(sScript));
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
 
+                EugeneStats stats = new EugeneStats();
+                
+                /*
+                 * here, we need to setup the database 
+                 * with the given session id
+                 */
+                //SymbolTables st = new SymbolTables(sessionId);
+                
 		EugeneParser parser = new EugeneParser(tokens);
+                // 10/08/2013 -- moved to EugeneServlet.config
                 parser.initSymbolTables();
                 parser.prog();
 
@@ -126,20 +144,29 @@ public class EugeneExecutor {
 			}			
 		}
 
-		// clean up the symbol tables
-		parser.cleanUpNoExit();
+		/*
+                 * finally, we clean up the symbol tables
+                 */ 
+                parser.cleanUpNoExit();
+                //st.cleanUp();
 
+                /*
+                 * for the time being, we just print the stats
+                 * onto the console
+                 */
+                stats.printStats();
+                
 		return results;
 	}
 
-	// nReturn == 0 -> no return
-	// nReturn == 1 -> return components as Strings
-	// nReturn == 2 -> return components in a hash map
-	public static Object execute(File fScript, int nReturn)
-			throws RecognitionException, IOException {
-		// read the file's content
-		return EugeneExecutor.execute(
-				EugeneUtil.readFile(fScript), 
-				nReturn);
-	}
+//	// nReturn == 0 -> no return
+//	// nReturn == 1 -> return components as Strings
+//	// nReturn == 2 -> return components in a hash map
+//	public static Object execute(File fScript, int nReturn)
+//			throws RecognitionException, IOException {
+//		// read the file's content
+//		return EugeneExecutor.execute(
+//				EugeneUtil.readFile(fScript), 
+//				nReturn);
+//	}
 }

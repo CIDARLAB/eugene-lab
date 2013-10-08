@@ -53,7 +53,9 @@ import org.biojava.bio.seq.SequenceIterator;
 import org.biojava.bio.seq.io.SeqIOTools;
 
 import org.cidarlab.eugene.builder.EugeneBuilder;
+import org.cidarlab.eugene.cache.SymbolTables;
 import org.cidarlab.eugene.dom.collection.EugeneCollection;
+import org.cidarlab.eugene.stats.EugeneStats;
 
 import org.cidarlab.weyekin.WeyekinPoster;
 import org.json.JSONArray;
@@ -71,6 +73,8 @@ public class EugeneServlet extends HttpServlet {
             throws ServletException {
 
         super.init();
+        
+        
         //this.clotho = ClothoFactory.getAPI("ws://localhost:8080/websocket");
     }
 
@@ -97,7 +101,7 @@ public class EugeneServlet extends HttpServlet {
                 out.write(readImageFiles());
             } else if (command.equals("run")) {
                 String devices = request.getParameter("devices");
-                String toReturn = run(devices);
+                String toReturn = run(request.getSession().getId(), devices);
                 toReturn = "{\"response\":\"response\"}";
                 out.write(toReturn);
             } else if (command.equals("read")) {
@@ -196,7 +200,11 @@ public class EugeneServlet extends HttpServlet {
     }
     // </editor-fold>
 
-    protected void processPostRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    protected void processPostRequest(HttpServletRequest request, HttpServletResponse response) 
+               throws IOException {
+        
+        System.out.println("[EugeneServlet.processPostRequest] sessionId -> "+request.getSession().getId());
+        
         if (ServletFileUpload.isMultipartContent(request)) {
             try {
                 ServletFileUpload uploadHandler = new ServletFileUpload(new DiskFileItemFactory());
@@ -239,7 +247,9 @@ public class EugeneServlet extends HttpServlet {
                 String command = request.getParameter("command");
                 if (command.equals("execute")) {
                     String input = request.getParameter("input");
-                    JSONObject result = executeEugene(input);
+                    JSONObject result = executeEugene(
+                            request.getSession().getId(), 
+                            input);
                     out.write(result.toString());
                 } else if (command.equals("saveFileContent")) {
                     String fileName = request.getParameter("fileName");
@@ -307,13 +317,15 @@ public class EugeneServlet extends HttpServlet {
         }
     }
 
-    private String run(String devices) throws RecognitionException {
+    private String run(String sessionId, String devices) 
+            throws RecognitionException {
+        
         System.out.println(devices);
         String[] deviceArray = devices.split("\\|");
         for (int i = 0; i < deviceArray.length; i++) {
             System.out.println(deviceArray[i]);
         }
-        String[] results = (String[]) EugeneExecutor.execute("eugeneString", 1);
+        String[] results = (String[]) new EugeneExecutor(sessionId).execute("eugeneString", 1);
         return null;
     }
 
@@ -341,18 +353,29 @@ public class EugeneServlet extends HttpServlet {
         return toReturn;
     }
 
-    public JSONObject executeEugene(String input) {
+    public JSONObject executeEugene(String sessionId, String input) {
 
         JSONObject returnJSON = new JSONObject();
         try {
-            Set<JSONObject> results = (HashSet<JSONObject>) EugeneExecutor.execute(input, 3);
+            
+            EugeneExecutor ee = new EugeneExecutor(sessionId);
+            Set<JSONObject> results = (HashSet<JSONObject>) ee.execute(input, 3);
+            
             List<JSONObject> lstUriJSON = new ArrayList<JSONObject>();
             if (null != results && !results.isEmpty()) {
                 lstUriJSON.addAll(results);
             }
+            
             returnJSON.put("results", lstUriJSON);
             returnJSON.put("status", "good");
 
+            
+            /*
+             * after every Eugene run, 
+             * 1. we clear the symbol tables
+             */
+//            SymbolTables.cleanUp();
+            
         } catch (Exception e) {
             e.printStackTrace();
             try {
