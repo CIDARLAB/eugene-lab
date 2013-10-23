@@ -82,6 +82,11 @@ public class EugeneConstants {
 
 	public static final String SEQUENCE_PROPERTY = "Sequence";
 	public static final String SBOL_PART_TYPE = "SBOLPartType";
+	public static final String DISPLAY_ID_PROPERTY = "displayId";
+	public static final String URI_PROPERTY = "URI";
+	public static final String NAME_PROPERTY = "Name";
+	public static final String DESCRIPTION_PROPERTY = "Description";
+	public static final String TYPE_PROPERTY = "Type";
 
 	public static final String VARIABLE = "Variable";
 	public static final String RULE = "Rule";

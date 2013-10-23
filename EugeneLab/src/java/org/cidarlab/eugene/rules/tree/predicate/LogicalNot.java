@@ -68,6 +68,11 @@ public class LogicalNot
 	public boolean evaluate(long[] l) 
 			throws EugeneException {
 		boolean b = this.getPredicate().evaluate(l);
+//		if(!b) {
+//			System.err.println("[Not] everything's ok again...");
+//		} else {
+//			System.err.println("[Not] everything's broken...");
+//		}
 		return !b;
 	}
 	
@@ -86,9 +91,7 @@ public class LogicalNot
 	@Override
 	public boolean evaluate(Device device) 
 			throws EugeneException {
-            boolean b = this.getPredicate().evaluate(device);
-            System.out.println("[LogicalNot.evaluate] -> "+device+" -> "+b);
-            return !b;
+		return !this.getPredicate().evaluate(device);
 	}
 
 	@Override

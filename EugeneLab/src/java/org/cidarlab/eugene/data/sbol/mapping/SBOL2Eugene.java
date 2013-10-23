@@ -37,12 +37,15 @@ import org.cidarlab.eugene.constants.EugeneConstants;
 import org.cidarlab.eugene.dom.NamedElement;
 import org.cidarlab.eugene.dom.PropertyValue;
 import org.cidarlab.eugene.dom.collection.CollectionElement;
+import org.cidarlab.eugene.dom.components.Device;
+import org.cidarlab.eugene.dom.components.Part;
 import org.cidarlab.eugene.dom.components.Property;
 import org.cidarlab.eugene.dom.components.types.PartType;
 import org.cidarlab.eugene.exception.EugeneException;
 import org.sbolstandard.core.DnaComponent;
 import org.sbolstandard.core.SBOLRootObject;
 import org.sbolstandard.core.SequenceAnnotation;
+import org.sbolstandard.core.StrandType;
 import org.sbolstandard.core.util.SequenceOntology;
 
 
@@ -59,15 +62,15 @@ public class SBOL2Eugene {
 
 		if (null != sbolComponent) {
 			if (sbolComponent instanceof org.sbolstandard.core.impl.CollectionImpl) {
-				org.sbolstandard.core.impl.CollectionImpl sbolCollection = (org.sbolstandard.core.impl.CollectionImpl) sbolComponent;
+				org.sbolstandard.core.impl.CollectionImpl sbolCollection = 
+						(org.sbolstandard.core.impl.CollectionImpl) sbolComponent;
 
 				Set<CollectionElement> setCollectionElements = new HashSet<CollectionElement>();
 				for (DnaComponent dc : sbolCollection.getComponents()) {
+
 					NamedElement objElement = SBOL2Eugene.convert(dc);
-					if (null != objElement
-							&& objElement instanceof CollectionElement) {
-						setCollectionElements
-								.add((CollectionElement) objElement);
+					if (null != objElement && objElement instanceof CollectionElement) {
+						setCollectionElements.add((CollectionElement) objElement);
 					}
 				}
 
@@ -75,108 +78,30 @@ public class SBOL2Eugene {
 						sbolCollection.getDisplayId(), setCollectionElements);
 			} else if (sbolComponent instanceof org.sbolstandard.core.impl.DnaComponentImpl) {
 				org.sbolstandard.core.impl.DnaComponentImpl sbolDC = (org.sbolstandard.core.impl.DnaComponentImpl) sbolComponent;
+
 				if (null != sbolDC.getAnnotations()
 						&& !sbolDC.getAnnotations().isEmpty()) {
-					// if the SBOL component does have annotations, then it is a
-					// device
-
-					List<org.cidarlab.eugene.dom.components.Component> lstDeviceElements = new ArrayList<org.cidarlab.eugene.dom.components.Component>(
-							sbolDC.getAnnotations().size());
-
-					// for a device, we have to iterate over all sequence
-					// annotations and
-					// convert each annotated DNA component
-					for (SequenceAnnotation sa : sbolDC.getAnnotations()) {
-						NamedElement objElement = SBOL2Eugene.convert(sa
-								.getSubComponent());
-						if (null != objElement
-								&& objElement instanceof org.cidarlab.eugene.dom.components.Component) {
-							lstDeviceElements
-									.add((org.cidarlab.eugene.dom.components.Component) objElement);
-						}
-					}
-					return EugeneBuilder.buildDevice(sbolDC.getDisplayId(),
-							lstDeviceElements, (char[])null);
+					
+					/*
+					 * SBOL composite DNAComponent -> Eugene Device
+					 */
+					return buildDevice(sbolDC);
+					
 				} else {
-					// if the SBOL component does not have any annotations, then
-					// check if
-					// the SBOL component has a DNA sequence
-					if (null != sbolDC.getDnaSequence()) {
-						// if yes -> the SBOL component is a part
-
-						// check if a SEQUENCE property exists already
-						NamedElement objTmp = SymbolTables
-								.get(EugeneConstants.SEQUENCE_PROPERTY);
-						Property objSequenceProperty = (Property) null;
-						if (null != objTmp && objTmp instanceof Property) {
-							objSequenceProperty = (Property) objTmp;
-						} else {
-							// if not, then create one and put it into the
-							// symbol tables
-							objSequenceProperty = EugeneBuilder.buildProperty(
-									EugeneConstants.SEQUENCE_PROPERTY,
-									EugeneConstants.TXT);
-
-							SymbolTables.put(objSequenceProperty);
-						}
-
-						// build a sequence property
-						PropertyValue objSequenceValue = EugeneBuilder
-								.buildPropertyValue(
-										EugeneConstants.SEQUENCE_PROPERTY,
-										EugeneBuilder.buildVariable(sbolDC
-												.getDnaSequence()
-												.getNucleotides()));
-						ArrayList<PropertyValue> lstValues = new ArrayList<PropertyValue>(
-								1);
-						lstValues.add(objSequenceValue);
-
-						return EugeneBuilder.buildPart(sbolDC.getDisplayId(),
-								lstValues, (PartType) SymbolTables
-										.get(EugeneConstants.SBOL_PART_TYPE));
+					// if the SBOL component does not have any annotations, then we transform it into a 
+					// Eugene Part
+					if(null != sbolDC.getDnaSequence()) {
+						/*
+						 * SBOL DNAComponent -> Eugene Part
+						 */
+						return buildPart(sbolDC);
 					} else {
-						// if no -> the SBOL component is a part type (with a
-						// Sequence property)
-						List<Property> lstProperties = new ArrayList<Property>(
-								1);
-						lstProperties.add(getSequenceProperty());
-
-						// get the type of the component
-						if (null == sbolDC.getTypes()
-								|| sbolDC.getTypes().isEmpty()) {
-							// if the type is null, then check if the standard
-							// SBOL part type was created already
-							PartType objPartType = (PartType) SymbolTables
-									.get(EugeneConstants.SBOL_PART_TYPE);
-							if (null != objPartType) {
-								return objPartType;
-							}
-
-							// if the standard SBOL part type was not created
-							// already, then create it
-							// and put it into the symbol tables
-							objPartType = EugeneBuilder.buildPartType(
-									EugeneConstants.SBOL_PART_TYPE,
-									lstProperties);
-							SymbolTables.put(objPartType);
-
-							return objPartType;
-						} else {
-							for (URI uri : sbolDC.getTypes()) {
-								// for every part type, create a new Eugene part
-								// type
-								String sSOTerm = uri.getPath();
-								int n = (-1);
-								if ((-1) != (n = sSOTerm.lastIndexOf('/'))) {
-									sSOTerm = sSOTerm.substring(n + 1,
-											sSOTerm.length() - 1);
-								}
-								PartType objPartType = getPartType(uri
-										.toString());
-								return objPartType;
-							}
-						}
+						/*
+						 * SBOL DNAComponent -> Eugene Part Type
+						 */
+						return buildPartType(sbolDC);
 					}
+					
 				}
 			}
 		}
@@ -184,15 +109,168 @@ public class SBOL2Eugene {
 		return (NamedElement) null;
 	}
 
-	private static PartType getPartType(String s) throws EugeneException {
-		String sPartTypeName = soMapping(s);
+	
+	private static Device buildDevice(
+			org.sbolstandard.core.impl.DnaComponentImpl sbolDC)
+		throws EugeneException {
+		
+		// if the SBOL component does have annotations, then we transform it into a 
+		// Eugene Device
+
+		List<org.cidarlab.eugene.dom.components.Component> lstDeviceElements = 
+				new ArrayList<org.cidarlab.eugene.dom.components.Component>(sbolDC.getAnnotations().size());
+
+		// for a device, we have to iterate over all sequence
+		// annotations and
+		// convert each annotated DNA component
+		char[] directions = new char[sbolDC.getAnnotations().size()];
+		int i=0;
+		for (SequenceAnnotation sa : sbolDC.getAnnotations()) {
+			NamedElement objElement = SBOL2Eugene.convert(sa.getSubComponent());
+			if (null != objElement && 
+					objElement instanceof org.cidarlab.eugene.dom.components.Component) {
+				SymbolTables.put(objElement);
+				lstDeviceElements.add((org.cidarlab.eugene.dom.components.Component) objElement);
+			}
+			if(sa.getStrand() == StrandType.NEGATIVE) {
+				directions[i++] = '-';
+			} else {
+				directions[i++] = '+';
+			}
+			
+		}
+		
+		/*
+		 * get the directions
+		 */
+		return EugeneBuilder.buildDevice(sbolDC.getDisplayId(),
+				lstDeviceElements, directions);
+	}
+	
+	private static Part buildPart(
+			org.sbolstandard.core.impl.DnaComponentImpl sbolDC)
+		throws EugeneException {
+
+		
+		/*
+		 * let's get the part type
+		 */
+		PartType pt = getPartType(sbolDC.getTypes().get(0).toString());
+
+		/*
+		 * finally, we set the part's property values
+		 */
+		List<PropertyValue> lstValues = getPartPropertyValues(sbolDC);
+		
+		/*
+		 * next, we create the part
+		 */		
+		Part objPart = EugeneBuilder.buildPart(
+				sbolDC.getDisplayId(), 
+				lstValues, 
+				pt);
+
+		/*
+		 * and store it in the symbol tables
+		 */
+		SymbolTables.put(objPart);
+
+		return objPart;
+	}
+	
+	private static List<PropertyValue> getPartPropertyValues(
+			org.sbolstandard.core.impl.DnaComponentImpl sbolDC)
+					throws EugeneException {
+		
+		List<PropertyValue> lstValues = new ArrayList<PropertyValue>();
+		
+		/*
+		 * displayId
+		 */
+		PropertyValue objDisplayId =
+				EugeneBuilder.buildPropertyValue(
+						EugeneConstants.DISPLAY_ID_PROPERTY,
+						EugeneBuilder.buildVariable(
+								(null!=sbolDC.getDisplayId())?sbolDC.getDisplayId():""));
+		lstValues.add(objDisplayId);
+		
+		/*
+		 * name
+		 */
+		PropertyValue objName =
+				EugeneBuilder.buildPropertyValue(
+						EugeneConstants.NAME_PROPERTY,
+						EugeneBuilder.buildVariable(
+								(null!=sbolDC.getName())?sbolDC.getName():""));
+		lstValues.add(objName);
+		
+		/*
+		 * URI
+		 */
+		PropertyValue objURI = EugeneBuilder
+				.buildPropertyValue(
+						EugeneConstants.URI_PROPERTY,
+						EugeneBuilder.buildVariable(
+								(null!=sbolDC.getURI())?sbolDC.getURI().toString():""));
+		lstValues.add(objURI);
+		
+		/*
+		 * description
+		 */
+		PropertyValue objDescription =
+				EugeneBuilder.buildPropertyValue(
+						EugeneConstants.DESCRIPTION_PROPERTY,
+						EugeneBuilder.buildVariable(
+								(null!=sbolDC.getDescription())?sbolDC.getDescription():""));
+		lstValues.add(objDescription);
+		
+		/*
+		 * SEQUENCE
+		 */
+		PropertyValue objSequenceValue = 
+				EugeneBuilder.buildPropertyValue(
+						EugeneConstants.SEQUENCE_PROPERTY,
+						EugeneBuilder.buildVariable(
+								(sbolDC.getDnaSequence()!=null)?sbolDC.getDnaSequence().getNucleotides():""));
+		lstValues.add(objSequenceValue);
+		
+		return lstValues;
+	}
+	
+	private static PartType buildPartType(
+			org.sbolstandard.core.impl.DnaComponentImpl sbolDC)
+					throws EugeneException {
+		PartType pt = getPartType(sbolDC.getTypes());
+		if(null != pt) {
+			SymbolTables.put(pt);
+		}
+		return pt;
+	}
+	
+	private static PartType getPartType(List<URI> types) 
+		throws EugeneException {
+		
+		PartType pt = getPartType(types.get(0).toString());
+		if(null != pt) {
+			return pt;
+		}
+		
+		/*
+		 * we need to create the part type
+		 */
+		return getPartType(types.get(0).toString());
+	}
+	
+	private static PartType getPartType(String type) throws EugeneException {
+		String sPartTypeName = soMapping(type);
 
 		PartType objPartType = (PartType) null;
 		NamedElement objTmp = SymbolTables.get(sPartTypeName);
 		if (null != objTmp && objTmp instanceof PartType) {
-			objPartType = (PartType) objTmp;
+			return (PartType) objTmp;
 		} else {
-			objPartType = EugeneBuilder.buildPartType(sPartTypeName,
+			objPartType = EugeneBuilder.buildPartType(
+					sPartTypeName,
 					lstProperties);
 			SymbolTables.put(objPartType);
 		}
@@ -200,10 +278,13 @@ public class SBOL2Eugene {
 	}
 
 	private static String soMapping(String s) {
+//		System.out.println("[soMapping] -> "+SequenceOntology.type(s));
 		if (SequenceOntology.FIVE_PRIME_UTR.toString().equals(s)) {
 			return "Five_Prime_UTR";
 		} else if (SequenceOntology.CDS.toString().equals(s)) {
 			return "CDS";
+		} else if("http://purl.obolibrary.org/obo/SO_0000139".equals(s)) {
+			return "RBS";
 		} else if (SequenceOntology.INSULATOR.toString().equals(s)) {
 			return "Insulator";
 		} else if (SequenceOntology.OPERATOR.toString().equals(s)) {
@@ -219,7 +300,12 @@ public class SBOL2Eugene {
 			return "Restriction_Enzyme_Recognition_Site";
 		} else if (SequenceOntology.TERMINATOR.toString().equals(s)) {
 			return "Terminator";
+		} else if("Promoter".equals(s)) {
+			return "Promoter";
+		} else if("CDS".equals(s)) {
+			return "CDS";
 		}
+		//System.out.println(s);
 		return EugeneConstants.SBOL_PART_TYPE;
 	}
 
@@ -234,22 +320,69 @@ public class SBOL2Eugene {
 		in.close();
 	}
 
+	
 	private static void createSBOLProperties() throws EugeneException {
 		if (null == lstProperties) {
+			
 			lstProperties = new ArrayList<Property>(6);
-			lstProperties.add(EugeneBuilder.buildProperty("URI", "txt"));
-			lstProperties.add(EugeneBuilder.buildProperty("displayId", "txt"));
-			lstProperties.add(EugeneBuilder.buildProperty("name", "txt"));
-			lstProperties
-					.add(EugeneBuilder.buildProperty("description", "txt"));
-			lstProperties.add(EugeneBuilder.buildProperty("type", "txt[]"));
-			lstProperties.add(EugeneBuilder.buildProperty(
-					EugeneConstants.SEQUENCE_PROPERTY, "txt"));
+			
+			/*
+			 * URI
+			 */
+			lstProperties.add(
+					EugeneBuilder.buildProperty(
+							EugeneConstants.URI_PROPERTY, 
+							EugeneConstants.TXT));
+			
+			/*
+			 * displayId
+			 */
+			lstProperties.add(
+					EugeneBuilder.buildProperty(
+							EugeneConstants.DISPLAY_ID_PROPERTY, 
+							EugeneConstants.TXT));
+			
+			/*
+			 * name
+			 */
+			lstProperties.add(
+					EugeneBuilder.buildProperty(
+							EugeneConstants.NAME_PROPERTY, 
+							EugeneConstants.TXT));
+			
+			/*
+			 * description
+			 */
+			lstProperties.add(
+					EugeneBuilder.buildProperty(
+							EugeneConstants.DESCRIPTION_PROPERTY, 
+							EugeneConstants.TXT));
+			
+			/*
+			 * type(s) 
+			 */
+			lstProperties.add(
+					EugeneBuilder.buildProperty(
+							EugeneConstants.TYPE_PROPERTY, 
+							EugeneConstants.TXTLIST));
+			
+			/*
+			 * Sequence
+			 */
+			lstProperties.add(
+					EugeneBuilder.buildProperty(
+							EugeneConstants.SEQUENCE_PROPERTY, 
+							EugeneConstants.TXT));
+			
+			/*
+			 * put the properties into the symbol tables
+			 */
 			for (Property objProperty : lstProperties) {
 				if (!SymbolTables.contains(objProperty.getName())) {
 					SymbolTables.put(objProperty);
 				}
 			}
+			
 		}
 	}
 

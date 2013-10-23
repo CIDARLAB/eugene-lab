@@ -23,6 +23,7 @@ ENHANCEMENTS, OR MODIFICATIONS.
 package org.cidarlab.eugene.dom.components;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -97,6 +98,7 @@ public class Device extends Component {
 			List<Property> lstProperties,
 			char[] directions) {
 		super(sName, lstProperties);
+
 		this.lstComponents = lstComponents;
 		this.directions = ArrayUtils.clone(directions);
 //		this.component_ids = null;
@@ -270,7 +272,13 @@ public class Device extends Component {
 						sb.append("-");
 					}
 				}
-				sb.append(c.getName()).append(", ");
+				
+				if(c instanceof Device) {
+					sb.append(c.toString());
+				} else {
+					sb.append(c.getName());
+				}
+				sb.append(", ");
 			}
 			if(!this.getComponents().isEmpty()) {
 				sb.deleteCharAt(sb.toString().length()-2);
@@ -299,29 +307,20 @@ public class Device extends Component {
 
 		StringBuilder sb = new StringBuilder();
 		if (null != this.lstComponents && !this.lstComponents.isEmpty()) {
-			Iterator<Component> it = this.lstComponents.iterator();
-			while (it.hasNext()) {
-				Component objComponent = it.next();
-
-				if (objComponent instanceof Device) {
-					Device d = (Device) objComponent;
-					sb.append(d.toSequence());
-				} else if (objComponent instanceof PartType) {
-					PartType p = (PartType) objComponent;
-					sb.append("<").append(p.getName()).append(">");
-				} else if (objComponent instanceof Part) {
-					Part pi = (Part) objComponent;
-					String sSequence = pi.toSequence();
-					if (null != sSequence) {
-						sb.append(sSequence);
-						
-						/**
-						throw new EugeneException("Part Instance "
-								+ pi.getName()
-								+ " does not have a DNA sequence!");
-						**/
-					}
-				}
+			for(Component component : this.lstComponents) {
+				sb.append(component.toSequence());
+//				if (component instanceof Device) {
+//					sb.append(((Device)component).toSequence());
+//				} else if (objComponent instanceof PartType) {
+//					PartType p = (PartType) objComponent;
+//					sb.append("<").append(p.getName()).append(">");
+//				} else if (objComponent instanceof Part) {
+//					Part pi = (Part) objComponent;
+//					String sSequence = pi.toSequence();
+//					if (null != sSequence) {
+//						sb.append(sSequence);
+//					}
+//				}
 			}
 		}
 		return sb.toString();
@@ -506,14 +505,49 @@ public class Device extends Component {
 	@Override
 	public void set(int idx, NamedElement objElement)
 			throws EugeneException {
-		if (objElement instanceof Component && idx >= 0
-				&& idx < this.lstComponents.size()) {
+		if (objElement instanceof Component && idx >= 0 && idx < this.lstComponents.size()) {
 			Component objComponent = this.lstComponents.get(idx);
 			objComponent.assign(objElement);
 		} else {
 			throw new EugeneException("Cannot assign the "
 					+ objElement + " element to the " + (idx + 1)
 					+ " component of the " + this.getName() + " Device");
+		}
+	}
+
+	/*
+	 * GO LEAFS GO
+	 */
+
+	public void setLeaf(int idx, Component newComponent) 
+			throws EugeneException {
+		try { 
+			replaceComponent(idx, newComponent, 0);
+		} catch(Exception e) {
+			e.printStackTrace();
+			throw new EugeneException(e.toString());
+		}
+	}
+	
+	public void replace(int idx, Component component) {
+		this.lstComponents.set(idx, component);
+	}
+	
+	public void replaceComponent(int idx, Component newComponent, int nCurrentIdx) 
+			throws EugeneException {
+		int i=0;
+		for(Component component : this.getComponents()) {
+			if(component instanceof Device) {
+				((Device)component).replaceComponent(idx, newComponent, nCurrentIdx);
+				nCurrentIdx += ((Device)component).getAllComponents().size();
+			} else {
+				if(nCurrentIdx == idx) {
+					this.lstComponents.set(i, newComponent);
+				}
+				//System.out.print(nCurrentIdx+": "+component.getName()+", ");
+				nCurrentIdx++;				
+			}
+			i++;			
 		}
 	}
 
@@ -648,6 +682,41 @@ public class Device extends Component {
 			}
 		}
 		return nMaxDepth+1;
+	}
+	
+	public void reverseComponents() {
+		if(null != this.lstComponents && !this.lstComponents.isEmpty()) {
+
+			for(int i=0; i<lstComponents.size()/2; i++) {
+				if(lstComponents.get(i) instanceof Device) {
+					((Device)lstComponents.get(i)).reverseComponents();
+				}
+				
+				if(lstComponents.get(lstComponents.size()-1-i) instanceof Device) {
+					((Device)lstComponents.get(i)).reverseComponents();
+				}
+
+				/* set the directions */
+				this.directions[i] = '-';
+				this.directions[lstComponents.size()-1-i] = '-';
+				
+				Component tmpComponent = lstComponents.get(i);
+				lstComponents.set(i, this.lstComponents.get(this.lstComponents.size()-i-1));
+				this.lstComponents.set(this.lstComponents.size()-i-1, tmpComponent);
+			}
+			
+			/*
+			 * finally, we need to change the direction of the middle component
+			 * (in case of an odd number of components)
+			 */
+			if(lstComponents.size() % 2 != 0) {
+				if(this.lstComponents.get(this.lstComponents.size()/2) instanceof Device) {
+					((Device)this.lstComponents.get(this.lstComponents.size()/2)).reverseComponents();
+				}
+				this.directions[this.lstComponents.size()/2] = '-';
+			}
+
+		}
 	}
 
 }

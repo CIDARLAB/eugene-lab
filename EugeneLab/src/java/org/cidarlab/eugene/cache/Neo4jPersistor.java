@@ -18,9 +18,11 @@ import java.util.Set;
 import java.util.logging.LogManager;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.cidarlab.eugene.builder.EugeneBuilder;
 import org.cidarlab.eugene.constants.EugeneConstants;
 import org.cidarlab.eugene.dom.PropertyValue;
 import org.cidarlab.eugene.dom.arrays.DeviceArray;
+import org.cidarlab.eugene.dom.arrays.GeneratedDeviceArray;
 import org.cidarlab.eugene.dom.components.Component;
 import org.cidarlab.eugene.dom.components.Device;
 import org.cidarlab.eugene.dom.components.Part;
@@ -281,6 +283,9 @@ public class Neo4jPersistor {
     /****    CARTESIAN PRODUCT    ****/
     /*********************************/
 
+    private static long POSSIBLE_DEVICES;
+    private static double PROCESSING_TIME;
+    
     public DeviceArray product(Device device, List<Rule> lstRules, int N) {
 
     	/*** STEP 1: FIGURE OUT THE ALLOWED POSITIONS OF EACH PART ***/
@@ -304,7 +309,7 @@ public class Neo4jPersistor {
     	/*
     	 * for testing: print the store's information
     	 */
-    	//store.print();
+//    	store.print();
     	
     	/*
     	 * now, let's solve the problem
@@ -315,14 +320,25 @@ public class Neo4jPersistor {
     	/*
     	 * finally, we return the solutions
     	 */
-		return new DeviceArray(
-				device,
-				solutions);
+
+		DeviceArray dArray = EugeneBuilder.buildDeviceArray(
+								device,
+								solutions);
+    	/*
+    	 * print the stats
+    	 */
+    	System.out.println("POSSIBLE DEVICES: "+POSSIBLE_DEVICES);
+    	System.out.println("VALID DEVICES: "+dArray.size());
+    	System.out.println("PROCESSING TIME: "+PROCESSING_TIME+" sec");
+
+    	return dArray;
     }
     
     public IntVar[] model(Store store, Device device) {
     	List<Component> lstDeviceComponents = device.getAllComponents();
     	
+    	POSSIBLE_DEVICES = 1;
+
     	IntVar[] variables = new IntVar[lstDeviceComponents.size()];
     	int i=0;
     	for(Component component : lstDeviceComponents) {
@@ -348,6 +364,8 @@ public class Neo4jPersistor {
     					int partId = (int)partIds[k];
 	        			iv.addDom(partId, partId);
     				}
+    				
+    				POSSIBLE_DEVICES *= partIds.length;
     			}
     			
         		variables[i++] = iv;
@@ -363,63 +381,64 @@ public class Neo4jPersistor {
     	return variables;
     }
     
-    public IntVar[] modelPositioning(Store store, Device device) {
-        Map<String, IntVar> map = new HashMap<String, IntVar>();
-        
-    	List<Component> lstDeviceComponents = device.getAllComponents();
-    	
-    	int idx = 0;
-    	for(Component component : lstDeviceComponents) {
-
-			Node node = this.queryNodeByName(component.getName());
-			
-			if(null != node) {
-				
-	    		if(component instanceof PartType) {
-	    			long[] partIds = this.queryParts(node);
-	        		for(int k=0; k<partIds.length; k++) {
-
-	        			String sVariableName = String.valueOf(partIds[k]);
-	        			
-	        			IntVar iv = null;
-	        			if(map.containsKey(sVariableName)) {
-	        				iv = map.get(sVariableName);
-	        				iv.addDom(idx, idx);
-	        				map.remove(sVariableName);
-	        			} else {
-	        				iv = new IntVar(store, sVariableName, idx, idx);
-	        			}
-	        			
-	        			map.put(sVariableName, iv);
-	        		}
-	    		} else if(component instanceof Part) {
-	    					 
-	    			String sVariableName = String.valueOf(node.getId());
-        			
-        			IntVar iv = null;
-        			if(map.containsKey(sVariableName)) {
-        				iv = map.get(sVariableName);
-        				iv.addDom(idx, idx);
-        				map.remove(sVariableName);
-        			} else {
-        				iv = new IntVar(store, sVariableName, idx, idx);
-        			}
-
-	    			map.put(sVariableName, new IntVar(store, sVariableName, idx, idx));
-	    		}
-	    		
-    		}
-    		idx++;
-    	}
-    	
-    	IntVar[] variables = new IntVar[map.size()];
-    	map.values().toArray(variables);
-    	return variables;
-    }
+//    public IntVar[] modelPositioning(Store store, Device device) {
+//        Map<String, IntVar> map = new HashMap<String, IntVar>();
+//        
+//    	List<Component> lstDeviceComponents = device.getAllComponents();
+//    	
+//    	int idx = 0;
+//    	for(Component component : lstDeviceComponents) {
+//
+//			Node node = this.queryNodeByName(component.getName());
+//			
+//			if(null != node) {
+//				
+//	    		if(component instanceof PartType) {
+//	    			long[] partIds = this.queryParts(node);
+//	        		for(int k=0; k<partIds.length; k++) {
+//
+//	        			String sVariableName = String.valueOf(partIds[k]);
+//	        			
+//	        			IntVar iv = null;
+//	        			if(map.containsKey(sVariableName)) {
+//	        				iv = map.get(sVariableName);
+//	        				iv.addDom(idx, idx);
+//	        				map.remove(sVariableName);
+//	        			} else {
+//	        				iv = new IntVar(store, sVariableName, idx, idx);
+//	        			}
+//	        			
+//	        			map.put(sVariableName, iv);
+//	        		}
+//	    		} else if(component instanceof Part) {
+//	    					 
+//	    			String sVariableName = String.valueOf(node.getId());
+//        			
+//        			IntVar iv = null;
+//        			if(map.containsKey(sVariableName)) {
+//        				iv = map.get(sVariableName);
+//        				iv.addDom(idx, idx);
+//        				map.remove(sVariableName);
+//        			} else {
+//        				iv = new IntVar(store, sVariableName, idx, idx);
+//        			}
+//
+//	    			map.put(sVariableName, new IntVar(store, sVariableName, idx, idx));
+//	    		}
+//	    		
+//    		}
+//    		idx++;
+//    	}
+//    	
+//    	IntVar[] variables = new IntVar[map.size()];
+//    	map.values().toArray(variables);
+//    	return variables;
+//    }
     
     public void imposeConstraints(Store store, IntVar[] variables, Device device, List<Rule> rules) {
     	for(Rule rule : rules) {
     		try {
+
 	    		Constraint constraint = rule.getPredicate().toJaCoP(store, variables, device, device.getAllComponents());
 	    		
 	    		if(null != constraint) {
@@ -456,6 +475,7 @@ public class Neo4jPersistor {
 
         // SOLVE
 		try {
+//			store.print();
 			search.labeling(store, select);
 		} catch(Exception e) {
 			e.printStackTrace();
@@ -463,10 +483,12 @@ public class Neo4jPersistor {
 
 		long T2 = System.nanoTime();
 		
-		double nProcessing = (T2 - T1) * Math.pow(10, -9);
+		PROCESSING_TIME = (T2 - T1) * Math.pow(10, -9);
 //		System.out.println("processing time: "+nProcessing+"sec");
-		System.out.println(nProcessing);
+//		System.out.println(nProcessing);
 
+		//search.printAllSolutions();
+		
 		return search.getSolutionListener().getSolutions();
 		
 		/*************************************/
@@ -1267,7 +1289,9 @@ public class Neo4jPersistor {
 
     	Node node = graphDb.createNode();				
 		node.setProperty(EugeneConstants.NODE_NAME, part.getName());
-		node.setProperty("parttype", part.getPartType().getName());
+		if(null != part.getPartType()) {
+			node.setProperty("parttype", part.getPartType().getName());
+		}
 		node.setProperty(EugeneConstants.NODE_TYPE, Part.class.getCanonicalName());
 
 		try {

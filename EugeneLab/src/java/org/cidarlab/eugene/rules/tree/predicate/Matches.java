@@ -119,11 +119,11 @@ public class Matches
 //			System.out.println(lhsIdx+" "+this.getOperator()+" "+rhsIdx);
 			
 			
-			return new XeqY(variables[lhsIdx], variables[rhsIdx]); 
-//			return this.buildConstraint(
-//					variables,
-//					components.get(lhsIdx), lhsIdx, 
-//					components.get(rhsIdx), rhsIdx);
+//			return new XeqY(variables[lhsIdx], variables[rhsIdx]); 
+			return this.buildConstraint(
+					variables,
+					components.get(lhsIdx), lhsIdx, 
+					components.get(rhsIdx), rhsIdx);
 		}
 		
 		return null;	

@@ -47,6 +47,8 @@ import org.cidarlab.eugene.exception.EugeneException;
 import org.cidarlab.eugene.rules.tree.RuleTreeParser;
 import org.cidarlab.eugene.rules.tree.predicate.Predicate;
 
+import JaCoP.core.Domain;
+
 import com.rits.cloning.Cloner;
 
 
@@ -62,14 +64,13 @@ public class EugeneBuilder {
 		return new Property(sName, sType);
 	}
 
-	public static Variable buidVariable(String sName, String sType) {
+	public static Variable buildVariable(String sName, String sType) {
 		return new Variable(sName, sType);
 	}
 
-	public static PropertyValue buildPropertyValue(String sName,
-			Variable objVariable) {
-		PropertyValue objPropertyValue = new PropertyValue(sName,
-				objVariable.getType());
+	public static PropertyValue buildPropertyValue(
+			String sName, Variable objVariable) {
+		PropertyValue objPropertyValue = new PropertyValue(sName, objVariable.getType());
 		objPropertyValue.setValue((Variable) objVariable);
 		return objPropertyValue;
 	}
@@ -86,7 +87,7 @@ public class EugeneBuilder {
 			String sName, List<Component> lstComponents, char[] directions)
 			throws EugeneException {
 		
-//		System.out.println("[EugeneBuilder.buildDevice] -> "+sName+", "+lstComponents);
+//		System.out.println("[EugeneBuilder.buildDevice] -> "+sName+", "+Arrays.toString(directions));
 		
 //		if(null != lstComponents) {
 //			/* here, we iterate over the devices components and start building the device graph */
@@ -136,6 +137,22 @@ public class EugeneBuilder {
 			List<Property> lstProperties, 
 			char[] directions) 
 					throws EugeneException {
+		
+		if(null != directions) {
+			for(int i=0; i<directions.length; i++) {
+				if('-' == directions[i]) {
+					Component component = lstComponents.get(i);
+					
+					/*
+					 * if the current component is a device, 
+					 * then we reverse the device's elements
+					 */
+					if(component instanceof Device) {
+						((Device)component).reverseComponents();
+					}
+				}
+			}
+		}
 		return new Device(sName, lstComponents, lstProperties, directions);		
 	}
 
@@ -232,6 +249,30 @@ public class EugeneBuilder {
 		return new DeviceArray(sName);
 	}
 	
+	/*
+	 * buildDeviceArray ... constructs a device array for Eugene's product/permute functions
+	 * 
+	 * @param device    ... the abstract device that got produced/permuted... 
+	 *                      therefore, we keep the ``hierachy'' information of the devices 
+	 * @param solutions ... solutions that map to the part ids in the database 
+	 *                      according to the devices ``hierarchy'' 
+	 */
+	public static DeviceArray buildDeviceArray(Device device, Domain[][] solutions) {
+		if(null != device && null != solutions) {
+			return new GeneratedDeviceArray(device, solutions);
+		}
+		return null;
+	}
+	
+	public static GeneratedDeviceArray unionDeviceArrays(
+			GeneratedDeviceArray leftElement, GeneratedDeviceArray rightElement) 
+			throws EugeneException {
+		GeneratedDeviceArray gda = new GeneratedDeviceArray(leftElement);
+		gda.add(rightElement);
+//		System.err.println("[EugeneBuilder.unionDeviceArrays] -> "+leftElement.size()+" + "+rightElement.size()+" -> "+gda.size());
+		return gda;
+	}
+			
 	public static EugeneCollection buildCollection(String sName,
 			java.util.Collection<CollectionElement> setElements) {
 		EugeneCollection objCollection = new EugeneCollection(sName);
@@ -245,7 +286,7 @@ public class EugeneBuilder {
 
 	public static Variable buildVariable(String sValue) {
 		Variable objVar = null;
-		if (null == sValue || sValue.isEmpty()) {
+		if (null == sValue) {
 			return (Variable) null;
 		}
 
@@ -278,7 +319,7 @@ public class EugeneBuilder {
 
 		// TODO: num[], txt[]
 
-		objVar = EugeneBuilder.buidVariable(null, EugeneConstants.TXT);
+		objVar = EugeneBuilder.buildVariable(null, EugeneConstants.TXT);
 		objVar.setTxt(sValue);
 
 		return objVar;

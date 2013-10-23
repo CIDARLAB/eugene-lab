@@ -42,26 +42,11 @@ public class Contains
 
 		Component componentB = SymbolTables.getComponent(this.getB());
 		if((null != componentB && (componentB instanceof Device || componentB instanceof PartType))) {
-                        
-                    if(null != device.getComponents()) {
-                        boolean b = false;
-                        for(Component component : device.getComponents()) {
-                            
-                            if(component instanceof Device) {
-                                b = this.evaluate((Device)component);
-                                if(b) {
-                                    return true;
-                                }
-                            } else if (component instanceof PartType) {
-                                if(componentB.getName().equals(component.getName())) {
-                                    return true;
-                                }
-                            }
-                        }
-                        return false;
-                    }
+			
+			int idxB = device.getComponents().indexOf(componentB);
+
+			return idxB != (-1);			
 		}
-                
 		return this.evaluate(SymbolTables.getDeviceComponentIds(device.getName()));
 	}
 

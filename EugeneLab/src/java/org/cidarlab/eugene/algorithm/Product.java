@@ -11,7 +11,6 @@ public class Product {
 			throws EugeneException {
 		
 		DeviceArray dArray = SymbolTables.product(sDeviceName, N);
-//		System.out.println(dArray);
 		return dArray;
 	}
 	

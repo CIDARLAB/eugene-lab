@@ -181,7 +181,9 @@ public class Part
 			// iterate over all properties
 			for(Property prop : this.objPartType.getProperties()) {
 				if(prop.getName().equalsIgnoreCase(EugeneConstants.SEQUENCE_PROPERTY)) {
-					return this.hmPropertiesValues.get(prop.getName()).getTxt();
+					if(null != this.hmPropertiesValues.get(prop.getName())) {
+						return this.hmPropertiesValues.get(prop.getName()).getTxt().toLowerCase();
+					}
 				}
 	 		}
 		}

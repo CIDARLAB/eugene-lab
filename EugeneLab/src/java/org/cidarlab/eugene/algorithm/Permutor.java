@@ -10,8 +10,12 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.cidarlab.eugene.builder.EugeneBuilder;
 import org.cidarlab.eugene.cache.SymbolTables;
 import org.cidarlab.eugene.dom.NamedElement;
+import org.cidarlab.eugene.dom.arrays.DeviceArray;
 import org.cidarlab.eugene.dom.arrays.PermutedDeviceArray;
+import org.cidarlab.eugene.dom.components.Component;
 import org.cidarlab.eugene.dom.components.Device;
+import org.cidarlab.eugene.dom.components.Part;
+import org.cidarlab.eugene.dom.components.types.PartType;
 import org.cidarlab.eugene.dom.rules.Rule;
 import org.cidarlab.eugene.exception.EugeneException;
 import org.cidarlab.eugene.rules.RuleEngine;
@@ -26,6 +30,21 @@ import org.cidarlab.eugene.rules.tree.predicate.StartsWith;
 import org.cidarlab.eugene.rules.tree.predicate.Then;
 import org.cidarlab.eugene.rules.tree.predicate.UnaryPredicate;
 import org.cidarlab.eugene.rules.tree.predicate.With;
+import org.neo4j.graphdb.Node;
+
+import JaCoP.constraints.Alldifferent;
+import JaCoP.constraints.Constraint;
+import JaCoP.core.Domain;
+import JaCoP.core.IntVar;
+import JaCoP.core.Store;
+import JaCoP.search.DepthFirstSearch;
+import JaCoP.search.IndomainMin;
+import JaCoP.search.IndomainSimpleRandom;
+import JaCoP.search.LargestDomain;
+import JaCoP.search.MostConstrainedDynamic;
+import JaCoP.search.Search;
+import JaCoP.search.SelectChoicePoint;
+import JaCoP.search.SimpleSelect;
 
 
 
@@ -99,10 +118,14 @@ public class Permutor {
 	}
 	/***************/
 
-	public static PermutedDeviceArray permute(String sDeviceName) 
+    private static long POSSIBLE_DEVICES;
+    private static double PROCESSING_TIME;
+    
+	public static DeviceArray permute(String sDeviceName, int N) 
 			throws EugeneException {
 				
 		NamedElement objElement = SymbolTables.get(sDeviceName);
+		System.out.println("Permutor.permute -> "+objElement);
 		Device device = null;
 		if(null != objElement && objElement instanceof Device) {
 			device = (Device)objElement;
@@ -111,68 +134,145 @@ public class Permutor {
 		}
 
 		//nDeviceId = SymbolTables.getId(sDeviceName);				
-		long[] elements = SymbolTables.getDeviceComponentIds(sDeviceName);
-		System.out.println("[Permutor.permute] I'm gonna permute : "+Arrays.toString(elements));
+//		long[] elements = SymbolTables.getDeviceComponentIds(sDeviceName);
+//		System.out.println("[Permutor.permute] I'm gonna permute : "+Arrays.toString(elements));
 		
-		// now, we need to get the rules ...
+		// second, check what rules constrain the device
 		List<Rule> lstRules = SymbolTables.getDeviceRules(sDeviceName);
-//		if(null != lstRules && !lstRules.isEmpty()) {
-//			System.out.println("[Permutor.permute] and I'm gonna include the following rules: ");
-//			for(Rule rule : lstRules) {
-//				System.out.println(rule.toString());
-//			}				
-//		}
 
-		/* here we can also do further calculations to figure out 
-		 * how long permuting would take...
-		 */
-		if(elements.length > 12 && lstRules.isEmpty()) {
-			long X = fact(elements.length);
-			if(X<0) {
-				throw new EugeneException (
-							"WARNING! NO RULES SPECIFIED!"+System.getProperty("line.separator")+
-							"I'm NOT gonna permute. This would take up too much time!");
-			}
-			
-			double ms = X/Math.pow(10, -3);
-			double sec = ((ms * Math.pow(10, -9))/3600);
-			
-			System.err.println("WARNING! NO RULES SPECIFIED!");
-			System.err.println("I'm gonna create "+fact(elements.length)+" devices. This will take up to "+sec+" hours.");
-			System.err.println("Do you want to continue? (y/n) ");
-			
-			Scanner sc = new Scanner(System.in);
-			String s = sc.next();
-			do {
-			} while("n".equalsIgnoreCase(s) || "no".equalsIgnoreCase(s) || "y".equalsIgnoreCase(s) || "yes".equalsIgnoreCase(s));
-			
-			if("n".equalsIgnoreCase(s) || "no".equalsIgnoreCase(s)) {
-				return null;
-			}
-		}
+    	/*
+    	 * create a new JaCoP store
+    	 */
+    	Store store = new Store();
+    	
+    	/*
+    	 * create the variables of the constraint solving problem
+    	 * i.e. the parts
+    	 */
+    	IntVar[] variables = model(store, device);
 
-		long[][] permutations = null;
-		if(null != lstRules && !lstRules.isEmpty()) {
-			 permutations = constraint_permute(elements, lstRules);
-		} else {
-			perms = null;
-			// let's do a Heap permute
-			heap_permute(elements, elements.length);
-			
-			permutations = perms;
-//			System.out.println("[Permutor.permute] -> "+permutations.length+" permutations");
-		}
-//		for(int i=0; i<permutations.length; i++) {
-//			System.out.println(Arrays.toString(permutations[i]));
-//		}			
+    	/*
+    	 * map the Eugene rules onto JaCoP constraints
+    	 */
+    	imposeConstraints(store, variables, device, lstRules);
+    	
+    	
+    	/*
+    	 * for testing: print the store's information
+    	 */
+    	//store.print();
+    	
+    	/*
+    	 * now, let's solve the problem
+    	 */
+    	Domain[][] solutions = solve(store, variables, N, device);
+    	
+    	
+    	/*
+    	 * finally, we return the solutions
+    	 */
 
-		return EugeneBuilder.buildPermutedDeviceArray(
-				device, permutations);
+		DeviceArray dArray = new DeviceArray(
+				device,
+				solutions);
 		
+    	/*
+    	 * print the stats
+    	 */
+    	System.out.println("POSSIBLE DEVICES: "+POSSIBLE_DEVICES);
+    	System.out.println("VALID DEVICES: "+dArray.size());
+    	System.out.println("PROCESSING TIME: "+PROCESSING_TIME+" sec");
+
+    	return dArray;
 	}
 
-	private static long[][] perms;
-	
+	private static IntVar[] model(Store store, Device device) 
+			throws EugeneException {
+    	
+		List<Component> lstDeviceComponents = 
+    			device.getComponents();
+    	
+    	POSSIBLE_DEVICES = 1;
+
+    	IntVar[] variables = new IntVar[lstDeviceComponents.size()];
+		
+		try {
+			for(int i=0; i<lstDeviceComponents.size(); i++) {
+				variables[i] = new IntVar(store, "idx-"+i);
+				
+				for(Component component : lstDeviceComponents) {
+					int componentId = (int)SymbolTables.getId(component.getName());
+					variables[i].addDom(componentId, componentId);
+				}
+			}
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		
+		// imposing an allDifferent constraint
+		store.impose(new Alldifferent(variables));
+		
+    	return variables;
+    }
+    
+    private static void imposeConstraints(Store store, IntVar[] variables, Device device, List<Rule> rules) {
+    	for(Rule rule : rules) {
+    		try {
+
+	    		Constraint constraint = rule.getPredicate().toJaCoP(store, variables, device, device.getAllComponents());
+	    		
+	    		if(null != constraint) {
+	    			store.impose(constraint);
+	    		}
+    		} catch(EugeneException ee) {
+    			ee.printStackTrace();
+    		}
+    	}
+    }
+
+    private static Domain[][] solve(Store store, IntVar[] variables, int N, Device device) {
+    	Search<IntVar> search = new DepthFirstSearch<IntVar>(); 
+
+        SelectChoicePoint<IntVar> select = null;
+        if(N != (-1)) {
+			select =  new SimpleSelect<IntVar>(
+							variables, 
+							new MostConstrainedDynamic<IntVar>(), 
+							new IndomainSimpleRandom<IntVar>());  
+			search.getSolutionListener().setSolutionLimit(N);
+        } else {        	
+        	select = new SimpleSelect<IntVar>(
+    				variables, 
+    				new LargestDomain<IntVar>(),
+    				new IndomainMin<IntVar>()); 
+        	search.getSolutionListener().searchAll(true);   
+        }
+
+        search.setPrintInfo(false);
+        search.getSolutionListener().recordSolutions(true);
+                
+		long T1 = System.nanoTime();
+
+        // SOLVE
+		try {
+//			store.print();
+			search.labeling(store, select);
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+
+		long T2 = System.nanoTime();
+		
+		PROCESSING_TIME = (T2 - T1) * Math.pow(10, -9);
+//		System.out.println("processing time: "+nProcessing+"sec");
+//		System.out.println(nProcessing);
+
+		//search.printAllSolutions();
+		
+		return search.getSolutionListener().getSolutions();
+    }
+    
+	private static long[][] perms;	
 	private static void heap_permute(long[] elements, int n) {
 		if (n==1) {
 			/** here we need to create the device **/

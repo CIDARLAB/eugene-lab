@@ -45,23 +45,27 @@ public abstract class Component
 	private static final long serialVersionUID = 6045834162841472128L;
 	private String sSequence;
 	protected List<Property> lstProperties; 
+	private char direction;
 	
 	protected Component() {
 		super();
 		this.sSequence = new String();
 		this.lstProperties = new ArrayList<Property>();
+		this.direction = '+';
 	}
 
 	public Component(String sName) {
 		super(sName);
 		this.sSequence = new String();
 		this.lstProperties = new ArrayList<Property>();
+		this.direction = '+';
 	}
 	
 	public Component(String sName, List<Property> lstProperties) {
 		super(sName);
 		this.lstProperties = lstProperties;
 		this.sSequence = new String();
+		this.direction = '+';
 	}
 
 	public void setSequence(String sSequence) {
@@ -92,6 +96,16 @@ public abstract class Component
 		return this.lstProperties;
 	}
 
+	public void setDirection(char direction) {
+		if(direction == '+' || '-' == direction) {
+			this.direction = direction;
+		}
+	}
+	
+	public char getDirection() {
+		return this.direction;
+	}
+	
 	public Property getProperty(String sPropertyName) {
 		for (Property p : lstProperties) {
 			if (p.getName().equals(sPropertyName)) {

@@ -93,9 +93,14 @@ public class DesignSpace {
 	}
 	
 	private void startNeo4j() {
+		long t1 = System.nanoTime();
+		
 //		System.out.println("[DesignSpace.startNeo4j]");
 		this.neo4j = new Neo4jPersistor(UUID.randomUUID().toString());
 		this.neo4j.startTransaction();
+		
+		long tStartUp = System.nanoTime() - t1;
+		System.out.println("[DesignSpace.startNeo4j] -> "+tStartUp*Math.pow(10,-9));
 	}
 	
 	/**
@@ -111,7 +116,6 @@ public class DesignSpace {
 
 		
 		if(this.contains(sName)) {
-//			System.out.println("[DesignSpace.put] -> "+objElement);
 			return;
 		}
 		
@@ -127,7 +131,7 @@ public class DesignSpace {
 				}								
 			
 				long nId = neo4j.put(sName, (Component)objElement);
-				//System.out.println("[DesignSpace.put] Device "+objElement+" -> "+nId);
+//				System.out.println("[DesignSpace.put] part "+objElement.getName()+" -> "+nId);
 				if((-1) != nId) {
 					this.hmIds.put(sName, new Long(nId));
 					//System.out.println(sName+" -> "+nId);
@@ -136,6 +140,7 @@ public class DesignSpace {
 			} else if(objElement instanceof Device ||
 					objElement instanceof PartType) { 
 			
+//				System.out.println("[DesignSpace.put] -> "+objElement);
 				/* 
 				 * ONLY global devices and part types will be put into 
 				 * the neo4j database
@@ -173,6 +178,7 @@ public class DesignSpace {
 				}
 				
 			} else {
+//				System.out.println("[DesignSpace.put] -> "+sName+", "+objElement);
 				this.jcs.put(sName, objElement);
 			}
 		}
@@ -348,7 +354,7 @@ public class DesignSpace {
 	}
 		
 	public List<Rule> getDeviceRules(Device device) {
-		
+
 		List<Rule> lstRules = new ArrayList<Rule>();
 		// iterate over all rules
 		if(null != this.hmRules) {			

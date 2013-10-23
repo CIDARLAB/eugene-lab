@@ -44,6 +44,15 @@ public class EugeneCollection
 	}
 	
 	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		System.out.println("elements -> "+elements.size());
+		
+		
+		return sb.toString();
+	}
+	
+	@Override
 	public void assign(NamedElement objElement) throws EugeneException {
 		// TODO Auto-generated method stub
 		
