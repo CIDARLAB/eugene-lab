@@ -77,6 +77,11 @@ public class EugeneServlet extends HttpServlet {
         
         //this.clotho = ClothoFactory.getAPI("ws://localhost:8080/websocket");
     }
+    
+    @Override
+    public void destroy() {
+        SymbolTables.cleanUp();
+    }
 
     /**
      * Processes requests for both HTTP

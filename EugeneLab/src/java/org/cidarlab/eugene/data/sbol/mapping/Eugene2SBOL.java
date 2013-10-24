@@ -25,6 +25,10 @@ package org.cidarlab.eugene.data.sbol.mapping;
 // SBOL
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import org.cidarlab.eugene.constants.EugeneConstants;
 import org.cidarlab.eugene.dom.arrays.ComponentArray;
@@ -49,7 +53,53 @@ public class Eugene2SBOL {
 
 	public static ArrayList<String> lstURIs;
 	private static final String DEFAULT_URI = "http://www.eugenecad.org";
+	public static Map<String, URI> reusedComponents;
 	
+	public static Collection convert(ComponentArray objArray, String sURI)
+			throws Exception {
+		
+		if (null == objArray) {
+			throw new EugeneException("I cannot export a NULL value to SBOL!");
+		}
+
+		lstURIs = new ArrayList<String>();
+		reusedComponents = new HashMap<String, URI>();
+		
+		Collection col = SBOLFactory.createCollection();
+		col.setDescription(objArray.getName());
+		col.setDisplayId(objArray.getName());
+
+		try {
+			col.setURI(URI.create(DEFAULT_URI + "/" + objArray.getName()));
+		} catch (Exception e) {
+			throw new EugeneException(e.toString());
+		}
+
+		if (objArray instanceof DeviceArray) {
+			DeviceArray objDeviceArray = (DeviceArray) objArray;
+			int size = objDeviceArray.size();
+			
+			for(int i=0; i<size; i++) {
+				Device device = (Device)objDeviceArray.get(i);
+				
+				col.addComponent(
+						toDnaComponent(
+							device,
+							null));
+			}
+		} else {
+			throw new EugeneException(
+					"Currently Eugene only supports the export of Device arrays!");
+		}
+
+//		printURIs();
+		
+		lstURIs = null;
+		reusedComponents = null;
+		
+		return col;
+	}
+
 	public static DnaComponent convert(Component objComponent, DnaComponent parent)
 			throws EugeneException {
 		
@@ -97,9 +147,9 @@ public class Eugene2SBOL {
 		 * displayId
 		 */
 		String deviceDisplayId = objDevice.getName();
-		if(null != parent) {
-			deviceDisplayId = parent.getDisplayId()+"_"+deviceDisplayId;
-		}
+//		if(null != parent) {
+//			deviceDisplayId = parent.getDisplayId()+"_"+deviceDisplayId;
+//		}
 		dc.setDisplayId(deviceDisplayId);
 
 		/*
@@ -114,7 +164,7 @@ public class Eugene2SBOL {
 		if(null != parent) {
 			sURI = parent.getURI() + "/" + objDevice.getName();
 		} else {
-			sURI = DEFAULT_URI + "/"  + objDevice.getName();
+			sURI = DEFAULT_URI + "/"  + deviceDisplayId;
 		}
 		dc.setURI(URI.create(sURI));
 
@@ -189,16 +239,25 @@ public class Eugene2SBOL {
 		/*
 		 * complete the DNAComponent's displayId
 		 */
-		if(null != subComponentDisplayIds) {
-			deviceDisplayId += "_"+subComponentDisplayIds;
+//		System.out.println(subComponentDisplayIds);
+		if(null != subComponentDisplayIds && parent != null) {
+			
+			String displayId = subComponentDisplayIds;
+
+			URI uri = null;
+			if(reusedComponents.containsKey(displayId)) {
+				uri = reusedComponents.get(displayId);
+			} else {
+				uri = URI.create("http://www.eugenecad.org/device/"+displayId);
+				reusedComponents.put(displayId, uri);
+			}
 
 			/*
 			 * complete the DNAComponent's URI
 			 */
-			dc.setURI(URI.create(dc.getURI()+"_"+subComponentDisplayIds));
-
+			dc.setDisplayId(displayId);
+			dc.setURI(uri);
 		}
-		dc.setDisplayId(deviceDisplayId);
 
 		/*
 		 * map Eugene device onto the
@@ -305,50 +364,6 @@ public class Eugene2SBOL {
 		return c;
 	}
 	
-	public static Collection convert(ComponentArray objArray, String sURI)
-			throws Exception {
-		if (null == objArray) {
-			throw new EugeneException("I cannot export a NULL value to SBOL!");
-		}
-
-
-		if(null == lstURIs) {
-			lstURIs = new ArrayList<String>();
-		}
-		
-		Collection col = new CollectionImpl();
-		col.setDescription(objArray.getName());
-		col.setDisplayId(objArray.getName());
-
-		try {
-			col.setURI(URI.create(DEFAULT_URI + "/" + objArray.getName()));
-		} catch (Exception e) {
-			throw new EugeneException(e.toString());
-		}
-
-		if (objArray instanceof DeviceArray) {
-			DeviceArray objDeviceArray = (DeviceArray) objArray;
-			int size = objDeviceArray.size();
-			
-			for(int i=0; i<size; i++) {
-				Device device = (Device)objDeviceArray.get(i);
-				
-				col.addComponent(
-						toDnaComponent(
-							device,
-							null));
-			}
-		} else {
-			throw new EugeneException(
-					"Currently Eugene only supports the export of Device arrays!");
-		}
-
-		printURIs();
-		
-		lstURIs = null;
-		
-		return col;
-	}
 	
 	private static void printURIs() {
 		if(null == lstURIs) {

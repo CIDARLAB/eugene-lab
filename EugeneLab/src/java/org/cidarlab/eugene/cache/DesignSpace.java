@@ -100,7 +100,7 @@ public class DesignSpace {
 		this.neo4j.startTransaction();
 		
 		long tStartUp = System.nanoTime() - t1;
-		System.out.println("[DesignSpace.startNeo4j] -> "+tStartUp*Math.pow(10,-9));
+//		System.out.println("[DesignSpace.startNeo4j] -> "+tStartUp*Math.pow(10,-9));
 	}
 	
 	/**

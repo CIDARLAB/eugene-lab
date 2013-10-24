@@ -528,7 +528,7 @@ $(document).ready(function() {
                             "bPaginate": false,
                             "sScrollY": "300px"
                         });
-                        $('#outputListArea').append('<button class=btn btn-large btn-success" id="saveAllButton">Save All Parts</button>');
+                        $('#outputListArea').parent().append('<button class=btn btn-large btn-success" id="saveAllButton">Save All Parts</button>');
                         $('.savePartButton').click(function() {
                             //save a part
                             savePart(_newParts[$(this).parent().parent().children("td:first").text()]);

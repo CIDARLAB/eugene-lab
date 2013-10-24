@@ -316,7 +316,6 @@ public class Neo4jPersistor {
     	 */
     	Domain[][] solutions = this.solve(store, variables, N, device);
     	
-    	
     	/*
     	 * finally, we return the solutions
     	 */
@@ -327,9 +326,9 @@ public class Neo4jPersistor {
     	/*
     	 * print the stats
     	 */
-    	System.out.println("POSSIBLE DEVICES: "+POSSIBLE_DEVICES);
-    	System.out.println("VALID DEVICES: "+dArray.size());
-    	System.out.println("PROCESSING TIME: "+PROCESSING_TIME+" sec");
+//    	System.out.println("POSSIBLE DEVICES: "+POSSIBLE_DEVICES);
+//    	System.out.println("VALID DEVICES: "+dArray.size());
+//    	System.out.println("PROCESSING TIME: "+PROCESSING_TIME+" sec");
 
     	return dArray;
     }
@@ -440,7 +439,6 @@ public class Neo4jPersistor {
     		try {
 
 	    		Constraint constraint = rule.getPredicate().toJaCoP(store, variables, device, device.getAllComponents());
-	    		
 	    		if(null != constraint) {
 	    			store.impose(constraint);
 	    		}
