@@ -80,8 +80,8 @@ public class RegistryImporter {
 		for (int i = 0; i < nodes.getLength(); i++) {
 			Node node = nodes.item(i);
 			// System.out.println(node.getLocalName()+" -> "+node.getTextContent());
-
-			String sContent = node.getTextContent().trim();
+			
+			String sContent = node.getNodeValue().trim();
 			String sID = null;
 			if (node.getLocalName().equals("part_name")) {
 				// System.out.println("partname -> "+sContent);

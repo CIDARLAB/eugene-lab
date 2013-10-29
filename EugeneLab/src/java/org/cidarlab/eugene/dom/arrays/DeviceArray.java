@@ -23,8 +23,6 @@ ENHANCEMENTS, OR MODIFICATIONS.
 package org.cidarlab.eugene.dom.arrays;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.lang3.ArrayUtils;
@@ -32,10 +30,14 @@ import org.cidarlab.eugene.cache.SymbolTables;
 import org.cidarlab.eugene.dom.NamedElement;
 import org.cidarlab.eugene.dom.components.Component;
 import org.cidarlab.eugene.dom.components.Device;
+import org.cidarlab.eugene.dom.components.Part;
+import org.cidarlab.eugene.dom.components.types.PartType;
 import org.cidarlab.eugene.exception.EugeneException;
 
 import JaCoP.core.Domain;
 import JaCoP.core.ValueEnumeration;
+
+import com.rits.cloning.Cloner;
 
 
 public class DeviceArray 
@@ -47,8 +49,8 @@ public class DeviceArray
 	private ArrayList<String> lstDeviceNames;
 	
 	// v1.9
-	private long[] devices;
-	private long[][] device_components;
+//	private long[] devices;
+//	private long[][] device_components;
 	
 	public DeviceArray() {
 		super(null);
@@ -65,27 +67,44 @@ public class DeviceArray
 	private Domain[][] solutions;
 	public DeviceArray(Device device, Domain[][] solutions) {
 		super(null);
+
 		this.device = device;
-		this.solutions = solutions;
+		
+		// cure the solutions
+		if(null != solutions && solutions.length>0) {
+			this.solutions = new Domain[1][solutions[0].length];
+			this.solutions[0] = solutions[0];
+			for(int i=1; i<solutions.length; i++) {
+				if( null != solutions[i]) {
+					this.solutions = ArrayUtils.add(this.solutions, solutions[i]);
+				}
+			}
+		} else { 
+			this.solutions = null;
+		}
 	}
 	
 	public Domain[][] getSolutions() {
 		return this.solutions;
 	}
 	
+	public Device getDevice() {
+		return this.device;
+	}
+	
 	// v1.9 -- Constructor
-	public DeviceArray(String sName, long[] devices) {
-		super(sName);
-		this.devices = devices;
-	}
-	public DeviceArray(String sName, long[][] device_components) {
-		super(sName);
-		this.device_components = device_components;
-	}
-
-	public long[] getDevices() {
-		return this.devices;
-	}
+//	public DeviceArray(String sName, long[] devices) {
+//		super(sName);
+//		this.devices = devices;
+//	}
+//	public DeviceArray(String sName, long[][] device_components) {
+//		super(sName);
+//		this.device_components = device_components;
+//	}
+//
+//	public long[] getDevices() {
+//		return this.devices;
+//	}
 	
 	/** ITERATOR FUNCTIONS **/	
 	public boolean hasNext() {
@@ -115,18 +134,20 @@ public class DeviceArray
 		return this.lstDeviceNames;
 	}
 	
-	public void add(long deviceId) {
-		this.devices = ArrayUtils.add(this.devices, deviceId);
-	}
-	
-	public void addAll(long[] devices) {
-		this.devices = ArrayUtils.addAll(this.devices, devices);
-	}
-	
+//	public void add(long deviceId) {
+//		this.devices = ArrayUtils.add(this.devices, deviceId);
+//	}
+//	
+//	public void addAll(long[] devices) {
+//		this.devices = ArrayUtils.addAll(this.devices, devices);
+//	}
+//	
+
 	public void remove(int idx) {
-		if(idx>=0 && idx<this.devices.length) {
-			this.devices = ArrayUtils.remove(this.devices, idx);
-		}
+		throw new UnsupportedOperationException("DeviceArray.remove(int) is not supported yet!");
+//		if(idx>=0 && idx<this.devices.length) {
+//			this.devices = ArrayUtils.remove(this.devices, idx);
+//		}
 	}
 	
 	public void add(String sDeviceName) {
@@ -145,12 +166,13 @@ public class DeviceArray
 				}
 	
 				// v1.9
-				this.devices = ArrayUtils.clone(objArray.getDevices());
+//				this.devices = ArrayUtils.clone(objArray.getDevices());
 				
 				// v1.8
 				this.lstDeviceNames.addAll(objArray.getDeviceNames());
 				
 			} else if(null != objArray.getSolutions()) {
+
 				Domain[][] arraySolutions = objArray.getSolutions();
 				if(null == this.solutions) {
 					this.solutions = arraySolutions.clone();
@@ -163,44 +185,120 @@ public class DeviceArray
 						}
 					}
 				} else {
-					for(Domain[] d : arraySolutions) {
-						if(null != d) {
-							this.solutions = ArrayUtils.add(this.solutions, ArrayUtils.clone(d));
+					for(int i=0; i<arraySolutions.length; i++) {
+						if(null != arraySolutions[i]) {
+							this.solutions = ArrayUtils.add(this.solutions, arraySolutions[i]);
 						}
 					}
 				}
 			}
 		}
+
 	}
 	
+//	public NamedElement createDevice(int idx) 
+//			throws EugeneException {
+//		if(null != this.solutions) {
+//			
+//			Cloner cloner = new Cloner();
+//			
+//			/** here, we create the device on-the-fly **/
+//
+//			Device d = null;
+//			if(null != this.device) {
+//				d = new Device(this.device.getName()+"_"+(idx+1));
+//			} else {
+//				d = new Device(this.getName()+"_"+(idx+1));
+//			}
+//
+//			/*
+//			 * here, we need to rebuild the hierarchy 
+//			 * as in the device array's device
+//			 */
+////			for(Component component : this.device.getComponents()) {
+////				if(component instanceof Device) {
+////					d.add(component);
+////				} else {
+////					d.set(idx, component);
+////				}
+////			}
+//			
+//			Domain[] domains = this.solutions[idx];
+//			int i = 0;
+//			for(Domain domain : domains) {
+//				ValueEnumeration ve = domain.valueEnumeration();
+//				/* here, we need to create the device */
+//				while(ve.hasMoreElements()) {
+//					Component c = SymbolTables.getComponent((long)ve.nextElement());
+//					
+//					/*
+//					 * here, we need to ``insert'' the component 
+//					 */
+////					System.out.println(i+" -> "+c);
+//					d.add(c);
+//				}				
+//			}
+//			
+//			//System.out.println("[DeviceArray.get] -> "+d);
+//			
+//			return d;
+//		}
+//		return null;
+//	}
+			
 	public NamedElement get(int idx) 
 			throws EugeneException {
 
-//		System.out.println("[DeviceArray.get] -> "+idx);
 		// v1.9
 		if(null != this.solutions) {
 			
+			Cloner cloner = new Cloner();
+			
 			/** here, we create the device on-the-fly **/
 
-			Device device = null;
+			Device d = null;
 			if(null != this.device) {
-				device = new Device(this.device.getName()+"_"+(idx+1));
-				device.setDirections(this.device.getDirections());
+				d = cloner.deepClone(this.device);
+				d.setName(this.device.getName()+"_"+(idx+1));
 			} else {
-				device = new Device(this.getName()+"_"+(idx+1));
+				d = new Device(this.getName()+"_"+(idx+1));
 			}
+
+			/*
+			 * here, we need to rebuild the hierarchy 
+			 * as in the device array's device
+			 */
+//			for(Component component : this.device.getComponents()) {
+//				if(component instanceof Device) {
+//					d.add(component);
+//				} else {
+//					d.set(idx, component);
+//				}
+//			}
 			
-			Domain[] domain = this.solutions[idx];
-			for(Domain d : domain) {
-				ValueEnumeration ve = d.valueEnumeration();
+			Domain[] domains = this.solutions[idx];
+			int i = 0;
+			for(Domain domain : domains) {
+				ValueEnumeration ve = domain.valueEnumeration();
 				/* here, we need to create the device */
 				while(ve.hasMoreElements()) {
 					Component c = SymbolTables.getComponent((long)ve.nextElement());
-					device.add(c);
+					
+					/*
+					 * here, we need to ``insert'' the component 
+					 */
+					//System.out.println(i+" -> "+c);
+					if(c instanceof Part || c instanceof PartType) {
+						d.setLeaf(i++, c);
+					} else if(c instanceof Device) {
+						d.set(i++, c);
+					}
 				}				
 			}
 			
-			return device;
+			//System.out.println("[DeviceArray.get] -> "+d);
+			
+			return d;
 			
 			
 //			ValueEnumeration ve = this.solutions[idx].valueEnumeration();
@@ -213,10 +311,10 @@ public class DeviceArray
 //				System.out.print(node.getProperty("name"));
 //			}
 			
-		} else if(null != this.devices) {
-			if(idx >= 0 && idx < this.devices.length) {		
-				return SymbolTables.getDevice(this.devices[idx]);
-			}
+//		} else if(null != this.devices) {
+//			if(idx >= 0 && idx < this.devices.length) {		
+//				return SymbolTables.getDevice(this.devices[idx]);
+//			}
 
 		// v1.8
 		} else if(null != this.lstDeviceNames) {		
@@ -255,20 +353,10 @@ public class DeviceArray
 		// v1.9
 		if(null != this.solutions) {
 			
-			int counter = 0;
-			boolean notNull = true;
-			for(int i=0; i<this.solutions.length && notNull; i++) {
-				if(this.solutions[i] != null) {
-					counter ++;
-				} else {
-					notNull = false;
-				}
-			}
-			return counter;
-			//return this.solutions.length;
+			return solutions.length;
 			
-		} else if(null != this.devices && 0 != this.devices.length) {
-			return this.devices.length;
+//		} else if(null != this.devices && 0 != this.devices.length) {
+//			return this.devices.length;
 		}
 			
 		// v1.8
@@ -344,6 +432,7 @@ public class DeviceArray
 	@Override
 	public void assign(NamedElement objElement)
 			throws EugeneException {
+
 		if (objElement == null) {
 			throw new EugeneException(
 					"I cannot assign an undefined value to an array of devices!");
@@ -353,12 +442,14 @@ public class DeviceArray
 					+ " element to an array of devices!");
 		}
 		
-		this.devices = ArrayUtils.clone(((DeviceArray)objElement).getDevices());
+//		this.devices = ArrayUtils.clone(((DeviceArray)objElement).getDevices());
 		this.solutions = ArrayUtils.clone(((DeviceArray)objElement).getSolutions());
-                if( null != ((DeviceArray) objElement).getDeviceNames()) {
-                    this.lstDeviceNames = new ArrayList<String>(((DeviceArray) objElement).getDeviceNames());
-                }
+        if( null != ((DeviceArray) objElement).getDeviceNames()) {
+            this.lstDeviceNames = new ArrayList<String>(((DeviceArray) objElement).getDeviceNames());
+        }
+        this.device = ((DeviceArray)objElement).getDevice();
 	}
+	
 
 	@Override
 	public void set(int idx, NamedElement objElement)

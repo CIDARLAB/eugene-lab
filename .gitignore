@@ -10,3 +10,5 @@ EugeneLab/build/
 EugeneLab/nbproject/private/
 *private*
 /EugeneLab/dist/
+/EugeneLab/data/
+/EugeneLab/eugene.cache/

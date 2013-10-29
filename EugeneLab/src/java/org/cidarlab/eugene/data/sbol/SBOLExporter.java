@@ -47,8 +47,8 @@ public class SBOLExporter {
 		}
 
 		try {
-			org.sbolstandard.core.Collection sbolCollection = Eugene2SBOL
-					.convert(objArray, EugeneConstants.EUGENE_URL);
+			org.sbolstandard.core.Collection sbolCollection = 
+					Eugene2SBOL.convert(objArray, EugeneConstants.EUGENE_URL);
 
 			// create an empty document populated with some SBOL objects
 			SBOLDocument document = SBOLFactory.createDocument();
@@ -58,7 +58,7 @@ public class SBOLExporter {
 
 			FileOutputStream fos;
 			File f = new File(sFileName);
-			System.out.println(sFileName);
+//			System.out.println(sFileName);
 			if (!f.exists()) {
 				f.createNewFile();
 			}
@@ -78,8 +78,8 @@ public class SBOLExporter {
 	public static boolean serialize(Device objDevice, String sFileName) {
 		try {
 			FileOutputStream fos;
-			DnaComponent dnaComponent = Eugene2SBOL.convert(objDevice,
-					EugeneConstants.EUGENE_URL);
+			DnaComponent dnaComponent = 
+					Eugene2SBOL.convert(objDevice, null);
 			// create an empty document populated with some SBOL objects
 			SBOLDocument document = SBOLFactory.createDocument();
 			// add the DnaComponent to this document

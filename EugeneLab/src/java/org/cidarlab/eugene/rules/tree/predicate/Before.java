@@ -149,6 +149,10 @@ public class Before
 			int a = (int)this.getA();
 			int b = (int)this.getB();
 
+			/*
+			 * calculate the possible positions of A and B
+			 */
+			
 //			System.out.println(this.componentA.getName()+"("+a+") BEFORE "+this.componentB.getName()+"("+b+")");
 			PrimitiveConstraint[] pc = null;
 			

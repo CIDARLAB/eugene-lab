@@ -42,7 +42,7 @@ public class Rule
 	private static final long serialVersionUID = 329956235096352013L;
 
 	// the rule can be specified on a device
-	protected Device objDevice;
+	//protected Device objDevice;
 	
 	protected String operator;
 
@@ -59,9 +59,9 @@ public class Rule
 		this.token = (Token) null;
 	}
 
-	public Rule(String sName, Device objDevice, Token token, CommonTree tree) {
+	public Rule(String sName, Device device, Token token, CommonTree tree) {
 		super(sName);
-		this.objDevice = objDevice;
+		this.device = device;
 		this.tree = tree;
 		this.token = token;
 	}
@@ -84,9 +84,9 @@ public class Rule
 		this.device = SymbolTables.getDevice(nDeviceId);
 	}
 	
-	public Rule(String sName, Device objDevice, Predicate predicate) {
+	public Rule(String sName, Device device, Predicate predicate) {
 		super(sName);
-		this.device = objDevice;
+		this.device = device;
 		this.predicate = predicate;
 		this.nDeviceId = -1;
 	}
@@ -103,8 +103,8 @@ public class Rule
 		return this.device;
 	}
 
-	public void setDevice(Device objDevice) {
-		this.objDevice = objDevice;
+	public void setDevice(Device device) {
+		this.device = device;
 	}
 	
 	public void setDeviceId(long nDeviceId) {

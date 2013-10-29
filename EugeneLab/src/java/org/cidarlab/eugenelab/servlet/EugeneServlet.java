@@ -24,6 +24,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -32,6 +33,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Random;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -53,6 +55,7 @@ import org.biojava.bio.seq.io.SeqIOTools;
 import org.cidarlab.eugene.builder.EugeneBuilder;
 import org.cidarlab.eugene.cache.SymbolTables;
 import org.cidarlab.eugene.dom.collection.EugeneCollection;
+import org.cidarlab.eugene.stats.EugeneStats;
 
 import org.cidarlab.weyekin.WeyekinPoster;
 import org.json.JSONArray;
@@ -70,7 +73,14 @@ public class EugeneServlet extends HttpServlet {
             throws ServletException {
 
         super.init();
+        
+        
         //this.clotho = ClothoFactory.getAPI("ws://localhost:8080/websocket");
+    }
+    
+    @Override
+    public void destroy() {
+        SymbolTables.cleanUp();
     }
 
     /**
@@ -96,7 +106,7 @@ public class EugeneServlet extends HttpServlet {
                 out.write(readImageFiles());
             } else if (command.equals("run")) {
                 String devices = request.getParameter("devices");
-                String toReturn = run(devices);
+                String toReturn = run(request.getSession().getId(), devices);
                 toReturn = "{\"response\":\"response\"}";
                 out.write(toReturn);
             } else if (command.equals("read")) {
@@ -123,11 +133,11 @@ public class EugeneServlet extends HttpServlet {
 
                 /* option 2:
                  * load the parts from a Eugene script
-                 */
                 JSONObject json = this.getData();
                 if (null != json) {
                     out.write(this.getData().toString());
                 }
+                 */
 
 //                out.write(simulateReadingPartsFromClotho());
 //                out.write(readFiles());
@@ -195,7 +205,11 @@ public class EugeneServlet extends HttpServlet {
     }
     // </editor-fold>
 
-    protected void processPostRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    protected void processPostRequest(HttpServletRequest request, HttpServletResponse response) 
+               throws IOException {
+        
+        System.out.println("[EugeneServlet.processPostRequest] sessionId -> "+request.getSession().getId());
+        
         if (ServletFileUpload.isMultipartContent(request)) {
             try {
                 ServletFileUpload uploadHandler = new ServletFileUpload(new DiskFileItemFactory());
@@ -203,7 +217,8 @@ public class EugeneServlet extends HttpServlet {
                 response.setContentType("application/json");
                 response.sendRedirect("eugenelab.html");
                 List<FileItem> items = uploadHandler.parseRequest(request);
-                String uploadFilePath = this.getServletContext().getRealPath("/") + "/data/" + getCurrentUser() + "/";
+                //String uploadFilePath = this.getServletContext().getRealPath("/") + "/data/" + getCurrentUser() + "/";
+                String uploadFilePath = Paths.get(this.getServletContext().getRealPath(""), "data", getCurrentUser()).toString();        
                 new File(uploadFilePath).mkdir();
                 ArrayList<File> toLoad = new ArrayList();
                 for (FileItem item : items) {
@@ -237,7 +252,9 @@ public class EugeneServlet extends HttpServlet {
                 String command = request.getParameter("command");
                 if (command.equals("execute")) {
                     String input = request.getParameter("input");
-                    JSONObject result = executeEugene(input);
+                    JSONObject result = executeEugene(
+                            request.getSession().getId(), 
+                            input);
                     out.write(result.toString());
                 } else if (command.equals("saveFileContent")) {
                     String fileName = request.getParameter("fileName");
@@ -310,13 +327,15 @@ public class EugeneServlet extends HttpServlet {
         }
     }
 
-    private String run(String devices) throws RecognitionException {
+    private String run(String sessionId, String devices) 
+            throws RecognitionException {
+        
         System.out.println(devices);
         String[] deviceArray = devices.split("\\|");
         for (int i = 0; i < deviceArray.length; i++) {
             System.out.println(deviceArray[i]);
         }
-        String[] results = (String[]) EugeneExecutor.execute("eugeneString", 1);
+        String[] results = (String[]) new EugeneExecutor(sessionId).execute("eugeneString", 1);
         return null;
     }
 
@@ -326,7 +345,7 @@ public class EugeneServlet extends HttpServlet {
 
     private String readImageFiles() {
         //get path relative to servlet; ie the /web directory
-        String imagePath = this.getServletContext().getRealPath("/") + "images/sbol_visual_jpeg/";
+        String imagePath = Paths.get(this.getServletContext().getRealPath(""), "images", "sbol_visual_jpeg").toString();
         String toReturn = "[";
         File[] filesInDirectory = new File(imagePath).listFiles();
         if (filesInDirectory != null) {
@@ -344,18 +363,29 @@ public class EugeneServlet extends HttpServlet {
         return toReturn;
     }
 
-    public JSONObject executeEugene(String input) {
+    public JSONObject executeEugene(String sessionId, String input) {
 
         JSONObject returnJSON = new JSONObject();
         try {
-            Set<JSONObject> results = (HashSet<JSONObject>) EugeneExecutor.execute(input, 3);
+            
+            EugeneExecutor ee = new EugeneExecutor(sessionId);
+            Set<JSONObject> results = (HashSet<JSONObject>) ee.execute(input, 3);
+            
             List<JSONObject> lstUriJSON = new ArrayList<JSONObject>();
             if (null != results && !results.isEmpty()) {
                 lstUriJSON.addAll(results);
             }
+            
             returnJSON.put("results", lstUriJSON);
             returnJSON.put("status", "good");
 
+            
+            /*
+             * after every Eugene run, 
+             * 1. we clear the symbol tables
+             */
+//            SymbolTables.cleanUp();
+            
         } catch (Exception e) {
             e.printStackTrace();
             try {
@@ -372,15 +402,22 @@ public class EugeneServlet extends HttpServlet {
     // Returns a JSON Array with the name of a file/directory and if it is a file
     // {"name": name, "isFile", isFile}
     private String getFileTree() {
-        String currentFolderExtension = this.getServletContext().getRealPath("/") + "data/" + getCurrentUser() + "/";
+       //String currentFolderExtension = this.getServletContext().getRealPath("/") + "/data/" + getCurrentUser() + "/";
+       String currentFolderExtension = Paths.get(this.getServletContext().getRealPath(""), "data", getCurrentUser()).toString();        
+       System.out.println("[EugeneServlet.getFileTree] -> "+currentFolderExtension);
+       
         File rootFolder = new File(currentFolderExtension);
         ArrayList<File> queue = new ArrayList();
         ArrayList<JSONArray> folders = new ArrayList();
         ArrayList<Integer> folderSizes = new ArrayList();
         File[] rootFiles = rootFolder.listFiles();
+        if(null == rootFiles) {
+            return "";
+        }
         for (int i = 0; i < rootFiles.length; i++) {
             queue.add(rootFiles[i]);
         }
+
         JSONArray rootArray = new JSONArray();
         JSONArray currentArray = rootArray;
         boolean switchFolder = false;
@@ -459,19 +496,21 @@ public class EugeneServlet extends HttpServlet {
 
 
     private String getFileExtension(String localExtension, boolean isFile) {
-        String extension = this.getServletContext().getRealPath("/") + "data/" + getCurrentUser() + "/" + localExtension;
+        //String extension = this.getServletContext().getRealPath("/") + "/data/" + getCurrentUser() + "/" + localExtension;
+        String extension = Paths.get(this.getServletContext().getRealPath(""), "data", getCurrentUser(), localExtension).toString();        
         if (!isFile) {
             extension += "/";
         }
         return extension;
     }
 
+    /**
     public JSONObject getData() {
         List<JSONObject> lstParts = new ArrayList<JSONObject>();
 
         try {
             File f = new File(this.getServletContext().getRealPath("/")
-                    + "eugene-examples/inverter_data.eug");
+                    + "/eugene-examples/inverter_data.eug");
 
             HashMap<String, SavableElement> hm =
                     (HashMap<String, SavableElement>) EugeneExecutor.execute(f, 2);
@@ -509,6 +548,80 @@ public class EugeneServlet extends HttpServlet {
             e.printStackTrace();
         }
         return null;
+    }
+    **/
+    
+
+    private static String getRandomSequence(){
+        StringBuilder sb = new StringBuilder();
+        Random random = new Random();
+        for (int i = 0; i < 50; i++){
+            switch(random.nextInt(4)){
+                case 0:
+                    sb.append("A");
+                    break;
+                case 1:
+                    sb.append("T");
+                    break;
+                case 2:
+                    sb.append("C");
+                    break;
+                case 3:
+                    sb.append("G");
+                    break;
+            }
+        }
+        return sb.toString();
+    }
+    
+    public static JSONObject toJSON(Device objDevice)
+            throws Exception {
+        String NEWLINE = System.getProperty("line.separator");
+        StringBuilder sbPigeon = new StringBuilder();
+        StringBuilder sbPigeonArcs = new StringBuilder();
+
+        sbPigeonArcs.append("# Arcs").append(NEWLINE);
+
+        JSONObject deviceJSON = new JSONObject();
+        deviceJSON.put("name", objDevice.getName());
+        deviceJSON.put("schema", "CompositePart");
+        deviceJSON.put("type", "composite");
+        List<Component> lstComponents = objDevice.getAllComponents();
+        List<JSONObject> lstComponentsJSON = new ArrayList<JSONObject>();
+
+        for (Component component : lstComponents) {
+            JSONObject componentJSON = new JSONObject();
+            componentJSON.put("name", component.getName());
+            componentJSON.put("schema", "BasicPart");
+            if (component instanceof Device) {
+                componentJSON = toJSON((Device) component);
+            } else if (component instanceof PartType) {
+                //componentJSON.put("name", lstComponents)
+            } else if (component instanceof Part) {
+                Part objPart = (Part) component;
+                List<JSONObject> lstPropertyValuesJSON = new ArrayList<JSONObject>();
+                componentJSON.put("Pigeon", objPart.get("Pigeon"));
+                sbPigeon.append(objPart.get("Pigeon")).append(NEWLINE);
+                if (objPart.get("Sequence")!= null) componentJSON.put("sequence", objPart.get("Sequence").toString().replaceAll("\n", ""));
+                //XXX: this is a tremendous atrocity against science
+                // aka it is a hack for a demo video
+                else componentJSON.put("sequence", getRandomSequence());
+                componentJSON.put("type", objPart.getPartType().getName());
+                if (null != objPart.get("Represses")) {
+                    sbPigeonArcs.append(objPart.getName())
+                            .append(" rep ")
+                            .append(objPart.get("Represses"))
+                            .append(NEWLINE);
+                }
+            }
+            lstComponentsJSON.add(componentJSON);
+        }
+        deviceJSON.put("components", lstComponentsJSON);
+
+        String sPigeon = sbPigeon.toString() + sbPigeonArcs.toString();
+        deviceJSON.put("Pigeon", sPigeon);
+
+        return deviceJSON;
     }
 
     // Takes an SBOL file and converts it into a eugene device

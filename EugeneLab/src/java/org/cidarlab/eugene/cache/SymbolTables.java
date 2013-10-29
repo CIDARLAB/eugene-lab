@@ -166,18 +166,19 @@ public class SymbolTables {
 	}
 
 	public static void clear(String sGroup) {
+//		System.out.println("[SymbolTables.clear] -> "+sGroup);
 		designSpace.clear(sGroup);
 	}
 
-	public static void clearLoop() {
-		
-		// we need to delete:
-		// - variables
-		// - rules
-		// - ???
-		
-//		System.out.println("[SymbolTables.clearLoop] -> " + SymbolTables.peek());
-	}
+//	public static void clearLoop() {
+//		
+//		// we need to delete:
+//		// - variables
+//		// - rules
+//		// - ???
+//		
+////		System.out.println("[SymbolTables.clearLoop] -> " + SymbolTables.peek());
+//	}
 	
 	public static boolean contains(String sName) {
 		return designSpace.contains(sName);
@@ -201,7 +202,7 @@ public class SymbolTables {
 		
 		NamedElement objElement = designSpace.get(sName);
 		if (objElement != null) {
-//			System.out.println("SymbolTables.get -> "+objElement);
+//			System.out.println("SymbolTables.get -> "+objElement.getName());
 			return objElement;
 		}
 
@@ -296,11 +297,11 @@ public class SymbolTables {
 //		return designSpace.sample(sDeviceName, N);
 //	}
 	
-	public static DeviceArray getInstancesOf(String sDeviceName) {
-		long[] instance_ids = designSpace.getInstancesOf(sDeviceName);
-		
-		return new DeviceArray(sDeviceName+"_INSTANCES", instance_ids);
-	}
+//	public static DeviceArray getInstancesOf(String sDeviceName) {
+//		long[] instance_ids = designSpace.getInstancesOf(sDeviceName);
+//		
+//		return new DeviceArray(sDeviceName+"_INSTANCES", instance_ids);
+//	}
 
 	
 	public static long[] getDeviceComponentIds(long nDeviceId) 
@@ -367,7 +368,7 @@ public class SymbolTables {
 			throws EugeneException {
 
 		if (null != objElement) {
-//			System.out.println("[SymbolTables.put] -> "+objElement);
+//			System.out.println("[SymbolTables.put] -> "+objElement.getName());
 			SymbolTables.put(objElement.getName(), objElement);
 		}
 	}

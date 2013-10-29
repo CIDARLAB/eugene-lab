@@ -29,6 +29,8 @@ import java.util.List;
 import org.cidarlab.eugene.cache.SymbolTables;
 import org.cidarlab.eugene.data.sbol.mapping.SBOL2Eugene;
 import org.cidarlab.eugene.dom.NamedElement;
+import org.cidarlab.eugene.dom.collection.CollectionElement;
+import org.cidarlab.eugene.dom.collection.EugeneCollection;
 import org.cidarlab.eugene.exception.EugeneException;
 import org.sbolstandard.core.SBOLDocument;
 import org.sbolstandard.core.SBOLFactory;
@@ -51,19 +53,30 @@ public class SBOLImporter {
         }
         try {
 
-			List<NamedElement> lstElements = new ArrayList<NamedElement>();
+			//EugeneCollection sbolCollection = new EugeneCollection("sbol-collection");						
+			List<NamedElement> lst = new ArrayList<NamedElement>();
 			if (null != newDocument && null != newDocument.getContents()
 					&& !newDocument.getContents().isEmpty()) {
+				
 				// first, create the SBOL properties
 				for (SBOLRootObject sbolObj : newDocument.getContents()) {
 					NamedElement objElement = SBOL2Eugene.convert(sbolObj);
+
 					if (null != objElement) {
 						SymbolTables.put(objElement);
-						lstElements.add(objElement);
+						lst.add(objElement);
 					}
 				}
 			}
-			return lstElements.get(0);
+			
+			/*
+			 * how to deal with  
+			 */
+			return lst.get(0);
+//			if(sbolCollection.size() == 1) {
+//				return sbolCollection.get(0);
+//			}
+//			return sbolCollection;
 		} catch (Exception e) {
             e.printStackTrace();
 			throw new EugeneException(e.toString()/*getMessage()*/);

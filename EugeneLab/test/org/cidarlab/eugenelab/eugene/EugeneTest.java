@@ -1,6 +1,5 @@
 package org.cidarlab.eugenelab.eugene;
 
-import org.cidarlab.eugene.Eugene;
 import org.cidarlab.eugene.EugeneExecutor;
 import org.cidarlab.eugene.dom.PropertyValue;
 import org.cidarlab.eugene.dom.SavableElement;
@@ -16,6 +15,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import org.cidarlab.eugene.util.EugeneUtil;
 import org.json.JSONObject;
 
 /**
@@ -26,17 +26,19 @@ public class EugeneTest {
 
     public static void main(String[] args)
             throws Exception {
-        //new EugeneTest().testInverters();
+        new EugeneTest().testInverters();
         //new EugeneTest().testNORGates();
         //new EugeneTest().testInvertaseNOR();
-        new EugeneTest().testNiF();
+        //new EugeneTest().testNiF();
         System.exit(0);
     }
 
     public void testInverters()
             throws Exception {
-        Set<JSONObject> results = (HashSet<JSONObject>) EugeneExecutor.execute(
-                new File("./web/data/testuser/Examples/SynBERC/inverter.eug"), 3);
+        Set<JSONObject> results = 
+                (HashSet<JSONObject>) new EugeneExecutor("1234567890")
+                    .execute(EugeneUtil.readFile(
+                            new File("./web/data/testuser/Examples/SynBERC/inverter.eug")), 3);
 
         if (null != results && !results.isEmpty()) {
             Iterator<JSONObject> it = results.iterator();
@@ -55,8 +57,9 @@ public class EugeneTest {
 
     public void testNORGates()
             throws Exception {
-        Set<JSONObject> results = (HashSet<JSONObject>) EugeneExecutor.execute(
-                new File("./web/data/testuser/Examples/SynBERC/nor-gate.eug"), 3);
+        Set<JSONObject> results = (HashSet<JSONObject>) new EugeneExecutor("1234567890")
+                    .execute(EugeneUtil.readFile(
+                            new File("./web/data/testuser/Examples/SynBERC/nor-gate.eug")), 3);
 
         if (null != results && !results.isEmpty()) {
             Iterator<JSONObject> it = results.iterator();
@@ -70,8 +73,9 @@ public class EugeneTest {
 
     public void testInvertaseNOR()
             throws Exception {
-        Set<JSONObject> results = (HashSet<JSONObject>) EugeneExecutor.execute(
-                new File("./web/data/testuser/Examples/SynBERC/invertase-nor.eug"), 3);
+        Set<JSONObject> results = (HashSet<JSONObject>) new EugeneExecutor("1234567890")
+                    .execute(EugeneUtil.readFile(
+                            new File("./web/data/testuser/Examples/SynBERC/invertase-nor.eug")), 3);
 
         if (null != results && !results.isEmpty()) {
             Iterator<JSONObject> it = results.iterator();
@@ -87,8 +91,9 @@ public class EugeneTest {
             throws Exception {
 //        Set<JSONObject> results = (HashSet<JSONObject>) EugeneExecutor.execute(
 //                new File("./web/data/testuser/Examples/SynBERC/NiF.eug"), 3);
-        Set<JSONObject> results = (HashSet<JSONObject>) EugeneExecutor.execute(
-                new File("./web/data/testuser/Examples/SynBERC/NiF.eug"), 3);
+        Set<JSONObject> results = (HashSet<JSONObject>) new EugeneExecutor("1234567890")
+                    .execute(EugeneUtil.readFile(
+                            new File("./web/data/testuser/Examples/SynBERC/NiF.eug")), 3);
 
         if (null != results && !results.isEmpty()) {
             Iterator<JSONObject> it = results.iterator();
