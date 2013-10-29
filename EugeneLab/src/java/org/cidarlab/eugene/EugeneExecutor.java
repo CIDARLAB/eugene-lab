@@ -56,7 +56,7 @@ public class EugeneExecutor {
 	public static Object execute(String sScript, int nReturn)
 			throws RecognitionException {
 
-		LogManager.getLogManager().reset();
+		//LogManager.getLogManager().reset();
 
 		EugeneLexer lexer = new EugeneLexer(new ANTLRStringStream(sScript));
 		CommonTokenStream tokens = new CommonTokenStream(lexer);

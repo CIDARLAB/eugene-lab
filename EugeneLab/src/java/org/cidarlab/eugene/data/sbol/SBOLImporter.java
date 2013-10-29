@@ -46,6 +46,10 @@ public class SBOLImporter {
 		SBOLDocument newDocument;
 		try {
 			newDocument = SBOLFactory.read(new FileInputStream(sFileName));
+        } catch(Exception e) {
+            throw new EugeneException("File Load Error");
+        }
+        try {
 
 			List<NamedElement> lstElements = new ArrayList<NamedElement>();
 			if (null != newDocument && null != newDocument.getContents()
@@ -61,7 +65,8 @@ public class SBOLImporter {
 			}
 			return lstElements.get(0);
 		} catch (Exception e) {
-			throw new EugeneException(e.getMessage());
+            e.printStackTrace();
+			throw new EugeneException(e.toString()/*getMessage()*/);
 		}
 	}
 }

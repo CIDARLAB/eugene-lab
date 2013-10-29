@@ -51,6 +51,8 @@ import org.biojava.bio.seq.SequenceIterator;
 import org.biojava.bio.seq.io.SeqIOTools;
 
 import org.cidarlab.eugene.builder.EugeneBuilder;
+import org.cidarlab.eugene.cache.SymbolTables;
+import org.cidarlab.eugene.dom.collection.EugeneCollection;
 
 import org.cidarlab.weyekin.WeyekinPoster;
 import org.json.JSONArray;
@@ -251,26 +253,31 @@ public class EugeneServlet extends HttpServlet {
                     fileName = getFileExtension(fileName, true);
                     NamedElement eugeneConversion;
                     JSONObject toWrite = new JSONObject();
+                    JSONArray resultsArray = new JSONArray();
                     try {
                         eugeneConversion = convertSBOL(fileName);
                         if(eugeneConversion instanceof Component) {
-                            //result = EugeneJSON.toJSON((Component)eugeneConversion); //@TODO: Get Example file
-                        } else if(eugeneConversion instanceof Collection) {
-                            List<Device> deviceList = ((Collection) eugeneConversion).getDevices();
-                            JSONArray resultsArray = new JSONArray();
+                            JSONObject jo = EugeneJSON.toJSON((Device)eugeneConversion);
+                            resultsArray.put(jo);
+                        } else if(eugeneConversion instanceof EugeneCollection) {
+                            Set<Device> deviceList = ((EugeneCollection) eugeneConversion).getDevices();
                             for(Device d: deviceList) {
                                 resultsArray.put(EugeneJSON.toJSON(d));
                             }
-                            toWrite.put("results", resultsArray);
-                            toWrite.put("status", "good");
+                            
                         }
+                        toWrite.put("results", resultsArray); 
+                            toWrite.put("status", "good");
+                        
                     } catch (Exception e) {
                         String exceptionAsString = e.toString().replaceAll("[\r\n\t]+", " ");
                         exceptionAsString = exceptionAsString.replaceAll("[\"]+", "'");
                         toWrite.put("results", exceptionAsString);
                         toWrite.put("status","bad");
+                        toWrite.put("filename", fileName);
                     }
                     out.write(toWrite.toString());
+                    
                 } else if (command.equals("executeGenBank")) {
                     //response.setContentType("text/plain");
                     JSONObject toWrite = new JSONObject();
@@ -506,6 +513,7 @@ public class EugeneServlet extends HttpServlet {
 
     // Takes an SBOL file and converts it into a eugene device
     private NamedElement convertSBOL(String sbolFileName) throws Exception {
+        SymbolTables.init(); //TODO: Will be resolved after Eugene fully integrated
         return SBOLImporter.importSBOL(sbolFileName);
     }
 
@@ -549,6 +557,7 @@ public class EugeneServlet extends HttpServlet {
             while(it.hasNext()) {
                 Feature feature = (Feature) it.next();
                 parts.add(buildPart(feature));
+                //feature.getAnnotation().getFeature(...)
             }
         }
         if(parts.isEmpty()) {

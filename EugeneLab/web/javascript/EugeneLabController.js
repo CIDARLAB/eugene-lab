@@ -155,7 +155,7 @@ $(document).ready(function() {
                 if (this["type"] === undefined) {
                     this["type"] = "gene";
                 }
-                toAppend = toAppend + '<tr><td>' + this["name"] + '</td><td>' + this["type"] + '</td></tr>';
+                toAppend = toAppend + '<tr style="cursor:pointer"><td>' + this["name"] + '</td><td>' + this["type"] + '</td></tr>';
                 drawn[this["name"]] = "added";
 
             }
@@ -478,9 +478,10 @@ $(document).ready(function() {
                 } else {
                     // @TODO: Add other file types
                 }
-
+                alert(JSON.stringify(command));
             $.post("EugeneServlet", command, function(response) {
                 $('#runButton').removeAttr("disabled");
+                alert(JSON.stringify(response));
                 if ("good" === response["status"]) {
                     if (response["results"] !== undefined) {
                         var pigeonLinks = [];

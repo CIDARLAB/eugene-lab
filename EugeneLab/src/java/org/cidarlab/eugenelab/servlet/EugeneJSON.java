@@ -4,10 +4,10 @@
  */
 package org.cidarlab.eugenelab.servlet;
 
-import eugene.dom.components.Component;
-import eugene.dom.components.Device;
-import eugene.dom.components.Part;
-import eugene.dom.components.types.PartType;
+import org.cidarlab.eugene.dom.components.Component;
+import org.cidarlab.eugene.dom.components.Device;
+import org.cidarlab.eugene.dom.components.Part;
+import org.cidarlab.eugene.dom.components.types.PartType;
 import java.util.ArrayList;
 import java.util.List;
 import org.json.JSONArray;
@@ -29,7 +29,7 @@ public class EugeneJSON {
     public static JSONObject toJSON(Part part) throws JSONException {
         JSONObject partJSON = new JSONObject();
         partJSON.put("name", part.getName());
-        partJSON.put("schema", "Part");
+        partJSON.put("schema", "BasicPart");
         partJSON.put("type", part.getPartType().getName());
         partJSON.put("sequence", part.getSequence().toString().replaceAll("\n", ""));
         partJSON.put("pigeon", part.get("Pigeon"));
