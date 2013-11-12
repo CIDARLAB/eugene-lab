@@ -206,7 +206,7 @@ $(document).ready(function() {
                 persist: false,
                 children: children
             });
-            $('#filesArea').dynatree("getTree").reload();
+            //$('#filesArea').dynatree("getTree").reload();
         });
     };
 
@@ -451,7 +451,6 @@ $(document).ready(function() {
             devices = devices.substring(0, devices.length - 1);
             command["devices"] = devices;
             alert(command["devices"]);
-            window.location.replace("http://cidar.bu.edu/ravencad/ravencad.html");
             $.get("EugeneServlet", command, function(response) {
                 alert(response);
             });
@@ -462,7 +461,14 @@ $(document).ready(function() {
             var input = editor.getValue();
             $('#runButton').attr("disabled", "disabled");
             
-             var command;
+            var command;
+             
+            command = {"input": editor.getValue(), 
+                       "command":"execute-miniEugene", 
+                       "N":10,
+                       "NrOfSolutions":100, 
+                       "predefined":false};
+             /**
                 // Get file type to determine command
                 var fileType = getFileType();
                 var fileExtension = getCurrentFileExtension();
@@ -477,7 +483,7 @@ $(document).ready(function() {
                 } else {
                     // @TODO: Add other file types
                 }
-
+                **/
             $.post("EugeneServlet", command, function(response) {
                 $('#runButton').removeAttr("disabled");
                 if ("good" === response["status"]) {
@@ -493,7 +499,7 @@ $(document).ready(function() {
                                 active = "active";
                             }
                             imageHeader = imageHeader + '<li class="' + active + '" data-target="#outputCarousel" +data-slide-to="' + imageCount + '"></li>';
-                            images = images + '<div class="item ' + active + '"><img src="' + this["pigeon-uri"] + '"/><div class="carousel-caption"><h4>' + this["name"] + '</h4></div></div>';
+                            images = images + '<div class="item ' + active + '"><img src="' + this["pigeon-uri"] + '"/></div>';
                             imageCount++;
                         });
                         //render images
@@ -528,7 +534,7 @@ $(document).ready(function() {
                             "bPaginate": false,
                             "sScrollY": "300px"
                         });
-                        $('#outputListArea').parent().append('<button class=btn btn-large btn-success" id="saveAllButton">Save All Parts</button>');
+                        //$('#outputListArea').parent().append('<button class=btn btn-large btn-success" id="saveAllButton">Save All Parts</button>');
                         $('.savePartButton').click(function() {
                             //save a part
                             savePart(_newParts[$(this).parent().parent().children("td:first").text()]);
@@ -549,21 +555,16 @@ $(document).ready(function() {
                         $('#outputArea').collapse('show');
                         drawPartsList();
                     }
-                } else {
-                    console.log(response["error"]);
+                } else if ("exception" === response["status"]) {
+                    
+                    // activate the output textarea 
+                    $('#outputExceptionTab').html(response["error"]);
+                    alert(response["error"]);
                 }
             });
         }
 
     });
-
-
-
-
-
-
-
-
 
     /********Clotho Functions and Variables********/
     var _connection = new WebSocket('wss://localhost:8443/websocket');

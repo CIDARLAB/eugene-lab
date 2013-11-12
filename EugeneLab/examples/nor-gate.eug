@@ -1,0 +1,7 @@
+N=6
+
+// P, P, R, C, T, P
+STARTSWITH p
+ENDSWITH p
+p EXACTLY 3
+r WITH c

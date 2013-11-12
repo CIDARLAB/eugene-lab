@@ -1,17 +1,5 @@
 package org.cidarlab.eugenelab.servlet;
 
-import org.cidarlab.eugene.EugeneExecutor;
-import org.cidarlab.eugene.data.genbank.GenbankImporter;
-import org.cidarlab.eugene.data.sbol.SBOLImporter;
-import org.cidarlab.eugene.dom.NamedElement;
-import org.cidarlab.eugene.dom.PropertyValue;
-import org.cidarlab.eugene.dom.SavableElement;
-import org.cidarlab.eugene.dom.components.Component;
-import org.cidarlab.eugene.dom.components.Device;
-import org.cidarlab.eugene.dom.components.Part;
-import org.cidarlab.eugene.dom.components.Property;
-import org.cidarlab.eugene.dom.components.types.PartType;
-import org.cidarlab.eugene.exception.EugeneException;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -23,9 +11,11 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -51,11 +41,7 @@ import org.biojava.bio.seq.Feature;
 import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.SequenceIterator;
 import org.biojava.bio.seq.io.SeqIOTools;
-
-import org.cidarlab.eugene.builder.EugeneBuilder;
-import org.cidarlab.eugene.cache.SymbolTables;
-import org.cidarlab.eugene.dom.collection.EugeneCollection;
-import org.cidarlab.eugene.stats.EugeneStats;
+import org.cidarlab.minieugene.MiniEugene;
 
 import org.cidarlab.weyekin.WeyekinPoster;
 import org.json.JSONArray;
@@ -80,7 +66,6 @@ public class EugeneServlet extends HttpServlet {
     
     @Override
     public void destroy() {
-        SymbolTables.cleanUp();
     }
 
     /**
@@ -256,6 +241,22 @@ public class EugeneServlet extends HttpServlet {
                             request.getSession().getId(), 
                             input);
                     out.write(result.toString());
+                } else if (command.equals("execute-miniEugene")) {
+                    int sizeOfDesign = Integer.parseInt(
+                            request.getParameter("N"));
+                    String input = request.getParameter("input");                    
+                    boolean predefined = Boolean.parseBoolean(
+                            request.getParameter("predefined"));
+                    int nrOfSolutions = Integer.parseInt(
+                            request.getParameter("NrOfSolutions"));
+                    
+                    
+                    JSONObject result = executeMiniEugene(
+                            request.getSession().getId(), 
+                            sizeOfDesign, input, predefined, nrOfSolutions);
+                    
+                    out.write(result.toString());
+                    
                 } else if (command.equals("saveFileContent")) {
                     String fileName = request.getParameter("fileName");
                     String fileContent = request.getParameter("fileContent");
@@ -266,6 +267,7 @@ public class EugeneServlet extends HttpServlet {
                     WeyekinPoster.setPigeonText(sPigeon);
                     WeyekinPoster.postMyBird();
                 } else if (command.equals("executeSBOL")) {
+                    /***
                     String fileName = request.getParameter("input");
                     fileName = getFileExtension(fileName, true);
                     NamedElement eugeneConversion;
@@ -273,7 +275,8 @@ public class EugeneServlet extends HttpServlet {
                     try {
                         eugeneConversion = convertSBOL(fileName);
                         if(eugeneConversion instanceof Component) {
-                            //result = EugeneJSON.toJSON((Component)eugeneConversion); //@TODO: Get Example file
+//                           JSONObject json = EugeneJSON.toJSON(eugeneConversion);
+//                            resultsArray.put(json);
                         } else if(eugeneConversion instanceof EugeneCollection) {
                             Set<Device> deviceList = ((EugeneCollection) eugeneConversion).getDevices();
                             JSONArray resultsArray = new JSONArray();
@@ -290,7 +293,9 @@ public class EugeneServlet extends HttpServlet {
                         toWrite.put("status","bad");
                     }
                     out.write(toWrite.toString());
+                    ***/
                 } else if (command.equals("executeGenBank")) {
+                    /***
                     //response.setContentType("text/plain");
                     JSONObject toWrite = new JSONObject();
                     String fileName = request.getParameter("input");
@@ -310,7 +315,7 @@ public class EugeneServlet extends HttpServlet {
                         toWrite.put("status", "bad");
                     }
                     out.write(toWrite.toString());
-
+                    ***/ 
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -324,13 +329,14 @@ public class EugeneServlet extends HttpServlet {
 
     private String run(String sessionId, String devices) 
             throws RecognitionException {
-        
+        /***
         System.out.println(devices);
         String[] deviceArray = devices.split("\\|");
         for (int i = 0; i < deviceArray.length; i++) {
             System.out.println(deviceArray[i]);
         }
         String[] results = (String[]) new EugeneExecutor(sessionId).execute("eugeneString", 1);
+        ***/
         return null;
     }
 
@@ -358,9 +364,50 @@ public class EugeneServlet extends HttpServlet {
         return toReturn;
     }
 
+    public JSONObject executeMiniEugene(
+            String sessionId, 
+            int N, String input, boolean predefined, int nrOfSolutions) {
+
+        JSONObject returnJSON = new JSONObject();
+        
+        try {
+            /*
+             * currently we only return 100 randomly choosen solutions
+             */
+            Set<URI> results = new MiniEugene(predefined).execute(input, nrOfSolutions);
+
+            /*
+             * if there was no exception thrown, then
+             * the result is a list of URIs that refer to 
+             * pigeon images
+             */
+            List<JSONObject> lstUriJSON = new ArrayList<JSONObject>();
+            if (null != results && !results.isEmpty()) {
+                for(URI uri : results) {
+                    JSONObject json = new JSONObject();
+                    json.put("pigeon-uri", uri);
+                    lstUriJSON.add(json);
+                }
+            }
+            
+            returnJSON.put("results", lstUriJSON);
+            returnJSON.put("status", "good");
+
+        } catch(Exception e) {
+            try {
+                returnJSON.put("status", "exception");
+                returnJSON.put("error", e.getMessage());
+            } catch(JSONException jse) {}
+        }
+        
+        return returnJSON;
+    }
+    
     public JSONObject executeEugene(String sessionId, String input) {
 
         JSONObject returnJSON = new JSONObject();
+
+        /***
         try {
             
             EugeneExecutor ee = new EugeneExecutor(sessionId);
@@ -374,11 +421,6 @@ public class EugeneServlet extends HttpServlet {
             returnJSON.put("results", lstUriJSON);
             returnJSON.put("status", "good");
 
-            
-            /*
-             * after every Eugene run, 
-             * 1. we clear the symbol tables
-             */
 //            SymbolTables.cleanUp();
             
         } catch (Exception e) {
@@ -390,7 +432,7 @@ public class EugeneServlet extends HttpServlet {
             } catch (Exception e1) {
             }
         }
-
+        **/ 
         return returnJSON;
     }
 
@@ -499,11 +541,11 @@ public class EugeneServlet extends HttpServlet {
         return extension;
     }
 
-    /**
     public JSONObject getData() {
         List<JSONObject> lstParts = new ArrayList<JSONObject>();
 
         try {
+            /***
             File f = new File(this.getServletContext().getRealPath("/")
                     + "/eugene-examples/inverter_data.eug");
 
@@ -539,12 +581,12 @@ public class EugeneServlet extends HttpServlet {
 
             return resultJSON;
             //this.clotho.create(dataJSON);
+            ***/ 
         } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
     }
-    **/
     
 
     private static String getRandomSequence(){
@@ -569,6 +611,7 @@ public class EugeneServlet extends HttpServlet {
         return sb.toString();
     }
     
+    /***
     public static JSONObject toJSON(Device objDevice)
             throws Exception {
         String NEWLINE = System.getProperty("line.separator");
@@ -618,78 +661,16 @@ public class EugeneServlet extends HttpServlet {
 
         return deviceJSON;
     }
-
+    ***/
+    
+    /**
     // Takes an SBOL file and converts it into a eugene device
     private NamedElement convertSBOL(String sbolFileName) throws Exception {
         return SBOLImporter.importSBOL(sbolFileName);
     }
-
-    // Interface that loads a GenBank component straight from the website
-    private Component loadGenBank(String componentName) throws MalformedURLException, IOException,
-            NoSuchElementException, BioException, EugeneException {
-
-        URL url = new URL("http:www.ncbi.nlm.nih.gov/nuccore/" + componentName);
-        BufferedReader br = new BufferedReader(new InputStreamReader(url.openStream()));
-        return readGenBankComponent(br);
-    }
-
-    // Interface that loads a GenBank component from a file
-    private Component loadGenBank(File file) throws FileNotFoundException,
-            NoSuchElementException, BioException, EugeneException {
-        BufferedReader br = new BufferedReader(new FileReader(file));
-        return readGenBankComponent(br);
-    }
-
-    // Converts a GenBank component to a Eugene component
-    // Do not call directly; use above APIs
-    private Component readGenBankComponent(BufferedReader br) throws
-            NoSuchElementException, BioException, EugeneException {
-        SequenceIterator sequences = SeqIOTools.readGenbank(br);
-        List<Component> parts = new ArrayList<Component>();
-        String deviceName = "UnnamedDevice";
-        // Should only have one sequence
-        boolean firstPass = true;
-        // Get a list of all features
-        while (sequences.hasNext()) {
-            Sequence seq = sequences.nextSequence();
-            if (firstPass) {
-                deviceName = seq.getName();
-                firstPass = false;
-
-            } else {
-                deviceName += "|" + seq.getName();
-            }
-            Iterator it = seq.features();
-
-            while(it.hasNext()) {
-                Feature feature = (Feature) it.next();
-                parts.add(buildPart(feature));
-            }
-        }
-        if(parts.isEmpty()) {
-            return null;
-        } else if(parts.size() == 1) {
-            // Size 1 imples just one part
-            return parts.get(0);
-        } else {
-            //@TODO: get a real device name
-            return new Device(deviceName, parts);
-            //return EugeneBuilder.buildDevice(deviceName, parts);
-        }
-    }
+    **/
     
-    private Part buildPart(Feature feature) 
-                throws EugeneException {
-        PartType partType = new PartType(feature.getType());
-        String partName = getPartName(feature);
-        Part part = new Part(partType, partName);
-        part.setSequence(feature.getSequence().seqString());
-        return part;     
-    }
     
-    private String getPartName(Feature feature) {
-        return feature.getType() + "_at_" + feature.getLocation().getMin();
-    }
     
     /* Temporarily saved for reference
     private Component importGenbankComponent(String sFileName) throws MalformedURLException, IOException, 
@@ -803,16 +784,4 @@ public class EugeneServlet extends HttpServlet {
     }
 
 
-    // Takes a device and stores it in Clotho
-    private boolean toClotho(NamedElement element) {
-        try {
-            if (element instanceof Device) {
-                //return clotho.create(this.toJSON((Device)element));   
-            } else if (element instanceof Part) {
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return true;
-    }
 }

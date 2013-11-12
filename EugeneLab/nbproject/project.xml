@@ -182,6 +182,7 @@
             <web-module-additional-libraries/>
             <source-roots>
                 <root id="src.java.dir"/>
+                <root id="src.mini-eugene.dir"/>
             </source-roots>
             <test-roots>
                 <root id="test.src.dir"/>
