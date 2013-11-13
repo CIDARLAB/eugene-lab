@@ -12,8 +12,6 @@ $(document).ready(function() {
     var _newParts = {}; //key: name, value: part JSON
 
 
-
-
     /********Functions********/
     //load files list
     var savePart = function(part, partId) {
@@ -181,7 +179,7 @@ $(document).ready(function() {
                     sequence = _parts[originalName].sequence.sequence;
                 }
             }
-            var pigeon = 'p ' + name + ' 10' ;
+            var pigeon = 'p ' + name + ' 10';
             var newLine = type + ' ' + name + '("' + originalName + '","' + pigeon + '");\n';
             var line = editor.getCursor("start")["line"];
             var currentLine = editor.getLine(line);
@@ -299,8 +297,6 @@ $(document).ready(function() {
             });
         }
     };
-
-
 
     //Event Handlers
     $('#refreshButton').click(function() {
@@ -421,8 +417,13 @@ $(document).ready(function() {
         deviceCount = deviceCount + 1;
     });
 
+    //$('#runButton') jquery syntax
+    //assigns various functions to the run button when clicked
     $('#runButton').click(function() {
-        var text = false; //is the text editor active?
+        //var outputMessageString = '<p> Status: </p>';
+        //$('#outputMessage').html(outputMessageString);
+        $('#outputArea').collapse('show');
+
         if ($('div#textEditorTab').hasClass("active")) {
             text = true;
         }
@@ -458,28 +459,28 @@ $(document).ready(function() {
         } else {
             //Clicking run button sends current text to server
             //May want to modify to send file or collection of files to server(if Eugene program spans multiple files)
-
             var input = editor.getValue();
             $('#runButton').attr("disabled", "disabled");
-            
-             var command;
-                // Get file type to determine command
-                var fileType = getFileType();
-                var fileExtension = getCurrentFileExtension();
-                
-                // Command is based on the file type
-                if(fileType === 'eug') {
-                    command = {"input": editor.getValue(), "command":"execute"};
-                } else if(fileType === 'sbol') {
-                    command = {"input":fileExtension, "command":"executeSBOL"};
-                } else if(fileType === 'gbk'|| fileType === 'gb') {
-                    command = {"input":fileExtension, "command":"executeGenBank"};
-                } else {
-                    // @TODO: Add other file types
-                }
+            var command;
+            // Get file type to determine command
+            var fileType = getFileType();
+            var fileExtension = getCurrentFileExtension();
+
+            // Command is based on the file type
+            /*if (fileType === 'eug') {
+                command = {"input": editor.getValue(), "command": "execute"};
+            } else*/ if (fileType === 'sbol') {
+                command = {"input": fileExtension, "command": "executeSBOL"};
+            } else if (fileType === 'gbk' || fileType === 'gb') {
+                command = {"input": fileExtension, "command": "executeGenBank"};
+            } else {
+                // @TODO: Add other file types
+                command = {"input": editor.getValue(), "command": "execute"};
+            }
 
             $.post("EugeneServlet", command, function(response) {
                 $('#runButton').removeAttr("disabled");
+                 alert(response["status"]);
                 if ("good" === response["status"]) {
                     if (response["results"] !== undefined) {
                         var pigeonLinks = [];
@@ -495,7 +496,8 @@ $(document).ready(function() {
                             imageHeader = imageHeader + '<li class="' + active + '" data-target="#outputCarousel" +data-slide-to="' + imageCount + '"></li>';
                             images = images + '<div class="item ' + active + '"><img src="' + this["pigeon-uri"] + '"/><div class="carousel-caption"><h4>' + this["name"] + '</h4></div></div>';
                             imageCount++;
-                        });
+                        }
+                        );
                         //render images
                         imageHeader = imageHeader + '</ol>';
                         images = images + '</div><a class="carousel-control left" href="#outputCarousel" data-slide="prev">&lsaquo;</a> <a class="carousel-control right" href="#outputCarousel" data-slide="next">&rsaquo;</a></div>';
@@ -522,6 +524,7 @@ $(document).ready(function() {
                                 newParts[this["name"]] = "added";
                             }
                         });
+
                         toAppend = toAppend + "</tbody></table>";
                         $('#outputListArea').html(toAppend);
                         $("#outputList").dataTable({
@@ -549,18 +552,18 @@ $(document).ready(function() {
                         $('#outputArea').collapse('show');
                         drawPartsList();
                     }
-                } else {
-                    console.log(response["error"]);
+                }
+                //add alerts
+                else if ("exception" === response["status"]){
+                    alert(response["results"]);
+                    alert(response["status"]);
+                    var outputMessageException = '<p>Exception</p>';
+                    $('#outputMessage').html(outputMessageException);
+                    //console.log(response["error"]);
                 }
             });
         }
-
     });
-
-
-
-
-
 
 
 
