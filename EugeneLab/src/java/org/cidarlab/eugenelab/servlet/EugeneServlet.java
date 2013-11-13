@@ -31,7 +31,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.antlr.runtime.RecognitionException;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
@@ -327,8 +326,7 @@ public class EugeneServlet extends HttpServlet {
         }
     }
 
-    private String run(String sessionId, String devices) 
-            throws RecognitionException {
+    private String run(String sessionId, String devices){
         /***
         System.out.println(devices);
         String[] deviceArray = devices.split("\\|");
@@ -374,7 +372,7 @@ public class EugeneServlet extends HttpServlet {
             /*
              * currently we only return 100 randomly choosen solutions
              */
-            Set<URI> results = new MiniEugene(predefined).execute(input, nrOfSolutions);
+            Set<URI> results = new MiniEugene(predefined).execute(input);
 
             /*
              * if there was no exception thrown, then

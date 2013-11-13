@@ -20,12 +20,7 @@ public class TestSuite {
 //		new TestSuite().test(new File("./examples/transcriptional-unit.eug"));
 
 		/*** TESTS ***/
-		//new TestSuite().testAll("./examples");
-
-		
-//		new TestSuite().test(new File("./tests/counting/contains.eug"));
-//		new TestSuite().test(new File("./tests/counting/not-morethan.eug"));
-		
+//		new TestSuite().testAll("./tests");
 	}
 
 	public void test(File f) {
@@ -35,7 +30,7 @@ public class TestSuite {
 			 */
 			String script = EugeneUtil.readFile(f);
 			long t1 = System.nanoTime();
-			new MiniEugene(true).execute(script, -1);
+			new MiniEugene(true).execute(script);
 			long tProcessing = System.nanoTime() - t1;
 			
 			System.out.println("[TestSuite.test] full processing time: "+tProcessing*Math.pow(10, -9)+"sec");
@@ -58,6 +53,7 @@ public class TestSuite {
 
 		for ( File f : list ) {
 			if ( f.isDirectory() ) {
+				System.out.println("XXXX");
 				testAll( f.getAbsolutePath() );
 			} else {
 				System.out.println("**** "+f.getAbsoluteFile()+" ****");

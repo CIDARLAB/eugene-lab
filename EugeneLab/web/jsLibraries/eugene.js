@@ -226,7 +226,7 @@ CodeMirror.defineMode("eugene", function(config, parserConfig) {
         name: "eugene",
         keywords: words("boolean num txt PartType Property Rule Device include " +
                 "else for if return while"
-                +" ON CONTAINS AFTER BEFORE STARTSWITH EQUALS ENDSWITH WITH THEN NEXTTO MORETHAN"),
+                +" CONTAINS NOTCONTAINS AFTER ALL_AFTER SOME_AFTER BEFORE ALL_BEFORE SOME_BEFORE STARTSWITH ENDSWITH WITH NOTWITH THEN NEXTTO ALL_NEXTTO SOME_NEXTTO MORETHAN NOTMORETHAN EXACTLY NOTEXACTLY REPRESSES INDUCES BINDS DRIVES"),
         blockKeywords: words("else for if while"),
         atoms: words("true false null undefined"),
         hooks: {
