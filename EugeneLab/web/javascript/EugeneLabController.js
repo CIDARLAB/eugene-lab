@@ -422,11 +422,14 @@ $(document).ready(function() {
     });
 
     $('#runButton').click(function() {
+        
+    	$('#outputArea').collapse('show');
+        
         var text = false; //is the text editor active?
         if ($('div#textEditorTab').hasClass("active")) {
             text = true;
         }
-
+        
         if (!text) {
             var command = {};
             command["command"] = "run";
@@ -465,8 +468,8 @@ $(document).ready(function() {
              
             command = {"input": editor.getValue(), 
                        "command":"execute-miniEugene", 
-                       "N":10,
-                       "NrOfSolutions":100, 
+                       "N":$('#sizeOfDesign').val(),
+                       "NrOfSolutions":$('#nrOfSolutions').val(), 
                        "predefined":false};
              /**
                 // Get file type to determine command
@@ -556,7 +559,7 @@ $(document).ready(function() {
                         drawPartsList();
                     }
                 } else if ("exception" === response["status"]) {
-                    
+                	
                     // activate the output textarea 
                     $('#outputExceptionTab').html(response["error"]);
                     alert(response["error"]);

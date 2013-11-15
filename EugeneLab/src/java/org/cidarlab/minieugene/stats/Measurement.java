@@ -1,4 +1,4 @@
-package org.cidarlab.minieugene.solver.stats.jacop;
+package org.cidarlab.minieugene.stats;
 
 public class Measurement {
 

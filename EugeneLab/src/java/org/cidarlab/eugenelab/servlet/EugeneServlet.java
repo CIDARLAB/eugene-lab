@@ -27,10 +27,12 @@ import java.util.Random;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
@@ -41,7 +43,8 @@ import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.SequenceIterator;
 import org.biojava.bio.seq.io.SeqIOTools;
 import org.cidarlab.minieugene.MiniEugene;
-
+import org.cidarlab.minieugene.MiniEugeneReturn;
+import org.cidarlab.minieugene.stats.Measurement;
 import org.cidarlab.weyekin.WeyekinPoster;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -192,8 +195,6 @@ public class EugeneServlet extends HttpServlet {
     protected void processPostRequest(HttpServletRequest request, HttpServletResponse response) 
                throws IOException {
         
-        System.out.println("[EugeneServlet.processPostRequest] sessionId -> "+request.getSession().getId());
-        
         if (ServletFileUpload.isMultipartContent(request)) {
             try {
                 ServletFileUpload uploadHandler = new ServletFileUpload(new DiskFileItemFactory());
@@ -241,20 +242,38 @@ public class EugeneServlet extends HttpServlet {
                             input);
                     out.write(result.toString());
                 } else if (command.equals("execute-miniEugene")) {
-                    int sizeOfDesign = Integer.parseInt(
+                    boolean bOk = true;
+                	int sizeOfDesign = Integer.parseInt(
                             request.getParameter("N"));
                     String input = request.getParameter("input");                    
                     boolean predefined = Boolean.parseBoolean(
                             request.getParameter("predefined"));
-                    int nrOfSolutions = Integer.parseInt(
-                            request.getParameter("NrOfSolutions"));
                     
+                    JSONObject result = new JSONObject();
                     
-                    JSONObject result = executeMiniEugene(
-                            request.getSession().getId(), 
-                            sizeOfDesign, input, predefined, nrOfSolutions);
+                    int nrOfSolutions = -1;
+                    if(!request.getParameter("NrOfSolutions").trim().isEmpty()) {
+                    	try {
+                    		nrOfSolutions = Integer.parseInt(
+                    				request.getParameter("NrOfSolutions"));
+                    		if(nrOfSolutions < 0) {
+                    			throw new Exception();
+                    		}
+                    	} catch(Exception e) {
+                    		result.put("status", "exception");
+                    		result.put("error", "Invalid Number of Solutions!");
+                    		out.write(result.toString());
+                    		bOk = false;
+                    	}
+                    }
                     
-                    out.write(result.toString());
+                    if(bOk) {
+                    	result = executeMiniEugene(
+                            	request.getSession().getId(), 
+                            	sizeOfDesign, input, predefined, nrOfSolutions);
+                    
+                    	out.write(result.toString());
+                    }
                     
                 } else if (command.equals("saveFileContent")) {
                     String fileName = request.getParameter("fileName");
@@ -372,23 +391,36 @@ public class EugeneServlet extends HttpServlet {
             /*
              * currently we only return 100 randomly choosen solutions
              */
-            Set<URI> results = new MiniEugene(predefined).execute(input);
+            MiniEugeneReturn eugeneReturn = new MiniEugene(N, nrOfSolutions, predefined).execute(input);
 
-            /*
-             * if there was no exception thrown, then
-             * the result is a list of URIs that refer to 
-             * pigeon images
-             */
             List<JSONObject> lstUriJSON = new ArrayList<JSONObject>();
-            if (null != results && !results.isEmpty()) {
-                for(URI uri : results) {
-                    JSONObject json = new JSONObject();
-                    json.put("pigeon-uri", uri);
-                    lstUriJSON.add(json);
-                }
+            List<JSONObject> lstStatsJSON = new ArrayList<JSONObject>();
+
+            if(null != eugeneReturn) {
+	            /*
+	             * if there was no exception thrown, then
+	             * the result is a list of URIs that refer to 
+	             * pigeon images
+	             */
+	            if (null != eugeneReturn.getURIs() && !eugeneReturn.getURIs().isEmpty()) {
+	                for(URI uri : eugeneReturn.getURIs()) {
+	                    JSONObject json = new JSONObject();
+	                    json.put("pigeon-uri", uri);
+	                    lstUriJSON.add(json);
+	                }
+	            }
+	            
+	            if (null != eugeneReturn.getStatistics() && !(eugeneReturn.getStatistics()).isEmpty()) {
+	            	for(Measurement m : eugeneReturn.getStatistics().getMeasurements()) {
+	            		JSONObject statsJSON = new JSONObject();
+	            		statsJSON.put(m.getKey(), m.getValue());
+	            		lstStatsJSON.add(statsJSON);	            		
+	            	}
+	            }
             }
-            
             returnJSON.put("results", lstUriJSON);
+            returnJSON.put("stats", lstStatsJSON);
+            
             returnJSON.put("status", "good");
 
         } catch(Exception e) {
@@ -439,7 +471,6 @@ public class EugeneServlet extends HttpServlet {
     private String getFileTree() {
        //String currentFolderExtension = this.getServletContext().getRealPath("/") + "/data/" + getCurrentUser() + "/";
        String currentFolderExtension = Paths.get(this.getServletContext().getRealPath(""), "data", getCurrentUser()).toString();        
-       System.out.println("[EugeneServlet.getFileTree] -> "+currentFolderExtension);
        
         File rootFolder = new File(currentFolderExtension);
         ArrayList<File> queue = new ArrayList();

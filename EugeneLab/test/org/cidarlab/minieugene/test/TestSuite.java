@@ -2,12 +2,6 @@ package org.cidarlab.minieugene.test;
 
 import java.io.File;
 import java.io.FilenameFilter;
-import java.io.IOException;
-import java.net.URI;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 import org.cidarlab.minieugene.MiniEugene;
 import org.cidarlab.eugene.util.EugeneUtil;
@@ -20,7 +14,7 @@ public class TestSuite {
 //		new TestSuite().test(new File("./examples/transcriptional-unit.eug"));
 
 		/*** TESTS ***/
-//		new TestSuite().testAll("./tests");
+		new TestSuite().testAll("./tests");
 	}
 
 	public void test(File f) {
@@ -30,7 +24,7 @@ public class TestSuite {
 			 */
 			String script = EugeneUtil.readFile(f);
 			long t1 = System.nanoTime();
-			new MiniEugene(true).execute(script);
+			new MiniEugene(-1, -1, false).execute(script);
 			long tProcessing = System.nanoTime() - t1;
 			
 			System.out.println("[TestSuite.test] full processing time: "+tProcessing*Math.pow(10, -9)+"sec");
@@ -53,7 +47,6 @@ public class TestSuite {
 
 		for ( File f : list ) {
 			if ( f.isDirectory() ) {
-				System.out.println("XXXX");
 				testAll( f.getAbsolutePath() );
 			} else {
 				System.out.println("**** "+f.getAbsoluteFile()+" ****");

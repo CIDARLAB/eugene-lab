@@ -126,7 +126,25 @@
                         <!-- <li class="active"><a  href="#textEditorTab" data-toggle="tab">Text Editor</a></li> -->
                         <!-- <li><a>Current Open File: <Strong id="fileName">New File.eug</Strong></a></li> -->
                         <!-- <li class="pull-right"><button style="width:150px" id="saveButton" class="btn btn-success">Save</button></li> -->
-                        <li class="pull-right"><button style="width:150px" id="runButton" class="btn btn-danger">Solve</button></li>
+
+                        
+                        <li class="pull-left">
+	                        Size of the Design: 
+							<select name="sizeOfDesign" id="sizeOfDesign" style="width:50px"></select>
+						    <script>
+						    var $select = $('#sizeOfDesign');
+						    for ( var i = 1; i <= 15; i++ ) {
+						        $select.append($('<option/>', { value: i, text: i }));
+						    }
+						   	</script>                        
+                        </li>
+                        <li class="pull-middle">
+	                        &nbsp;&nbsp;&nbsp;&nbsp;Number of Solutions: <input type="text" style="width:150px" id="nrOfSolutions" /> 
+  					 	</li>                        
+  					 	
+                        <li class="pull-right">
+                        	<button style="width:150px" id="runButton" class="btn btn-danger">Solve</button>
+                        </li>
                     </ul>
 
                     <div id="dataTableContent" class="tab-content">
@@ -150,10 +168,15 @@
                                     </div>
                                     <div id="editorArea" class="accordion-body collapse in">
                                         <div class="accordion-inner">
-                                            <textarea id="textEditor"></textarea>
+                                            <textarea id="textEditor">CONTAINS p
+CONTAINS r
+CONTAINS c
+CONTAINS t
+                                            </textarea>
                                         </div>
                                     </div>
                                 </div>
+                                
                                 <div class="accordion-group">
                                     <div class="accordion-heading">
                                         <h5>
@@ -212,7 +235,7 @@
         <script src="javascript/ObjectIDGenerator.js"></script>
         <script src="javascript/EugeneLabController.js"></script>
         <script src="jsLibraries/codemirror.js"></script>
-        <script src="jsLibraries/jquery.dynatree.min.js"></script>
+        <!--  <script src="jsLibraries/jquery.dynatree.min.js"></script> -->
         <!--<script src="jsLibraries/jquery.cookie.js"></script>-->
         <script src="jsLibraries/eugene.js"></script>
 

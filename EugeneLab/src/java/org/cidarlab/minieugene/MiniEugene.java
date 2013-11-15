@@ -34,6 +34,7 @@ import org.cidarlab.minieugene.exception.EugeneException;
 import org.cidarlab.minieugene.predicates.LogicalNot;
 import org.cidarlab.minieugene.predicates.Predicate;
 import org.cidarlab.minieugene.solver.jacop.JaCoPSolver;
+import org.cidarlab.minieugene.stats.EugeneStatistics;
 import org.cidarlab.minieugene.symbol.SymbolTables;
 
 import JaCoP.core.Domain;
@@ -51,11 +52,14 @@ public class MiniEugene {
 	 * N ... length/size of the design
 	 */
 	private int N;
+	private int NR_OF_SOLUTIONS;
 	
-	public MiniEugene(boolean usePredefined) {
+	public MiniEugene(int N, int NR_OF_SOLUTIONS, boolean usePredefined) {
 		this.symbols = new SymbolTables();
 		this.pb = new PredicateBuilder();
 		
+		this.N = N;
+		this.NR_OF_SOLUTIONS = NR_OF_SOLUTIONS;
 		/*
 		 * use our predefined symbols
 		 */
@@ -71,12 +75,16 @@ public class MiniEugene {
 	/*
 	 * return .. a set of URIs that point to the pigeon images
 	 */
-	public Set<URI> execute(String script) 
+	public MiniEugeneReturn execute(String script) 
 			throws EugeneException {
 
 		if(script == null || script.isEmpty()) {
 			throw new EugeneException("please provide some input!");
 		}
+		
+		EugeneStatistics stats = new EugeneStatistics();		
+		Set<URI> imageUris = null;
+		
 		
 		/*
 		 * we parse the received string line by line
@@ -93,11 +101,21 @@ public class MiniEugene {
 			int i=0;
 			try {
 				
+//				/*
+//				 * PARSING
+//				 */
+				
 				/*
-				 * PARSING
+				 * if there was no N provided, then N
+				 * is specified in the first line
 				 */
-				this.N = parseN(lines[i++]);
+				if(this.N == -1) {
+					this.N = parseN(lines[i++]);
+				}
+				
 				for(; i<lines.length; i++) {
+					lines[i] = lines[i].trim();
+
 					if (! (lines[i].startsWith("//") || lines[i].isEmpty())) {
 						if(predicates == null) {
 							predicates = new Predicate[1];
@@ -120,18 +138,30 @@ public class MiniEugene {
 				if(null == symbolIds || symbolIds.length==0) {
 					throw new EugeneException("no solutions found!");
 				}
-				
-//				System.out.println("symbolIds -> "+Arrays.toString(symbolIds));
+
+				stats.add("Number of Parts", symbolIds.length);
+				stats.add("Possible Solutions", Math.pow(symbolIds.length, this.N));
 				
 				/*
 				 * SOLUTION FINDING
 				 */
+				long T1 = System.nanoTime();
 				List<String[]> solutions = new JaCoPSolver(this.symbols).solve(N, symbolIds, predicates);
+				long T2 = System.nanoTime();
+				stats.add("Solution Finding Time", (T2-T1)*Math.pow(10, -9));
+				stats.add("Valid Solutions", Math.pow(symbolIds.length, this.N));
 
+				
 				if(null == solutions || solutions.size()==0) {
 					throw new EugeneException("no solutions found!");
-				} else {				
-					return new SolutionExporter().exportSolutions(solutions, -1);
+				} else {	
+					/**
+					long T3 = System.nanoTime();
+					imageUris = new SolutionExporter().exportSolutions(solutions, this.NR_OF_SOLUTIONS);
+					long T4 = System.nanoTime();
+					stats.add("Solutiong Visualization Time", (T4-T3)*Math.pow(10, -9));
+					*/
+					System.out.println(solutions.size());
 				}
 			} catch(Exception e) {
 				throw new EugeneException(e.getMessage());
@@ -144,7 +174,7 @@ public class MiniEugene {
 		 */
 //		this.symbols.print();
 		
-		return null;
+		return new MiniEugeneReturn(imageUris, stats);
 	}
 	
 	/*

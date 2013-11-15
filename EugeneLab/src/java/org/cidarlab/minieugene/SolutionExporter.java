@@ -35,24 +35,25 @@ public class SolutionExporter {
 		
         try {
             Set<URI> uris = new HashSet<URI>();
+        	Pigeonizer pigeon = new Pigeonizer();
             
             /* 
-             * we visualize always 20 pigeon images
+             * we visualize always 20 designs 
              */           
             if(lst.size() > 20) {
             	
-            	Pigeonizer pigeon = new Pigeonizer();
+            	System.out.println("solutions.size -> "+solutions.size());
                 int k=0;
                 while(k<solutions.size()) {   
                     if(k+20 >= solutions.size()) {
-                        uris.add(pigeon.pigeonize(lst.subList(k, solutions.size()-1)));
+                        uris.add(pigeon.pigeonize(lst.subList(k, solutions.size())));
                     } else {
                         uris.add(pigeon.pigeonize(lst.subList(k, k+20)));
                     }
                     k+=20;
                 }
             } else {
-                uris.add(new Pigeonizer().pigeonize(lst));
+                uris.add(pigeon.pigeonize(lst));
             }
             
             return uris;

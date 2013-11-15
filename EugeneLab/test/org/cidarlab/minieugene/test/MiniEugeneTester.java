@@ -39,7 +39,7 @@ public class MiniEugeneTester {
 		int validIdx = 0;		
 		for(int i=0; i<testN.length; i++) {
 			try {
-				new MiniEugene(false).parseN(testN[i]);
+				new MiniEugene(-1, -1, false).parseN(testN[i]);
 				valid[validIdx++] = i;
 			} catch(Exception e) {
 			}
@@ -72,7 +72,7 @@ public class MiniEugeneTester {
 		for(int i=2; i<=10; i++) {
 			String s = new String("N="+i+NEWLINE+"a BEFORE b");
 			try {
-				new MiniEugene(false).execute(s);
+				new MiniEugene(-1, -1, false).execute(s);
 			} catch(Exception e) {
 				System.err.println(e.getMessage());
 			}
@@ -85,7 +85,7 @@ public class MiniEugeneTester {
 		for(int i=2; i<=10; i++) {
 			String s = new String("N="+i+NEWLINE+"a SOME_BEFORE b");
 			try {
-				new MiniEugene(false).execute(s);
+				new MiniEugene(-1, -1, false).execute(s);
 			} catch(Exception e) {
 				System.err.println(e.getMessage());
 			}
@@ -107,7 +107,7 @@ public class MiniEugeneTester {
 
 		for(int i=0; i<testN.length; i++) {
 			try {
-				new MiniEugene(true).execute(testN[i]);
+				new MiniEugene(-1, -1, true).execute(testN[i]);
 			} catch(Exception e) {
 				System.err.println(e.getMessage());
 			}

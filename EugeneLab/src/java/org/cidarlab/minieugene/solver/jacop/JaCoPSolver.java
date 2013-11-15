@@ -1,50 +1,22 @@
 package org.cidarlab.minieugene.solver.jacop;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.cidarlab.minieugene.exception.EugeneException;
 import org.cidarlab.minieugene.predicates.Predicate;
 import org.cidarlab.minieugene.solver.Solver;
-import org.cidarlab.minieugene.solver.stats.jacop.SolverStats;
-import org.cidarlab.minieugene.solver.stats.jacop.Stats;
 import org.cidarlab.minieugene.symbol.SymbolTables;
 
-import JaCoP.constraints.Alldifferent;
-import JaCoP.constraints.And;
-import JaCoP.constraints.Constraint;
-import JaCoP.constraints.Element;
-import JaCoP.constraints.IfThen;
-import JaCoP.constraints.Or;
-import JaCoP.constraints.PrimitiveConstraint;
-import JaCoP.constraints.Reified;
-import JaCoP.constraints.XeqC;
-import JaCoP.constraints.XeqY;
-import JaCoP.constraints.XgtC;
-import JaCoP.constraints.XgtY;
-import JaCoP.core.BooleanVar;
 import JaCoP.core.Domain;
-import JaCoP.core.IntDomain;
 import JaCoP.core.IntVar;
 import JaCoP.core.Store;
 import JaCoP.core.ValueEnumeration;
-import JaCoP.scala.SetVar;
 import JaCoP.search.DepthFirstSearch;
-import JaCoP.search.IndomainHierarchical;
-import JaCoP.search.IndomainList;
-import JaCoP.search.IndomainMiddle;
-import JaCoP.search.IndomainMin;
 import JaCoP.search.IndomainSimpleRandom;
-import JaCoP.search.LargestDomain;
 import JaCoP.search.MostConstrainedDynamic;
 import JaCoP.search.Search;
 import JaCoP.search.SelectChoicePoint;
-import JaCoP.search.SimpleMatrixSelect;
 import JaCoP.search.SimpleSelect;
 
 
@@ -52,12 +24,10 @@ public class JaCoPSolver
 		implements Solver {
 
 	private Store store;
-	private SolverStats stats;
 	private SymbolTables symbols;
 	
 	public JaCoPSolver(SymbolTables symbols) {
 		this.store = new Store();
-		this.stats = new SolverStats();
 		this.symbols = symbols;
 	}
 	
@@ -102,7 +72,13 @@ public class JaCoPSolver
     	return null;
 	}
     
-	public IntVar[] model(int N, int[] ids) {
+	public IntVar[] model(int N, int[] ids) 
+			throws EugeneException {
+		/**
+		if(Math.pow(ids.length, N) > Math.pow(10, 7)) {
+			throw new EugeneException("I'm sorry! This problem is currently too big for me to solve!");
+		}
+		**/
 		IntVar[] variables = new IntVar[N];
 		for(int i=0; i<N; i++) {
 			variables[i] = new IntVar(store, "X"+i);

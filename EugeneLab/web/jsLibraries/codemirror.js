@@ -3100,13 +3100,13 @@ window.CodeMirror = (function() {
 
   option("indentUnit", 2, loadMode, true);
   option("indentWithTabs", false);
-  option("smartIndent", true);
+  option("smartIndent", false);
   option("tabSize", 4, function(cm) {
     loadMode(cm);
     clearCaches(cm);
     regChange(cm);
   }, true);
-  option("electricChars", true);
+  option("electricChars", false);
   option("rtlMoveVisually", !windows);
 
   option("theme", "default", function(cm) {
