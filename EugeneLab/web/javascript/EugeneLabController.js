@@ -11,7 +11,6 @@ $(document).ready(function() {
     var _partIds = {}; //key: name, value: uuid
     var _newParts = {}; //key: name, value: part JSON
 
-
     /********Functions********/
     //load files list
     var savePart = function(part, partId) {
@@ -468,19 +467,19 @@ $(document).ready(function() {
 
             // Command is based on the file type
             /*if (fileType === 'eug') {
-                command = {"input": editor.getValue(), "command": "execute"};
-            } else*/ if (fileType === 'sbol') {
+             command = {"input": editor.getValue(), "command": "execute"};
+             } else*/
+            if (fileType === 'sbol') {
                 command = {"input": fileExtension, "command": "executeSBOL"};
             } else if (fileType === 'gbk' || fileType === 'gb') {
                 command = {"input": fileExtension, "command": "executeGenBank"};
             } else {
-                // @TODO: Add other file types
                 command = {"input": editor.getValue(), "command": "execute"};
             }
 
             $.post("EugeneServlet", command, function(response) {
                 $('#runButton').removeAttr("disabled");
-                 alert(response["status"]);
+                //alert(response["status"]);
                 if ("good" === response["status"]) {
                     if (response["results"] !== undefined) {
                         var pigeonLinks = [];
@@ -553,20 +552,15 @@ $(document).ready(function() {
                         drawPartsList();
                     }
                 }
-                //add alerts
-                else if ("exception" === response["status"]){
-                    alert(response["results"]);
-                    alert(response["status"]);
-                    var outputMessageException = '<p>Exception</p>';
-                    $('#outputMessage').html(outputMessageException);
+                else if ("exception" === response["status"]) {
+                    //alert(response["results"]);
+                    //alert("Response: ", response["status"]);
+                    $('#outputMessage').html("Exception: " + response["results"]);
                     //console.log(response["error"]);
                 }
             });
         }
     });
-
-
-
 
     /********Clotho Functions and Variables********/
     var _connection = new WebSocket('wss://localhost:8443/websocket');

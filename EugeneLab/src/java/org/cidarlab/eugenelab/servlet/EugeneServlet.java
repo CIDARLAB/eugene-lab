@@ -285,7 +285,7 @@ public class EugeneServlet extends HttpServlet {
                     } catch (Exception e) {
                         String exceptionAsString = e.toString().replaceAll("[\r\n\t]+", " ");
                         exceptionAsString = exceptionAsString.replaceAll("[\"]+", "'");
-                        toWrite.put("results", "Exception (Dummy String)");
+                        toWrite.put("results", "***Exception-Dummy-String***");
                         toWrite.put("status", "exception");
                     }
                     out.write(toWrite.toString());
@@ -306,7 +306,7 @@ public class EugeneServlet extends HttpServlet {
                         toWrite.put("results", resultsArray);
                         toWrite.put("status", "good");
                     } catch (Exception e) {
-                        toWrite.put("results", "Exception (Dummy String)");
+                        toWrite.put("results", "***Exception-Dummy-String***");
                         toWrite.put("status", "exception");
                     }
                     out.write(toWrite.toString());
@@ -377,7 +377,7 @@ public class EugeneServlet extends HttpServlet {
              */
 //            SymbolTables.cleanUp();
        // } catch (Exception e) {*/
-            returnJSON.put("results", "Exception (Dummy String)");
+            returnJSON.put("results", "***Exception-Dummy-String***");
             returnJSON.put("status", "exception");
             //returnJSON.put("error", e.getMessage());
             //e.printStackTrace();
