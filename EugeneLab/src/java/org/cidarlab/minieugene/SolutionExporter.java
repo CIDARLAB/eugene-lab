@@ -16,7 +16,7 @@ public class SolutionExporter {
 	/*
 	 * visualize (using pigeon) N solutions
 	 */
-	public Set<URI> exportSolutions(List<String[]> solutions, int N) 
+	public Set<URI> pigeonizeSolutions(List<String[]> solutions, int N) 
 			throws EugeneException {
 		int[] idx = null;
 		if(N != -1 && N < solutions.size()) {
@@ -41,10 +41,8 @@ public class SolutionExporter {
              * we visualize always 20 designs 
              */           
             if(lst.size() > 20) {
-            	
-            	System.out.println("solutions.size -> "+solutions.size());
                 int k=0;
-                while(k<solutions.size()) {   
+                while(k<lst.size()) {   
                     if(k+20 >= solutions.size()) {
                         uris.add(pigeon.pigeonize(lst.subList(k, solutions.size())));
                     } else {
@@ -60,12 +58,6 @@ public class SolutionExporter {
         } catch(Exception e) {
             throw new EugeneException(e.getMessage());
         }
-	}
-
-	private void printAllSolutions(List<String[]> solutions) {
-		for(int i=0; i<solutions.size(); i++) {
-			System.out.println(Arrays.toString(solutions.get(i)));
-		}
 	}
 
 	private int[] generateRandomIndices(int N, int range) {

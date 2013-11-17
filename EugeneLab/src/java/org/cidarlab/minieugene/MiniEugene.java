@@ -84,7 +84,7 @@ public class MiniEugene {
 		
 		EugeneStatistics stats = new EugeneStatistics();		
 		Set<URI> imageUris = null;
-		
+		List<String[]> solutions = null;
 		
 		/*
 		 * we parse the received string line by line
@@ -141,27 +141,30 @@ public class MiniEugene {
 
 				stats.add("Number of Parts", symbolIds.length);
 				stats.add("Possible Solutions", Math.pow(symbolIds.length, this.N));
+				stats.add("Number of Rules", predicates.length);
 				
 				/*
 				 * SOLUTION FINDING
 				 */
 				long T1 = System.nanoTime();
-				List<String[]> solutions = new JaCoPSolver(this.symbols).solve(N, symbolIds, predicates);
+				solutions = new JaCoPSolver(this.symbols).solve(N, symbolIds, predicates);
 				long T2 = System.nanoTime();
 				stats.add("Solution Finding Time", (T2-T1)*Math.pow(10, -9));
-				stats.add("Valid Solutions", Math.pow(symbolIds.length, this.N));
+				stats.add("Number of Solutions", solutions.size());
 
 				
 				if(null == solutions || solutions.size()==0) {
 					throw new EugeneException("no solutions found!");
 				} else {	
-					/**
 					long T3 = System.nanoTime();
-					imageUris = new SolutionExporter().exportSolutions(solutions, this.NR_OF_SOLUTIONS);
+					if(solutions.size() > 100) {
+						imageUris = new SolutionExporter().pigeonizeSolutions(solutions, 100);
+					} else {
+						imageUris = new SolutionExporter().pigeonizeSolutions(solutions, solutions.size());
+					}
 					long T4 = System.nanoTime();
-					stats.add("Solutiong Visualization Time", (T4-T3)*Math.pow(10, -9));
-					*/
-					System.out.println(solutions.size());
+					stats.add("Solution Visualization Time", (T4-T3)*Math.pow(10, -9));
+					//System.out.println(solutions.size());
 				}
 			} catch(Exception e) {
 				throw new EugeneException(e.getMessage());
@@ -174,7 +177,7 @@ public class MiniEugene {
 		 */
 //		this.symbols.print();
 		
-		return new MiniEugeneReturn(imageUris, stats);
+		return new MiniEugeneReturn(imageUris, solutions, stats);
 	}
 	
 	/*

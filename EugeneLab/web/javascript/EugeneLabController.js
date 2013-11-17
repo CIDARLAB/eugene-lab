@@ -11,9 +11,6 @@ $(document).ready(function() {
     var _partIds = {}; //key: name, value: uuid
     var _newParts = {}; //key: name, value: part JSON
 
-
-
-
     /********Functions********/
     //load files list
     var savePart = function(part, partId) {
@@ -181,7 +178,7 @@ $(document).ready(function() {
                     sequence = _parts[originalName].sequence.sequence;
                 }
             }
-            var pigeon = 'p ' + name + ' 10' ;
+            var pigeon = 'p ' + name + ' 10';
             var newLine = type + ' ' + name + '("' + originalName + '","' + pigeon + '");\n';
             var line = editor.getCursor("start")["line"];
             var currentLine = editor.getLine(line);
@@ -191,6 +188,7 @@ $(document).ready(function() {
 
     //draw the file table tree based on users file contents
     var loadFileTree = function() {
+    	/**
         $("#filesArea").html("");
         $.get("EugeneServlet", {"command": "getFileTree"}, function(data) {
             var children = data;
@@ -208,6 +206,7 @@ $(document).ready(function() {
             });
             //$('#filesArea').dynatree("getTree").reload();
         });
+        **/
     };
 
     var getActiveNode = function() {
@@ -299,8 +298,6 @@ $(document).ready(function() {
             });
         }
     };
-
-
 
     //Event Handlers
     $('#refreshButton').click(function() {
@@ -421,11 +418,14 @@ $(document).ready(function() {
         deviceCount = deviceCount + 1;
     });
 
+    //$('#runButton') jquery syntax
+    //assigns various functions to the run button when clicked
     $('#runButton').click(function() {
         
     	$('#outputArea').collapse('show');
         
         var text = false; //is the text editor active?
+
         if ($('div#textEditorTab').hasClass("active")) {
             text = true;
         }
@@ -460,7 +460,6 @@ $(document).ready(function() {
         } else {
             //Clicking run button sends current text to server
             //May want to modify to send file or collection of files to server(if Eugene program spans multiple files)
-
             var input = editor.getValue();
             $('#runButton').attr("disabled", "disabled");
             
@@ -487,10 +486,24 @@ $(document).ready(function() {
                     // @TODO: Add other file types
                 }
                 **/
+
             $.post("EugeneServlet", command, function(response) {
                 $('#runButton').removeAttr("disabled");
+                //alert(response["status"]);
                 if ("good" === response["status"]) {
                     if (response["results"] !== undefined) {
+                    	
+                    	// print the stats
+                        var stats = '<div><table class="table table-bordered table-hover" id="outputList"><thead><tr><th>Name</th><th>Value</th><th></th></tr></thead><tbody>';
+                    	$.each(response["stats"], function() {
+
+                    		stats = stats + '<tr><td>' + this["name"] + '</td><td>' + this["value"] + '</td></tr>';
+                        }
+                        );
+                    	stats = stats + '</tbody></table></div>';
+                    	$('#outputStatsArea').html(stats);
+                    	
+                    	// visualize the designs using pigeon
                         var pigeonLinks = [];
                         var imageHeader = '<div id="outputCarousel" class="slide carousel"><ol class="carousel-indicators">';
                         var images = '<div class="carousel-inner">';
@@ -504,7 +517,8 @@ $(document).ready(function() {
                             imageHeader = imageHeader + '<li class="' + active + '" data-target="#outputCarousel" +data-slide-to="' + imageCount + '"></li>';
                             images = images + '<div class="item ' + active + '"><img src="' + this["pigeon-uri"] + '"/></div>';
                             imageCount++;
-                        });
+                        }
+                        );
                         //render images
                         imageHeader = imageHeader + '</ol>';
                         images = images + '</div><a class="carousel-control left" href="#outputCarousel" data-slide="prev">&lsaquo;</a> <a class="carousel-control right" href="#outputCarousel" data-slide="next">&rsaquo;</a></div>';
@@ -512,31 +526,20 @@ $(document).ready(function() {
                         $('#outputImageArea').html(slideShow);
                         $('#outputCarousel').carousel({interval: 5000});
                         //render new parts list
-                        var toAppend = '<table class="table table-bordered table-hover" id="outputList"><thead><tr><th>Name</th><th>Type</th><th></th></tr></thead><tbody>';
-                        //handle each device
-                        var newParts = {};
-
-                        $.each(response["results"], function() {
-                            if (newParts[this["name"]] !== "added") {
-                                _newParts[this["name"]] = this;
-                                toAppend = toAppend + '<tr><td>' + this["name"] + '</td><td>' + this["type"] + '</td><td><button class="btn btn-success savePartButton">Save</button></td></tr>';
-                                //handle each component
-                                $.each(this["components"], function() {
-                                    if (this["type"] !== undefined && newParts[this["name"]] !== "added") {
-                                        _newParts[this["name"]] = this;
-                                        toAppend = toAppend + '<tr><td>' + this["name"] + '</td><td>' + this["type"] + '</td><td><button class="btn btn-success savePartButton">Save</button></td></tr>';
-                                        newParts[this["name"]] = "added";
-                                    }
-                                });
-                                newParts[this["name"]] = "added";
-                            }
-                        });
-                        toAppend = toAppend + "</tbody></table>";
-                        $('#outputListArea').html(toAppend);
+                        
+                        
+                        /*
+                         * textual representation of the solutions
+                         */
+                        $('#outputSolutionArea').html(response["solutions"]);
                         $("#outputList").dataTable({
                             "bPaginate": false,
                             "sScrollY": "300px"
                         });
+                        
+                    	$('#outputExceptionArea').html('');
+
+                        /**
                         //$('#outputListArea').parent().append('<button class=btn btn-large btn-success" id="saveAllButton">Save All Parts</button>');
                         $('.savePartButton').click(function() {
                             //save a part
@@ -557,16 +560,22 @@ $(document).ready(function() {
                         });
                         $('#outputArea').collapse('show');
                         drawPartsList();
+                        **/
                     }
-                } else if ("exception" === response["status"]) {
-                	
-                    // activate the output textarea 
-                    $('#outputExceptionTab').html(response["error"]);
-                    alert(response["error"]);
+                }
+                else if ("exception" === response["status"]) {
+                	// clean the other tabs
+                    $("#outputStatsArea").html('');
+                    $("#outputImageArea").html('');
+                    $("#outputListArea").html('');
+                    
+                    // print the exception
+                	$('#outputExceptionArea').html("Exception: " + response["results"]);
+                    //$('#outputExceptionArea').collapse('show');
+                    //$('#outputExceptionTab').collapse('show');
                 }
             });
         }
-
     });
 
     /********Clotho Functions and Variables********/

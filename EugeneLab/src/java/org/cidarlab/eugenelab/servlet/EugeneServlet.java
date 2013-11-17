@@ -15,6 +15,7 @@ import java.net.URI;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -61,19 +62,17 @@ public class EugeneServlet extends HttpServlet {
             throws ServletException {
 
         super.init();
-        
-        
+
         //this.clotho = ClothoFactory.getAPI("ws://localhost:8080/websocket");
     }
-    
+
     @Override
     public void destroy() {
     }
 
     /**
-     * Processes requests for both HTTP
-     * <code>GET</code> and
-     * <code>POST</code> methods.
+     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
+     * methods.
      *
      * @param request servlet request
      * @param response servlet response
@@ -92,23 +91,27 @@ public class EugeneServlet extends HttpServlet {
             if (command.equals("imageList")) {
                 out.write(readImageFiles());
             } else if (command.equals("run")) {
+                /* try {*/
                 String devices = request.getParameter("devices");
                 String toReturn = run(request.getSession().getId(), devices);
                 toReturn = "{\"response\":\"response\"}";
                 out.write(toReturn);
+                /*
+                 } catch (Exception e) {
+                 JSONObject myJSON = new JSONObject();
+                 myJSON.put("results", "Exception (Dummy String)");
+                 myJSON.put("status", "exception");
+                 }
+                 */
             } else if (command.equals("read")) {
-
                 // That's how the query should look like:
-
                 // {"channel":"query","data":{"schema":"org.cidarlab.eugene.dom.component.Part"}}
-
                 // process the data for EugeneLab...
                 //System.out.println(this.getData());
 
                 /* option 1: 
                  * retrieve the parts from Clotho
                  */
-
 //                 JSONObject queryJSON = new JSONObject();
 //                 try {
 //                 queryJSON.put("schema", "eugene.dom.component.Part");
@@ -120,12 +123,11 @@ public class EugeneServlet extends HttpServlet {
 
                 /* option 2:
                  * load the parts from a Eugene script
-                JSONObject json = this.getData();
-                if (null != json) {
-                    out.write(this.getData().toString());
-                }
+                 JSONObject json = this.getData();
+                 if (null != json) {
+                 out.write(this.getData().toString());
+                 }
                  */
-
 //                out.write(simulateReadingPartsFromClotho());
 //                out.write(readFiles());
             } else if (command.equals("getFileTree")) {
@@ -137,14 +139,14 @@ public class EugeneServlet extends HttpServlet {
                 out.write(toReturn);
             } else if (command.equals("test")) {
                 out.write("{\"response\":\"test response\"}");
-            } 
+            }
         } catch (Exception e) {
             e.printStackTrace();
             StringWriter stringWriter = new StringWriter();
             PrintWriter printWriter = new PrintWriter(stringWriter);
             e.printStackTrace(printWriter);
             String exceptionAsString = stringWriter.toString().replaceAll("[\r\n\t]+", "<br/>");
-            out.println("{\"result\":\"" + exceptionAsString + "\",\"status\":\"bad\"}");
+            out.println("{\"result\":\"" + exceptionAsString + "\",\"status\":\"exception\"}");
         } finally {
             out.flush();
             out.close();
@@ -153,8 +155,7 @@ public class EugeneServlet extends HttpServlet {
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
-     * Handles the HTTP
-     * <code>GET</code> method.
+     * Handles the HTTP <code>GET</code> method.
      *
      * @param request servlet request
      * @param response servlet response
@@ -168,8 +169,7 @@ public class EugeneServlet extends HttpServlet {
     }
 
     /**
-     * Handles the HTTP
-     * <code>POST</code> method.
+     * Handles the HTTP <code>POST</code> method.
      *
      * @param request servlet request
      * @param response servlet response
@@ -195,6 +195,8 @@ public class EugeneServlet extends HttpServlet {
     protected void processPostRequest(HttpServletRequest request, HttpServletResponse response) 
                throws IOException {
         
+        System.out.println("[EugeneServlet.processPostRequest] sessionId -> " + request.getSession().getId());
+
         if (ServletFileUpload.isMultipartContent(request)) {
             try {
                 ServletFileUpload uploadHandler = new ServletFileUpload(new DiskFileItemFactory());
@@ -203,7 +205,7 @@ public class EugeneServlet extends HttpServlet {
                 response.sendRedirect("eugenelab.html");
                 List<FileItem> items = uploadHandler.parseRequest(request);
                 //String uploadFilePath = this.getServletContext().getRealPath("/") + "/data/" + getCurrentUser() + "/";
-                String uploadFilePath = Paths.get(this.getServletContext().getRealPath(""), "data", getCurrentUser()).toString();        
+                String uploadFilePath = Paths.get(this.getServletContext().getRealPath(""), "data", getCurrentUser()).toString();
                 new File(uploadFilePath).mkdir();
                 ArrayList<File> toLoad = new ArrayList();
                 for (FileItem item : items) {
@@ -238,7 +240,7 @@ public class EugeneServlet extends HttpServlet {
                 if (command.equals("execute")) {
                     String input = request.getParameter("input");
                     JSONObject result = executeEugene(
-                            request.getSession().getId(), 
+                            request.getSession().getId(),
                             input);
                     out.write(result.toString());
                 } else if (command.equals("execute-miniEugene")) {
@@ -261,7 +263,7 @@ public class EugeneServlet extends HttpServlet {
                     		}
                     	} catch(Exception e) {
                     		result.put("status", "exception");
-                    		result.put("error", "Invalid Number of Solutions!");
+                    		result.put("results", "Invalid Number of Solutions!");
                     		out.write(result.toString());
                     		bOk = false;
                     	}
@@ -292,13 +294,19 @@ public class EugeneServlet extends HttpServlet {
                     JSONObject toWrite = new JSONObject();
                     try {
                         eugeneConversion = convertSBOL(fileName);
+<<<<<<< HEAD
                         if(eugeneConversion instanceof Component) {
 //                           JSONObject json = EugeneJSON.toJSON(eugeneConversion);
 //                            resultsArray.put(json);
                         } else if(eugeneConversion instanceof EugeneCollection) {
+=======
+                        if (eugeneConversion instanceof Component) {
+                            //result = EugeneJSON.toJSON((Component)eugeneConversion); //@TODO: Get Example file
+                        } else if (eugeneConversion instanceof EugeneCollection) {
+>>>>>>> 3914bc1cdc8b8bcba4cf44a64e35cbaf35d8dc66
                             Set<Device> deviceList = ((EugeneCollection) eugeneConversion).getDevices();
                             JSONArray resultsArray = new JSONArray();
-                            for(Device d: deviceList) {
+                            for (Device d : deviceList) {
                                 resultsArray.put(EugeneJSON.toJSON(d));
                             }
                             toWrite.put("results", resultsArray);
@@ -307,8 +315,8 @@ public class EugeneServlet extends HttpServlet {
                     } catch (Exception e) {
                         String exceptionAsString = e.toString().replaceAll("[\r\n\t]+", " ");
                         exceptionAsString = exceptionAsString.replaceAll("[\"]+", "'");
-                        toWrite.put("results", exceptionAsString);
-                        toWrite.put("status","bad");
+                        toWrite.put("results", "***Exception-Dummy-String***");
+                        toWrite.put("status", "exception");
                     }
                     out.write(toWrite.toString());
                     ***/
@@ -322,17 +330,19 @@ public class EugeneServlet extends HttpServlet {
                         Component c = loadGenBank(new File(fileName));
                         JSONArray componentArray = EugeneJSON.toJSONPartArray(c);
                         JSONObject results = new JSONObject();
-                        results.put("name", ((Device)c).getName());
+                        results.put("name", ((Device) c).getName());
                         results.put("type", "PartCollection");
                         results.put("components", componentArray);
                         JSONArray resultsArray = new JSONArray();
                         resultsArray.put(results);
                         toWrite.put("results", resultsArray);
-                        toWrite.put("status","good");
+                        toWrite.put("status", "good");
                     } catch (Exception e) {
-                        toWrite.put("status", "bad");
+                        toWrite.put("results", "***Exception-Dummy-String***");
+                        toWrite.put("status", "exception");
                     }
                     out.write(toWrite.toString());
+<<<<<<< HEAD
                     ***/ 
                 }
             } catch (Exception e) {
@@ -341,12 +351,15 @@ public class EugeneServlet extends HttpServlet {
                 out.flush();
                 out.close();
             }
-
         }
     }
 
     private String run(String sessionId, String devices){
         /***
+=======
+    private String run(String sessionId, String devices)
+            throws RecognitionException, Exception {
+>>>>>>> 3914bc1cdc8b8bcba4cf44a64e35cbaf35d8dc66
         System.out.println(devices);
         String[] deviceArray = devices.split("\\|");
         for (int i = 0; i < deviceArray.length; i++) {
@@ -395,6 +408,7 @@ public class EugeneServlet extends HttpServlet {
 
             List<JSONObject> lstUriJSON = new ArrayList<JSONObject>();
             List<JSONObject> lstStatsJSON = new ArrayList<JSONObject>();
+    		JSONObject solutionsJSON = new JSONObject();
 
             if(null != eugeneReturn) {
 	            /*
@@ -413,20 +427,41 @@ public class EugeneServlet extends HttpServlet {
 	            if (null != eugeneReturn.getStatistics() && !(eugeneReturn.getStatistics()).isEmpty()) {
 	            	for(Measurement m : eugeneReturn.getStatistics().getMeasurements()) {
 	            		JSONObject statsJSON = new JSONObject();
-	            		statsJSON.put(m.getKey(), m.getValue());
+	            		statsJSON.put("name", m.getKey());
+	            		statsJSON.put("value", m.getValue());
 	            		lstStatsJSON.add(statsJSON);	            		
 	            	}
 	            }
+	            
+	            /* 
+	             * textual representation of the solutions
+	             */
+	            if (null != eugeneReturn.getSolutions() && !(eugeneReturn.getSolutions()).isEmpty()) {
+
+	            	StringBuilder sb = new StringBuilder();
+	            	sb.append("<table class=\"table table-bordered table-hover\" id=\"outputList\"><thead><tr><th>Name</th><th>Solution</th><th></th></tr></thead><tbody>");
+	            	
+	            	for(String[] solution : eugeneReturn.getSolutions()) {
+	            		sb.append("<tr><td>").append(Arrays.toString(solution)).append("</td></tr>");
+	            	}
+	            	sb.append("</tbody></table>");
+	            	
+	            	System.out.println(sb.toString());
+	            	
+	            	solutionsJSON.put("solutions", sb.toString());
+	            }
             }
+            
             returnJSON.put("results", lstUriJSON);
             returnJSON.put("stats", lstStatsJSON);
+            returnJSON.put("solutions", solutionsJSON);
             
             returnJSON.put("status", "good");
 
         } catch(Exception e) {
             try {
                 returnJSON.put("status", "exception");
-                returnJSON.put("error", e.getMessage());
+                returnJSON.put("results", e.getMessage());
             } catch(JSONException jse) {}
         }
         
@@ -436,33 +471,10 @@ public class EugeneServlet extends HttpServlet {
     public JSONObject executeEugene(String sessionId, String input) {
 
         JSONObject returnJSON = new JSONObject();
-
-        /***
         try {
-            
-            EugeneExecutor ee = new EugeneExecutor(sessionId);
-            Set<JSONObject> results = (HashSet<JSONObject>) ee.execute(input, 3);
-            
-            List<JSONObject> lstUriJSON = new ArrayList<JSONObject>();
-            if (null != results && !results.isEmpty()) {
-                lstUriJSON.addAll(results);
-            }
-            
-            returnJSON.put("results", lstUriJSON);
-            returnJSON.put("status", "good");
-
-//            SymbolTables.cleanUp();
-            
-        } catch (Exception e) {
-            e.printStackTrace();
-            try {
-                returnJSON.put("results", "");
-                returnJSON.put("status", "bad");
-                returnJSON.put("error", e.getMessage());
-            } catch (Exception e1) {
-            }
-        }
-        **/ 
+            returnJSON.put("results", "***Exception-Dummy-String***");
+            returnJSON.put("status", "exception");
+        } catch(Exception e) {}
         return returnJSON;
     }
 
@@ -477,7 +489,7 @@ public class EugeneServlet extends HttpServlet {
         ArrayList<JSONArray> folders = new ArrayList();
         ArrayList<Integer> folderSizes = new ArrayList();
         File[] rootFiles = rootFolder.listFiles();
-        if(null == rootFiles) {
+        if (null == rootFiles) {
             return "";
         }
         for (int i = 0; i < rootFiles.length; i++) {
@@ -560,10 +572,9 @@ public class EugeneServlet extends HttpServlet {
         bw.close();
     }
 
-
     private String getFileExtension(String localExtension, boolean isFile) {
         //String extension = this.getServletContext().getRealPath("/") + "/data/" + getCurrentUser() + "/" + localExtension;
-        String extension = Paths.get(this.getServletContext().getRealPath(""), "data", getCurrentUser(), localExtension).toString();        
+        String extension = Paths.get(this.getServletContext().getRealPath(""), "data", getCurrentUser(), localExtension).toString();
         if (!isFile) {
             extension += "/";
         }
@@ -618,11 +629,12 @@ public class EugeneServlet extends HttpServlet {
     }
     
 
-    private static String getRandomSequence(){
+
+    private static String getRandomSequence() {
         StringBuilder sb = new StringBuilder();
         Random random = new Random();
-        for (int i = 0; i < 50; i++){
-            switch(random.nextInt(4)){
+        for (int i = 0; i < 50; i++) {
+            switch (random.nextInt(4)) {
                 case 0:
                     sb.append("A");
                     break;
@@ -639,8 +651,11 @@ public class EugeneServlet extends HttpServlet {
         }
         return sb.toString();
     }
-    
+
     /***
+=======
+
+>>>>>>> 3914bc1cdc8b8bcba4cf44a64e35cbaf35d8dc66
     public static JSONObject toJSON(Device objDevice)
             throws Exception {
         String NEWLINE = System.getProperty("line.separator");
@@ -669,10 +684,13 @@ public class EugeneServlet extends HttpServlet {
                 List<JSONObject> lstPropertyValuesJSON = new ArrayList<JSONObject>();
                 componentJSON.put("Pigeon", objPart.get("Pigeon"));
                 sbPigeon.append(objPart.get("Pigeon")).append(NEWLINE);
-                if (objPart.get("Sequence")!= null) componentJSON.put("sequence", objPart.get("Sequence").toString().replaceAll("\n", ""));
-                //XXX: this is a tremendous atrocity against science
+                if (objPart.get("Sequence") != null) {
+                    componentJSON.put("sequence", objPart.get("Sequence").toString().replaceAll("\n", ""));
+                } //XXX: this is a tremendous atrocity against science
                 // aka it is a hack for a demo video
-                else componentJSON.put("sequence", getRandomSequence());
+                else {
+                    componentJSON.put("sequence", getRandomSequence());
+                }
                 componentJSON.put("type", objPart.getPartType().getName());
                 if (null != objPart.get("Represses")) {
                     sbPigeonArcs.append(objPart.getName())
@@ -697,73 +715,141 @@ public class EugeneServlet extends HttpServlet {
     private NamedElement convertSBOL(String sbolFileName) throws Exception {
         return SBOLImporter.importSBOL(sbolFileName);
     }
+<<<<<<< HEAD
     **/
     
+    /***
     
-    
-    /* Temporarily saved for reference
-    private Component importGenbankComponent(String sFileName) throws MalformedURLException, IOException, 
-            NoSuchElementException, BioException, InvalidEugeneAssignmentException {
-        //Website has files embedded in the website so need to find a way to isolate the file from the rest of the website
-        //Currently using direct file upload to test
-	//URL url = new URL("http://www.ncbi.nlm.nih.gov/nuccore/" + sFileName);
-	BufferedReader in = new BufferedReader(new FileReader(sFileName));//new InputStreamReader(url.openStream()));
-	SequenceIterator sequences = SeqIOTools.readGenbank(in);
+    // Interface that loads a GenBank component straight from the website
+    private Component loadGenBank(String componentName) throws MalformedURLException, IOException,
+            NoSuchElementException, BioException, EugeneException {
+
+        URL url = new URL("http:www.ncbi.nlm.nih.gov/nuccore/" + componentName);
+        BufferedReader br = new BufferedReader(new InputStreamReader(url.openStream()));
+        return readGenBankComponent(br);
+    }
+
+    // Interface that loads a GenBank component from a file
+    private Component loadGenBank(File file) throws FileNotFoundException,
+            NoSuchElementException, BioException, EugeneException {
+        BufferedReader br = new BufferedReader(new FileReader(file));
+        return readGenBankComponent(br);
+    }
+
+    // Converts a GenBank component to a Eugene component
+    // Do not call directly; use above APIs
+    private Component readGenBankComponent(BufferedReader br) throws
+            NoSuchElementException, BioException, EugeneException {
+        SequenceIterator sequences = SeqIOTools.readGenbank(br);
         List<Component> parts = new ArrayList<Component>();
-        int i = 0;
-	// Can this lead to multiple devices?
-        while(sequences.hasNext()) {
+        String deviceName = "UnnamedDevice";
+        // Should only have one sequence
+        boolean firstPass = true;
+        // Get a list of all features
+        while (sequences.hasNext()) {
             Sequence seq = sequences.nextSequence();
-            Iterator it = seq.features();
-            while(it.hasNext()) {
-                Feature feature = (Feature) it.next();
-                //Feature is essentially the Genbank version of a part
-                PartType partType = new PartType(feature.getType());
-                // Still need a part name
-                String partName = feature.getType() + "_part" + i;
-                Part part = new Part(partType, partName);
-                // Add the sequence to the part
-                Property property = new Property("sequence", "txt");
-                PropertyValue propertyValue = new PropertyValue("sequence", "txt");
-                propertyValue.setTxt(feature.getSequence().seqString());
-                part.setValue(property, propertyValue);
-                parts.add(part);
-                i++;
+            if (firstPass) {
+                deviceName = seq.getName();
+                firstPass = false;
+
+            } else {
+                deviceName += "|" + seq.getName();
             }
-	}
-        if(parts.isEmpty()) {
-            return null;
-        } else if(parts.size() == 1) {
-            // File is just a device
-            return parts.get(0);
-        } else {
-            //Will be able to get actual device name when website file upload works
-            return Device.newInstance("DeviceName", parts);
-=======
+            Iterator it = seq.features();
+
             while (it.hasNext()) {
                 Feature feature = (Feature) it.next();
-                features.add(feature);
+                parts.add(buildPart(feature));
             }
-        }
-        // Process the features to remove overlaps and make it more natural for a Eugene device
-        //removeOverlap(features); //Currently just return list of parts
-        List<Component> parts = new ArrayList<Component>();
-        // Convert features to Eugene parts
-        for (Feature feature : features) {
-            parts.add(buildPart(feature));
         }
         if (parts.isEmpty()) {
             return null;
         } else if (parts.size() == 1) {
             // Size 1 imples just one part
-            return new Part(deviceName, (Part) parts.get(0));
+            return parts.get(0);
         } else {
-            return Device.newInstance(deviceName, parts);
+            //@TODO: get a real device name
+            return new Device(deviceName, parts);
+            //return EugeneBuilder.buildDevice(deviceName, parts);
         }
-		
     }
-    * */
+
+    private Part buildPart(Feature feature)
+            throws EugeneException {
+        PartType partType = new PartType(feature.getType());
+        String partName = getPartName(feature);
+        Part part = new Part(partType, partName);
+        part.setSequence(feature.getSequence().seqString());
+        return part;
+    }
+
+    private String getPartName(Feature feature) {
+        return feature.getType() + "_at_" + feature.getLocation().getMin();
+    }
+***/
     
+    /* Temporarily saved for reference
+     private Component importGenbankComponent(String sFileName) throws MalformedURLException, IOException, 
+     NoSuchElementException, BioException, InvalidEugeneAssignmentException {
+     //Website has files embedded in the website so need to find a way to isolate the file from the rest of the website
+     //Currently using direct file upload to test
+     //URL url = new URL("http://www.ncbi.nlm.nih.gov/nuccore/" + sFileName);
+     BufferedReader in = new BufferedReader(new FileReader(sFileName));//new InputStreamReader(url.openStream()));
+     SequenceIterator sequences = SeqIOTools.readGenbank(in);
+     List<Component> parts = new ArrayList<Component>();
+     int i = 0;
+     // Can this lead to multiple devices?
+     while(sequences.hasNext()) {
+     Sequence seq = sequences.nextSequence();
+     Iterator it = seq.features();
+     while(it.hasNext()) {
+     Feature feature = (Feature) it.next();
+     //Feature is essentially the Genbank version of a part
+     PartType partType = new PartType(feature.getType());
+     // Still need a part name
+     String partName = feature.getType() + "_part" + i;
+     Part part = new Part(partType, partName);
+     // Add the sequence to the part
+     Property property = new Property("sequence", "txt");
+     PropertyValue propertyValue = new PropertyValue("sequence", "txt");
+     propertyValue.setTxt(feature.getSequence().seqString());
+     part.setValue(property, propertyValue);
+     parts.add(part);
+     i++;
+     }
+     }
+     if(parts.isEmpty()) {
+     return null;
+     } else if(parts.size() == 1) {
+     // File is just a device
+     return parts.get(0);
+     } else {
+     //Will be able to get actual device name when website file upload works
+     return Device.newInstance("DeviceName", parts);
+     =======
+     while (it.hasNext()) {
+     Feature feature = (Feature) it.next();
+     features.add(feature);
+     }
+     }
+     // Process the features to remove overlaps and make it more natural for a Eugene device
+     //removeOverlap(features); //Currently just return list of parts
+     List<Component> parts = new ArrayList<Component>();
+     // Convert features to Eugene parts
+     for (Feature feature : features) {
+     parts.add(buildPart(feature));
+     }
+     if (parts.isEmpty()) {
+     return null;
+     } else if (parts.size() == 1) {
+     // Size 1 imples just one part
+     return new Part(deviceName, (Part) parts.get(0));
+     } else {
+     return Device.newInstance(deviceName, parts);
+     }
+		
+     }
+     * */
     private void removeOverlap(List<Feature> features) {
         // Sort the features based on when they start in the sequence
         Collections.sort(features, new Comparator<Feature>() {
@@ -812,5 +898,18 @@ public class EugeneServlet extends HttpServlet {
                 && a.getLocation().getMax() >= b.getLocation().getMax();
     }
 
-
+    /**
+    // Takes a device and stores it in Clotho
+    private boolean toClotho(NamedElement element) {
+        try {
+            if (element instanceof Device) {
+                //return clotho.create(this.toJSON((Device)element));   
+            } else if (element instanceof Part) {
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return true;
+    }
+    **/
 }
