@@ -24,6 +24,17 @@ public class EugeneStatistics {
 		return this.measurements;
 	}
 	
+	public double getValueByKey(String key) {
+		if(null != key) {
+			for(Measurement m : measurements) {
+				if(key.equals(m.getKey())) {
+					return m.getValue();
+				}
+			}
+		}
+		return -1;
+	}
+	
 	public void print() {
 		System.out.println("**** STATISTICS ****");
 		Iterator<Measurement> it = this.measurements.iterator();

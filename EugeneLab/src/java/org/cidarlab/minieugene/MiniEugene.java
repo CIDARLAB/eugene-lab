@@ -156,15 +156,17 @@ public class MiniEugene {
 				if(null == solutions || solutions.size()==0) {
 					throw new EugeneException("no solutions found!");
 				} else {	
-					long T3 = System.nanoTime();
-					if(solutions.size() > 100) {
-						imageUris = new SolutionExporter().pigeonizeSolutions(solutions, 100);
-					} else {
-						imageUris = new SolutionExporter().pigeonizeSolutions(solutions, solutions.size());
-					}
-					long T4 = System.nanoTime();
-					stats.add("Solution Visualization Time", (T4-T3)*Math.pow(10, -9));
-					//System.out.println(solutions.size());
+//					long T3 = System.nanoTime();
+//					if(solutions.size() > 100) {
+//						imageUris = new SolutionExporter().pigeonizeSolutions(solutions, 100);
+//					} else {
+//						imageUris = new SolutionExporter().pigeonizeSolutions(solutions, solutions.size());
+//					}
+//					long T4 = System.nanoTime();
+//					stats.add("Solution Visualization Time", (T4-T3)*Math.pow(10, -9));
+//					System.out.println(solutions.size());
+					
+					stats.add("NumSolutions", solutions.size());
 				}
 			} catch(Exception e) {
 				throw new EugeneException(e.getMessage());
