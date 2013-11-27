@@ -1,7 +1,9 @@
-package org.cidarlab.minieugene.predicates;
+package org.cidarlab.minieugene.predicates.pairing;
 
 import org.cidarlab.minieugene.exception.EugeneException;
+import org.cidarlab.minieugene.predicates.BinaryPredicate;
 import org.cidarlab.minieugene.rules.RuleOperator;
+
 import JaCoP.constraints.Constraint;
 import JaCoP.constraints.IfThen;
 import JaCoP.constraints.Or;
