@@ -8,6 +8,7 @@ import org.cidarlab.minieugene.predicates.Predicate;
 import org.cidarlab.minieugene.solver.Solver;
 import org.cidarlab.minieugene.symbol.SymbolTables;
 
+import JaCoP.constraints.Constraint;
 import JaCoP.core.Domain;
 import JaCoP.core.IntVar;
 import JaCoP.core.Store;
@@ -93,7 +94,11 @@ public class JaCoPSolver
 			throws EugeneException {
 		for(int i=0; i<predicates.length; i++) {
 			try {
-				store.impose(predicates[i].toJaCoP(this.store, variables));
+				Constraint constraint = predicates[i].toJaCoP(this.store, variables);
+				if(constraint != null) {
+					System.out.println(predicates[i]+" -> "+constraint.getClass().toString());
+					store.impose(constraint);
+				}
 			} catch(Exception e) {
 				e.printStackTrace();
 				throw new EugeneException("I cannot impose "+predicates[i]);

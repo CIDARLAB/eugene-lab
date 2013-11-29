@@ -54,13 +54,20 @@ public class AllNextTo
 		/*
 		 * a NEXTTO b
 		 */
-		return constraintIndices(variables, idxA, a, b);
+		PrimitiveConstraint[] pc = constraintIndices(variables, idxA, a, b);
+		if(null != pc) {
+			for(int i=0; i<pc.length; i++) {
+				store.impose(pc[i]);
+			}
+		}
+		
+		return null;
 	}
 
 	/*
 	 * a NEXTTO b
 	 */
-	private static PrimitiveConstraint constraintIndices(IntVar[] variables, int[] indices, int a, int b) {
+	private static PrimitiveConstraint[] constraintIndices(IntVar[] variables, int[] indices, int a, int b) {
 		int N = variables.length;
 		PrimitiveConstraint[] pc = new PrimitiveConstraint[indices.length];
 		for(int i=0; i<indices.length; i++) {
@@ -73,10 +80,10 @@ public class AllNextTo
 				 *                     at the position immediately after
 				 */
 				pc[i] = new IfThen(
-							new XeqC(variables[idx], a),
-							new Or(
-									new XeqC(variables[idx-1], b),
-									new XeqC(variables[idx+1], b)));
+						new XeqC(variables[idx], a),
+						new Or(
+								new XeqC(variables[idx-1], b),
+								new XeqC(variables[idx+1], b)));
 			} else if(idx == 0) {
 				/*
 				 * if a is placed at the first position,
@@ -97,7 +104,7 @@ public class AllNextTo
 			}
 		}
 		
-		return new And(pc);
+		return pc;
 	}
 	
 }

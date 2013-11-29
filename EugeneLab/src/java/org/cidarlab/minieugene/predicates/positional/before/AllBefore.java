@@ -72,18 +72,28 @@ public class AllBefore
 					pcB[j] = new XneqC(variables[j], b);
 				}
 				
-				pc[i] = new IfThen(
-							new XeqC(variables[i], a),
-							new And(pcB));
+				store.impose(
+						new IfThen(
+								new XeqC(variables[i], a),
+								new And(pcB)));
+//				pc[i] = new IfThen(
+//							new XeqC(variables[i], a),
+//							new And(pcB));
 			} else {
 
-				pc[i] = new IfThen(
-							new XeqC(variables[i], a),
-							new XneqC(variables[i], b));
+				store.impose(
+						new IfThen(
+								new XeqC(variables[i], a),
+								new XneqC(variables[i], b)));
+				
+//				pc[i] = new IfThen(
+//							new XeqC(variables[i], a),
+//							new XneqC(variables[i], b));
 			}							
 		}			
 		
-		return new And(pc);
+		return null;
+//		return new And(pc);
 	}
 	
 }

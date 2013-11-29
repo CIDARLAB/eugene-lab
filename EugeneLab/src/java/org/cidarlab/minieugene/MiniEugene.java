@@ -23,22 +23,18 @@ ENHANCEMENTS, OR MODIFICATIONS.
 package org.cidarlab.minieugene;
 
 import java.net.URI;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.cidarlab.minieugene.constants.EugeneConstants;
 import org.cidarlab.minieugene.constants.EugeneRules;
-import org.cidarlab.minieugene.data.pigeon.Pigeonizer;
 import org.cidarlab.minieugene.exception.EugeneException;
 import org.cidarlab.minieugene.predicates.LogicalNot;
 import org.cidarlab.minieugene.predicates.Predicate;
 import org.cidarlab.minieugene.solver.jacop.JaCoPSolver;
 import org.cidarlab.minieugene.stats.EugeneStatistics;
 import org.cidarlab.minieugene.symbol.SymbolTables;
-
-import JaCoP.core.Domain;
-import JaCoP.core.ValueEnumeration;
 
 public class MiniEugene {
 
@@ -47,6 +43,8 @@ public class MiniEugene {
 	 */
 	private SymbolTables symbols;
 	private PredicateBuilder pb;
+	
+	private static boolean TEST_MODE = true;
 	
 	/*
 	 * N ... length/size of the design
@@ -60,6 +58,7 @@ public class MiniEugene {
 		
 		this.N = N;
 		this.NR_OF_SOLUTIONS = NR_OF_SOLUTIONS;
+		
 		/*
 		 * use our predefined symbols
 		 */
@@ -93,42 +92,7 @@ public class MiniEugene {
 		
 		if(lines.length>0) {
 			
-			Predicate[] predicates = null;
-
-			/*
-			 * the first line needs to be the N line
-			 */
-			int i=0;
-			try {
-				
-//				/*
-//				 * PARSING
-//				 */
-				
-				/*
-				 * if there was no N provided, then N
-				 * is specified in the first line
-				 */
-				if(this.N == -1) {
-					this.N = parseN(lines[i++]);
-				}
-				
-				for(; i<lines.length; i++) {
-					lines[i] = lines[i].trim();
-
-					if (! (lines[i].startsWith("//") || lines[i].isEmpty())) {
-						if(predicates == null) {
-							predicates = new Predicate[1];
-							predicates[0] = parseRule(lines[i]);
-						} else {
-							predicates = ArrayUtils.add(predicates, parseRule(lines[i]));
-						}
-					}
-				}
-				
-			} catch(Exception e) {
-				throw new EugeneException("line "+(i+1)+" => "+e.getMessage());
-			}
+			Predicate[] predicates = this.parsePredicates(lines);
 
 			try {
 				/*
@@ -149,13 +113,13 @@ public class MiniEugene {
 				long T1 = System.nanoTime();
 				solutions = new JaCoPSolver(this.symbols).solve(N, symbolIds, predicates);
 				long T2 = System.nanoTime();
-				stats.add("Solution Finding Time", (T2-T1)*Math.pow(10, -9));
-				stats.add("Number of Solutions", solutions.size());
+				stats.add(EugeneConstants.SOLUTION_FINDING_TIME, (T2-T1)*Math.pow(10, -9));
+				stats.add(EugeneConstants.NUMBER_OF_SOLUTIONS, solutions.size());
 
 				
 				if(null == solutions || solutions.size()==0) {
 					throw new EugeneException("no solutions found!");
-				} else {	
+				} else if(!TEST_MODE) {	
 					long T3 = System.nanoTime();
 					if(solutions.size() > 100) {
 						imageUris = new SolutionExporter().pigeonizeSolutions(solutions, 100);
@@ -164,9 +128,6 @@ public class MiniEugene {
 					}
 					long T4 = System.nanoTime();
 					stats.add("Solution Visualization Time", (T4-T3)*Math.pow(10, -9));
-					//System.out.println(solutions.size());
-					
-					//stats.add("NumSolutions", solutions.size());
 				}
 			} catch(Exception e) {
 				throw new EugeneException(e.getMessage());
@@ -204,36 +165,12 @@ public class MiniEugene {
 		return -1;
 	}
 
+	
 	/*
-	 * (NOT)? <symbol> <predicate> <symbol>
-	 * 
-	 * <symbol>    := {p, r, g, t}
-	 * <predicate> := {CONTAINS, NOTCONTAINS}
+	 * INTERPRETER - RELATED METHODS
 	 */
-	private Predicate parseRule(String line) 
+	private Predicate interpreteRule(String[] tokens) 
 			throws EugeneException {
-		String[] s = line.split(" ");
-
-		String[] tokens = null;
-		
-		// remove possible white spaces
-		for(int i=0; i<s.length; i++) {
-			s[i].trim();
-			if(s[i] != null && !(s[i].isEmpty())) {
-				
-				if(null == tokens) {
-					tokens = new String[1];
-					tokens[0] = s[i];
-				} else {
-					tokens = ArrayUtils.add(tokens, s[i]);
-				}
-			}
-		}
-		
-		if(null == tokens) {
-			throw new EugeneException("Invalid Rule! "+line);
-		}
-		s=null;
 		
 		switch(tokens.length) {
 		case 2:
@@ -259,7 +196,7 @@ public class MiniEugene {
 				return new LogicalNot(createBinaryPredicate(tokens[1], tokens[2], tokens[3]));
 			}
 		default:
-			throw new EugeneException("Invalid Rule! "+line);
+			throw new EugeneException("Invalid Rule!");
 		}
 	}
 	
@@ -288,7 +225,7 @@ public class MiniEugene {
 			return this.pb.buildUnary(p, id);
 		}
 		
-		throw new EugeneException("Invalid rule predicate!");		
+		throw new EugeneException("Invalid rule!");		
 	}
 
 	
@@ -344,4 +281,84 @@ public class MiniEugene {
 		throw new EugeneException("Invalid rule!");
 	}
 	
+	/*
+	 * PARSING - RELATED METHODS
+	 */
+	public Predicate[] parsePredicates(String[] lines) 
+			throws EugeneException {
+		/*
+		 * the first line needs to be the N line
+		 */
+		Predicate[] predicates = null;
+		int i=0;
+		try {
+			
+			/*
+			 * if there was no N provided, then N
+			 * is specified in the first line
+			 */
+			if(this.N == -1) {
+				this.N = parseN(lines[i++]);
+			}
+			
+			for(; i<lines.length; i++) {
+				lines[i] = lines[i].trim();
+
+				if (! (lines[i].startsWith("//") || lines[i].isEmpty())) {
+					predicates = addPredicate(predicates, 
+							interpreteRule(parseRule(lines[i])));
+				}
+			}
+			
+		} catch(Exception e) {
+			throw new EugeneException("line "+(i+1)+" => "+e.getMessage());
+		}
+
+		return predicates;
+	}
+	
+	private Predicate[] addPredicate(Predicate[] predicates, Predicate predicate) {
+		if(predicates == null) {
+			predicates = new Predicate[1];
+			predicates[0] = predicate;
+		} else {
+			predicates = ArrayUtils.add(predicates, predicate);
+		}
+		
+		return predicates;
+	}
+	
+	/*
+	 * (NOT)? <symbol> <predicate> <symbol>
+	 * 
+	 * <symbol>    := {p, r, g, t}
+	 * <predicate> := {CONTAINS, NOTCONTAINS}
+	 */
+	private String[] parseRule(String line) 
+			throws EugeneException {
+		String[] s = line.split(" ");
+
+		String[] tokens = null;
+		
+		// remove possible white spaces
+		for(int i=0; i<s.length; i++) {
+			s[i].trim();
+			if(s[i] != null && !(s[i].isEmpty())) {
+				
+				if(null == tokens) {
+					tokens = new String[1];
+					tokens[0] = s[i];
+				} else {
+					tokens = ArrayUtils.add(tokens, s[i]);
+				}
+			}
+		}
+		
+		if(null == tokens) {
+			throw new EugeneException("Invalid Rule! "+line);
+		}
+		
+		return tokens;
+	}
+
 }
