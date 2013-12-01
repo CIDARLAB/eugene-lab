@@ -46,6 +46,7 @@ import org.biojava.bio.seq.io.SeqIOTools;
 import org.cidarlab.minieugene.MiniEugene;
 import org.cidarlab.minieugene.MiniEugeneReturn;
 import org.cidarlab.minieugene.stats.Measurement;
+import org.cidarlab.minieugene.symbol.Symbol;
 import org.cidarlab.weyekin.WeyekinPoster;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -439,16 +440,27 @@ public class EugeneServlet extends HttpServlet {
 	            if (null != eugeneReturn.getSolutions() && !(eugeneReturn.getSolutions()).isEmpty()) {
 
 	            	StringBuilder sb = new StringBuilder();
-	            	sb.append("<table class=\"table table-bordered table-hover\" id=\"outputList\"><thead><tr><th>Name</th><th>Solution</th><th></th></tr></thead><tbody>");
+	            	sb.append("<table class=\"table table-bordered table-hover\" id=\"solutionList\">");
 	            	
-	            	for(String[] solution : eugeneReturn.getSolutions()) {
-	            		sb.append("<tr><td>").append(Arrays.toString(solution)).append("</td></tr>");
+	            	for(Symbol[] solution :  eugeneReturn.getSolutions()) {	 
+	            		sb.append("<tr><td>");
+	            		for(int i=0; i<solution.length; i++) {
+	            			Symbol symbol = solution[i];
+	            			if(!symbol.isForward()) {
+	            				sb.append("-");
+	            			} 
+	            			sb.append(symbol.getName());
+	            			if(i != solution.length - 1) {
+	            				sb.append(", ");
+	            			}
+	            		}
+	            		sb.append("</td></tr>");
 	            	}
-	            	sb.append("</tbody></table>");
+	            	sb.append("</table>");
 	            	
 	            	System.out.println(sb.toString());
 	            	
-	            	solutionsJSON.put("solutions", sb.toString());
+	            	solutionsJSON.put("solution", sb.toString());
 	            }
             }
             

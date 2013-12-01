@@ -1,6 +1,7 @@
 package org.cidarlab.minieugene.test;
 
 import org.cidarlab.minieugene.MiniEugene;
+import org.cidarlab.minieugene.MiniEugeneReturn;
 
 public class MiniEugeneTester {
 
@@ -53,8 +54,10 @@ public class MiniEugeneTester {
 	public boolean testRules() {
 		
 //		testContains();
-		testAllBefore();
-		testSomeBefore();
+//		testAllBefore();
+//		testSomeBefore();
+		
+		testDirectionality();
 		
 		return true;
 	}
@@ -115,6 +118,37 @@ public class MiniEugeneTester {
 		
 		return true;
 	}
+	
+	private void testDirectionality() {
+		
+		testAllReverse();
+		testAllReverseWithId();
+		testSomeReverse();
+		
+
+	}
+	
+	private void testAllReverse() {
+		StringBuilder sb = new StringBuilder();
+		sb.append(this.buildContains(10, letters.length));
+		sb.append("ALL_REVERSE");
+		try {
+			MiniEugeneReturn mer = new MiniEugene(-1, -1, true).execute(sb.toString());
+			mer.printSolutions();
+		} catch(Exception e) {
+			e.printStackTrace();
+		}		
+	}
+	
+	private void testAllReverseWithId() {
+		
+	}
+	
+	private void testSomeReverse() {
+		
+	}
+
+	
 	
 	private String buildContains(int N, int k) {
 		String s = new String("N="+N)+NEWLINE;

@@ -6,6 +6,8 @@ import org.cidarlab.minieugene.predicates.Predicate;
 import org.cidarlab.minieugene.predicates.counting.Contains;
 import org.cidarlab.minieugene.predicates.counting.Exactly;
 import org.cidarlab.minieugene.predicates.counting.MoreThan;
+import org.cidarlab.minieugene.predicates.direction.AllReverse;
+import org.cidarlab.minieugene.predicates.direction.SomeReverse;
 import org.cidarlab.minieugene.predicates.pairing.Then;
 import org.cidarlab.minieugene.predicates.pairing.With;
 import org.cidarlab.minieugene.predicates.positional.StartsWith;
@@ -17,9 +19,25 @@ import org.cidarlab.minieugene.predicates.positional.before.SomeBefore;
 import org.cidarlab.minieugene.predicates.positional.nextto.AllNextTo;
 import org.cidarlab.minieugene.predicates.positional.nextto.SomeNextTo;
 import org.cidarlab.minieugene.rules.RuleOperator;
+import org.cidarlab.minieugene.symbol.SymbolTables;
 
 public class PredicateBuilder {
 
+	private SymbolTables symbols;
+	public PredicateBuilder(SymbolTables symbols) {
+		this.symbols = symbols;
+	}
+	
+	public Predicate buildPredicate(String p) 
+			throws EugeneException {
+		if(RuleOperator.ALL_REVERSE.toString().equalsIgnoreCase(p)) {
+			return new AllReverse(this.symbols, -1);
+		}
+		
+		throw new EugeneException("Invalid Rule!");
+
+	}
+	
 	public Predicate buildUnary(String p, int id) 
 			throws EugeneException {
 		
@@ -31,6 +49,10 @@ public class PredicateBuilder {
 			return new StartsWith(id);
 		} else if(RuleOperator.ENDSWITH.toString().equalsIgnoreCase(p)) {
 			return new EndsWith(id);
+		} else if(RuleOperator.ALL_REVERSE.toString().equalsIgnoreCase(p)) {
+			return new AllReverse(this.symbols, id);
+		} else if(RuleOperator.SOME_REVERSE.toString().equalsIgnoreCase(p)) {
+			return new SomeReverse(this.symbols, id);
 		}
 		
 		throw new EugeneException("Invalid Unary Rule!");

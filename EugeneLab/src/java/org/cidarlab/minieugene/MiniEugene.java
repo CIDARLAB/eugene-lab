@@ -32,8 +32,13 @@ import org.cidarlab.minieugene.constants.EugeneRules;
 import org.cidarlab.minieugene.exception.EugeneException;
 import org.cidarlab.minieugene.predicates.LogicalNot;
 import org.cidarlab.minieugene.predicates.Predicate;
+import org.cidarlab.minieugene.predicates.direction.AllReverse;
+import org.cidarlab.minieugene.predicates.direction.DirectionalityPredicate;
+import org.cidarlab.minieugene.predicates.direction.SomeReverse;
+import org.cidarlab.minieugene.rules.RuleOperator;
 import org.cidarlab.minieugene.solver.jacop.JaCoPSolver;
 import org.cidarlab.minieugene.stats.EugeneStatistics;
+import org.cidarlab.minieugene.symbol.Symbol;
 import org.cidarlab.minieugene.symbol.SymbolTables;
 
 public class MiniEugene {
@@ -44,7 +49,19 @@ public class MiniEugene {
 	private SymbolTables symbols;
 	private PredicateBuilder pb;
 	
-	private static boolean TEST_MODE = true;
+	private static boolean TEST_MODE = false;
+	
+	/*
+	 * this flag is true, if the user has 
+	 * specified a SOME_REVERSE rule...
+	 * this is currently done, because the SOME_REVERSE rules 
+	 * are integrated into the solution processing phase...
+	 * 
+	 * in the SomeReverse class, we set the SOME_REVERSE_RULE flag...
+	 * 
+	 * soon, we will update our model for the solver...
+	 */
+	public static boolean SOME_REVERSE_RULE;
 	
 	/*
 	 * N ... length/size of the design
@@ -54,11 +71,12 @@ public class MiniEugene {
 	
 	public MiniEugene(int N, int NR_OF_SOLUTIONS, boolean usePredefined) {
 		this.symbols = new SymbolTables();
-		this.pb = new PredicateBuilder();
+		this.pb = new PredicateBuilder(this.symbols);
 		
 		this.N = N;
 		this.NR_OF_SOLUTIONS = NR_OF_SOLUTIONS;
 		
+		SOME_REVERSE_RULE = false;
 		/*
 		 * use our predefined symbols
 		 */
@@ -83,7 +101,7 @@ public class MiniEugene {
 		
 		EugeneStatistics stats = new EugeneStatistics();		
 		Set<URI> imageUris = null;
-		List<String[]> solutions = null;
+		List<Symbol[]> solutions = null;
 		
 		/*
 		 * we parse the received string line by line
@@ -93,7 +111,7 @@ public class MiniEugene {
 		if(lines.length>0) {
 			
 			Predicate[] predicates = this.parsePredicates(lines);
-
+			
 			try {
 				/*
 				 * finally, we solve the problem
@@ -115,6 +133,14 @@ public class MiniEugene {
 				long T2 = System.nanoTime();
 				stats.add(EugeneConstants.SOLUTION_FINDING_TIME, (T2-T1)*Math.pow(10, -9));
 				stats.add(EugeneConstants.NUMBER_OF_SOLUTIONS, solutions.size());
+
+				/*
+				 * next, we iterate over the predicates and check if there are any
+				 * SOME_REVERSE directionality predicates
+				 */
+				if(this.SOME_REVERSE_RULE) {
+					solutions = this.solveSomeReverse(predicates, solutions);
+				}
 
 				
 				if(null == solutions || solutions.size()==0) {
@@ -138,9 +164,50 @@ public class MiniEugene {
 		/*
 		 * for testing, we print the symbol tables
 		 */
-//		this.symbols.print();
+		//this.symbols.print();
 		
 		return new MiniEugeneReturn(imageUris, solutions, stats);
+	}
+	
+	private List<Symbol[]>  solveSomeReverse(Predicate[] predicates, List<Symbol[]> solutions) {
+		
+		/*
+		 * this needs to be enhanced...
+		 * 
+		 * we need to integrate the directionality into the solution 
+		 * finding process of the solver... 
+		 * i.e. define appropriate variables...
+		 */
+		Predicate[] ps = null;
+		for(Predicate p : predicates) {
+			
+			/*
+			 * if we have a SomeReverse predicate, then
+			 * we need to modify all solutions so that 
+			 * in every solution is at least one symbol that 
+			 * has a reverse directions
+			 */
+			if(p instanceof SomeReverse) {
+				
+				for(Symbol[] solution : solutions) {
+					
+					/*
+					 * we set the direction of a's first occurrence to '-'
+					 */
+					boolean bFound = false;
+					for(int i=0; i<solution.length && !bFound; i++) {
+						if(solution[i].getId() == ((SomeReverse)p).getA()) {
+							solution[i].setForward(false);
+							bFound = true;
+							
+						}
+					}
+				}
+
+			}
+		}
+		
+		return solutions;
 	}
 	
 	/*
@@ -173,6 +240,12 @@ public class MiniEugene {
 			throws EugeneException {
 		
 		switch(tokens.length) {
+		case 1:
+			/*
+			 * PREDICATES w/o a rule operand
+			 * e.g. ALL_REVERSE
+			 */
+			return createPredicate(tokens[0]);
 		case 2:
 			/*
 			 * unary rule
@@ -200,10 +273,21 @@ public class MiniEugene {
 		}
 	}
 	
+	private Predicate createPredicate(String s) 
+			throws EugeneException {
+		return this.pb.buildPredicate(s);
+	}
+	
 	private Predicate createUnaryPredicate(String p, String s) 
 			throws EugeneException {
 
-		if(EugeneRules.isUnaryRule(p)) {
+		if("NOT".equalsIgnoreCase(p)) {
+			
+			if(RuleOperator.ALL_REVERSE.toString().equalsIgnoreCase(s)) {
+				return new LogicalNot(new AllReverse(this.symbols, -1));
+			}
+			
+		} else if(EugeneRules.isUnaryRule(p)) {
 			/*
 			 * get the id from the symbol
 			 */
@@ -244,6 +328,7 @@ public class MiniEugene {
 		 * get a's id from the symbol
 		 */
 		int idA = this.symbols.getId(a);
+		
 		int idB = -1;
 		if(EugeneRules.isCountingRule(X)) {
 			
@@ -305,8 +390,8 @@ public class MiniEugene {
 				lines[i] = lines[i].trim();
 
 				if (! (lines[i].startsWith("//") || lines[i].isEmpty())) {
-					predicates = addPredicate(predicates, 
-							interpreteRule(parseRule(lines[i])));
+					Predicate p = interpreteRule(parseRule(lines[i]));
+					predicates = addPredicate(predicates, p);
 				}
 			}
 			

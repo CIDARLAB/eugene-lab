@@ -6,9 +6,12 @@ import java.util.List;
 import org.cidarlab.minieugene.exception.EugeneException;
 import org.cidarlab.minieugene.predicates.Predicate;
 import org.cidarlab.minieugene.solver.Solver;
+import org.cidarlab.minieugene.symbol.Symbol;
 import org.cidarlab.minieugene.symbol.SymbolTables;
 
 import JaCoP.constraints.Constraint;
+import JaCoP.constraints.And;
+import JaCoP.constraints.PrimitiveConstraint;
 import JaCoP.core.Domain;
 import JaCoP.core.IntVar;
 import JaCoP.core.Store;
@@ -32,7 +35,7 @@ public class JaCoPSolver
 		this.symbols = symbols;
 	}
 	
-	public List<String[]> solve(int N, int[] ids, Predicate[] predicates)
+	public List<Symbol[]> solve(int N, int[] ids, Predicate[] predicates)
 			throws EugeneException {
 
     	/*
@@ -96,8 +99,13 @@ public class JaCoPSolver
 			try {
 				Constraint constraint = predicates[i].toJaCoP(this.store, variables);
 				if(constraint != null) {
-					System.out.println(predicates[i]+" -> "+constraint.getClass().toString());
-					store.impose(constraint);
+					if(constraint instanceof And) {
+						for(PrimitiveConstraint pc : ((And)constraint).listOfC) {
+							store.impose(pc);
+						}
+					} else {
+						store.impose(constraint);
+					}
 				}
 			} catch(Exception e) {
 				e.printStackTrace();
@@ -140,13 +148,13 @@ public class JaCoPSolver
     }
 
 		
-	public List<String[]> processSolutions(Domain[][] solutions) {
+	public List<Symbol[]> processSolutions(Domain[][] solutions) {
 
-		List<String[]> lst = new ArrayList<String[]>();
+		List<Symbol[]> lst = new ArrayList<Symbol[]>();
 		for(int i=0; i<solutions.length && solutions[i]!=null; i++) {
 			
 			Domain[] solution = solutions[i];
-			String[] sol = new String[solution.length];
+			Symbol[] sol = new Symbol[solution.length];
 			for(int j=0; j<solution.length; j++) {
 				ValueEnumeration ve = solution[j].valueEnumeration();
 				while(ve.hasMoreElements()) {

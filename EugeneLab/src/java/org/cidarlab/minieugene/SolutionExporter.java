@@ -10,13 +10,14 @@ import java.util.Set;
 
 import org.cidarlab.minieugene.data.pigeon.Pigeonizer;
 import org.cidarlab.minieugene.exception.EugeneException;
+import org.cidarlab.minieugene.symbol.Symbol;
 
 public class SolutionExporter {
 	
 	/*
 	 * visualize (using pigeon) N solutions
 	 */
-	public Set<URI> pigeonizeSolutions(List<String[]> solutions, int N) 
+	public Set<URI> pigeonizeSolutions(List<Symbol[]> solutions, int N) 
 			throws EugeneException {
 		int[] idx = null;
 		if(N != -1 && N < solutions.size()) {
@@ -28,7 +29,7 @@ public class SolutionExporter {
 			}
 		}
 		
-		List<String[]> lst = new ArrayList<String[]>(idx.length);
+		List<Symbol[]> lst = new ArrayList<Symbol[]>(idx.length);
 		for(int i=0; i<idx.length; i++) {
 			lst.add(solutions.get(idx[i]));
 		}

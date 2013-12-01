@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Random;
 
 import org.cidarlab.minieugene.exception.EugeneException;
+import org.cidarlab.minieugene.symbol.Symbol;
 
 public class Pigeonizer {
 
@@ -20,13 +21,13 @@ public class Pigeonizer {
 		colors = new HashMap<String, Integer>();
 	}
 	
-	public URI pigeonize(List<String[]> solutions) 
+	public URI pigeonize(List<Symbol[]> solutions) 
 			throws EugeneException {
 
 		StringBuilder sb = new StringBuilder();
 
 		for(int k=0; k<solutions.size(); k++) {
-			String[] solution = solutions.get(k);
+			Symbol[] solution = solutions.get(k);
 			for(int i=0; i<solution.length; i++) {
 				sb.append(toPigeon(solution[i])).append("\r\n");
 			}
@@ -44,30 +45,42 @@ public class Pigeonizer {
 		return WeyekinPoster.getMyBirdsURL();
 	}
 	
-	private String toPigeon(String s) {
+	private String toPigeon(Symbol symbol) {
+		String s = symbol.getName();
+		StringBuilder sb = new StringBuilder();
+		if(!symbol.isForward()) {
+			sb.append("<");
+		}
+		
 		if(s.startsWith("p")) {
 			/*
 			 * promoter
 			 */
-			return "p "+s+" "+getColor(s);
+			sb.append("p ").append(s).append(" ").append(getColor(s));
 		} else if(s.startsWith("r")) {
 			/*
 			 * rbs
 			 */
-			return "r "+s+" "+getColor(s);
+			sb.append("r ").append(s).append(" ").append(getColor(s));
 		} else if(s.startsWith("c") || s.startsWith("g")) {
 			/*
 			 * coding sequence v gene
 			 */
-			return "c "+s+" "+getColor(s);
+			sb.append("c ").append(s).append(" ").append(getColor(s));
 		} else if(s.startsWith("t")) {
 			/*
 			 * terminator
 			 */
-			return "t "+s+" "+getColor(s);			
+			sb.append("t ").append(s).append(" ").append(getColor(s));
+		} else {
+			char type = getPigeonType(s);
+			if(type != '>') {
+				sb.append(type);
+			} 
+			sb.append(" ").append(s).append(" ").append(getColor(s));
 		}
 		
-		return getPigeonType(s) + " " + s + " " + getColor(s);
+		return sb.toString();
 	}
 	
 	private int getColor(String s) {

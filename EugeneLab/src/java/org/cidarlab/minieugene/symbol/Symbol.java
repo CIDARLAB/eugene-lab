@@ -35,6 +35,10 @@ public class Symbol {
 		return forward;
 	}
 	
+	public void setForward(boolean forward) {
+		this.forward = forward;
+	}
+	
 	public String getName() {
 		return this.name;
 	}
@@ -44,9 +48,22 @@ public class Symbol {
 	}
 	
 	public String toPigeon() {
-		if(this.isForward()) {
+		if(!this.isForward()) {
 			return "<"+this.getName();
 		}
 		return this.getName();
+	}
+	
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("{").append(this.getId()).append(", ").append(this.getName()).append(", ");
+		if(this.isForward()) {
+			sb.append("->");
+		} else {
+			sb.append("<-");
+		}
+		sb.append("}");
+		return sb.toString();
 	}
 }

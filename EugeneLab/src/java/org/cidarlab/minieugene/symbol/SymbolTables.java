@@ -53,7 +53,7 @@ public class SymbolTables {
 	 * g ... Gene
 	 * t ... Terminator
 	 */
-	private Map<Integer, String> symbols;
+	private Map<Integer, Symbol> symbols;
 	private Set<Predicate> predicates;
 	
 
@@ -68,7 +68,7 @@ public class SymbolTables {
 		 * symbols
 		 * the predefined ones are: p, r, g, t
 		 */
-		this.symbols = new HashMap<Integer, String>();
+		this.symbols = new HashMap<Integer, Symbol>();
 	
 		this.predicates = new HashSet<Predicate>();
 	}
@@ -77,10 +77,14 @@ public class SymbolTables {
 	 * put a symbol into the symbol tables
 	 */
 	public int put(String s) {
-		if(!contains(s)) {
-			symbols.put(s.hashCode(), s);
+		return this.put(new Symbol(s));
+	}
+	
+	public int put(Symbol s) {
+		if(!containsId(s.getId())) {
+			symbols.put(s.getId(), s);
 		}
-		return s.hashCode();
+		return s.getId();
 	}
 	
 	public void put(Predicate p) {
@@ -100,7 +104,7 @@ public class SymbolTables {
 		return b;
 	}
 	
-	public String get(int i) {
+	public Symbol get(int i) {
 		return this.symbols.get(i);
 	}
 	
@@ -114,22 +118,25 @@ public class SymbolTables {
 		/*
 		 * get b's id from the symbol
 		 */
-		if(this.symbols.containsValue(s)) {
+
+		if(this.symbols.containsValue(new Symbol(s))) {
 			if(this.contains(s)) {
 				for(Integer i : this.symbols.keySet()) {
-					String symbol = this.symbols.get(i);
-					if(symbol.equalsIgnoreCase(s)) {
+					Symbol symbol = this.symbols.get(i);
+					if(symbol.getName().equalsIgnoreCase(s)) {
 						return i.intValue();
 					}
 				}
 			}
 		}
 
+//		System.out.println("NEW SYMBOL -> "+new Symbol(s).toString());
+		
 		/*
 		 * if the symbol does not exist, 
 		 * then add it to the symbol tables
 		 */
-		return this.put(s);
+		return this.put(new Symbol(s));
 	}
 	
 	public void print() {
@@ -143,4 +150,26 @@ public class SymbolTables {
 			System.out.println(it.next());
 		}
 	}
- }
+	
+	/*
+	 * methods to change the directionality of all symbols 
+	 * or of a specific symbol
+	 */
+	public void allReverse() {
+		for(int i : this.symbols.keySet()) {
+			this.symbols.get(i).setForward(false);
+		}
+	}
+	public void reverse(int a) {
+		this.symbols.get(a).setForward(false);
+	}
+	public void allForward() {
+		for(int i : this.symbols.keySet()) {
+			this.symbols.get(i).setForward(true);
+		}
+	}
+	public void forward(int a) {
+		this.symbols.get(a).setForward(true);
+	}
+
+}
