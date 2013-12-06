@@ -18,6 +18,8 @@ import org.cidarlab.eugene.rules.tree.predicate.Predicate;
 import org.cidarlab.eugene.dom.arrays.*;
 import org.cidarlab.eugene.rules.tree.predicate.LogicalNot;
 import org.cidarlab.eugene.rules.tree.predicate.MoreThan;
+import org.cidarlab.eugene.rules.tree.predicate.Then;
+import org.cidarlab.eugene.rules.tree.predicate.With;
 
 public class PositionalRulesTester {
 
@@ -269,6 +271,132 @@ public class PositionalRulesTester {
                 return bCorrect;
         }
         
+        public boolean testWith() throws EugeneException {
+            boolean bCorrect = true;
+                for(int n=1; n<=MAX_N && bCorrect; n++) {
+
+                        /*
+                         * x == 0
+                         */
+//                        System.out.println("*** n: "+n+", k: "+k+", x: "+0+" ***");
+//                        System.out.println((long)Math.pow(k, n));
+                        
+                        /*
+                         * currently keeping k constant
+                         */
+                        
+                        /*
+                         * x ... appearance of part part-1
+                         */                        
+                        for(int k=2; k<=n; k++) {
+
+                                /*
+                                 * TODO: Ernst needs to improve the symbol tables start-up and clean-up
+                                 */
+                                SymbolTables.init();
+                                
+                                /*
+                                 * currently, k needs to be <= n
+                                 * TODO: we need to scale k too ...
+                                 * 
+                                 */
+                
+                                createParts(k);
+                                Device d = createDevice(n);
+                                
+                                System.out.println("*** n: "+n+", k: "+k+" ***");
+                                /*
+                                 * impose constraints
+                                 */
+                                createWithRule(d, "part-1", "part-2");
+                                //System.out.println("part-1 EXACTLY "+x);
+
+                                
+                                GeneratedDeviceArray gda = ((GeneratedDeviceArray)Product.product(d.getName(), -1));
+                                long NR_OF_GENERATED_DEVICES = gda.size();
+                                long NR_OF_DEVICES = calculateWith(n, k);
+                                for(int i = 0; i < NR_OF_GENERATED_DEVICES; i++) {
+                                    System.out.println(gda.get(i));
+                                }
+                                System.out.println(NR_OF_GENERATED_DEVICES);
+                                System.out.println(NR_OF_DEVICES);
+                                
+                                if(NR_OF_GENERATED_DEVICES != NR_OF_DEVICES) {
+                                        bCorrect = false;
+                                        break;
+                                }
+                                System.out.println(NR_OF_GENERATED_DEVICES);
+                                
+                                SymbolTables.cleanUp();
+                        }
+                }
+                
+                return bCorrect;
+        }
+        
+        public boolean testThen() throws EugeneException {
+            boolean bCorrect = true;
+                for(int n=1; n<=MAX_N && bCorrect; n++) {
+
+                        /*
+                         * x == 0
+                         */
+//                        System.out.println("*** n: "+n+", k: "+k+", x: "+0+" ***");
+//                        System.out.println((long)Math.pow(k, n));
+                        
+                        /*
+                         * currently keeping k constant
+                         */
+                        
+                        /*
+                         * x ... appearance of part part-1
+                         */                        
+                        for(int k=2; k<=n; k++) {
+
+                                /*
+                                 * TODO: Ernst needs to improve the symbol tables start-up and clean-up
+                                 */
+                                SymbolTables.init();
+                                
+                                /*
+                                 * currently, k needs to be <= n
+                                 * TODO: we need to scale k too ...
+                                 * 
+                                 */
+                
+                                createParts(k);
+                                Device d = createDevice(n);
+                                
+                                System.out.println("*** n: "+n+", k: "+k+" ***");
+                                /*
+                                 * impose constraints
+                                 */
+                                createThenRule(d, "part-1", "part-2");
+                                //System.out.println("part-1 EXACTLY "+x);
+
+                                
+                                GeneratedDeviceArray gda = ((GeneratedDeviceArray)Product.product(d.getName(), -1));
+                                long NR_OF_GENERATED_DEVICES = gda.size();
+                                long NR_OF_DEVICES = 0;//calculateThen(n, k);
+                                for(int i = 0; i < NR_OF_GENERATED_DEVICES; i++) {
+                                    System.out.println(gda.get(i));
+                                }
+                                System.out.println(NR_OF_GENERATED_DEVICES);
+                                System.out.println(NR_OF_DEVICES);
+                                
+                                if(NR_OF_GENERATED_DEVICES != NR_OF_DEVICES) {
+                                        bCorrect = false;
+                                        break;
+                                }
+                                System.out.println(NR_OF_GENERATED_DEVICES);
+                                
+                                SymbolTables.cleanUp();
+                        }
+                }
+                
+                return bCorrect;
+        }
+        
         private void createExactlyRule(Device d, String partName, int x) 
                         throws EugeneException {
                 
@@ -300,6 +428,20 @@ public class PositionalRulesTester {
             Rule rule = new Rule("CONTAINS-"+partName, d, contains);
             SymbolTables.put(rule);
             
+        }
+        
+        private void createWithRule(Device d, String partName1, String partName2) throws EugeneException {
+            
+            Predicate with = new With(SymbolTables.getId(partName1), SymbolTables.getId(partName2));
+            Rule rule = new Rule(partName1+"-WITH-"+partName2, with);
+            SymbolTables.put(rule);
+        }
+        
+        private void createThenRule(Device d, String partName1, String partName2) throws EugeneException {
+            
+            Predicate then = new Then(SymbolTables.getId(partName1), SymbolTables.getId(partName2));
+            Rule rule = new Rule(partName1+"-THEN-"+partName2, then);
+            SymbolTables.put(rule);
         }
         
         private void createParts(int k) 
@@ -366,6 +508,16 @@ public class PositionalRulesTester {
             return (long)(Math.pow(k-1, n));
         }
         
+        private long calculateWith(int n, int k) {
+            long total = 0;
+            for(int a = 1; a <= n - 1; a++) {
+                for(int b = 1; b <= n - a; b++) {
+                    total += choose(n, a) * choose(n-a,b) * (long) Math.pow(k-2, n-a-b);
+                }
+            }
+            return total;
+        }
+        
         private long choose(int n, int k) {
                 return         fact(n) / (fact(k)*fact(n-k));
 
@@ -398,11 +550,23 @@ public class PositionalRulesTester {
                             System.out.println("MORETHAN rule does NOT work...");
                         }*/
                         
-                        if(prt.testNotMoreThan()) {
+                        /*if(prt.testNotMoreThan()) {
                             System.out.println("NOTMORETHAN rule works...");
                         } else {
                             System.out.println("NOTMORETHAN rule does NOT work...");
+                        }*/
+                    
+                        if(prt.testWith()) {
+                            System.out.println("WITH rule works...");
+                        } else {
+                            System.out.println("WITH rule does NOT work...");
                         }
+                        
+                        /*if(prt.testThen()) {
+                            System.out.println("THEN rule works...");
+                        } else {
+                            System.out.println("THEN rule does NOT work...");
+                        }*/
                 } catch(Exception e) {
                         e.printStackTrace();
                 }
