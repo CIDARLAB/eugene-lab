@@ -468,7 +468,7 @@ $(document).ready(function() {
             command = {"input": editor.getValue(), 
                        "command":"execute-miniEugene", 
                        "N":$('#sizeOfDesign').val(),
-                       "NrOfSolutions":$('#nrOfSolutions').val(), 
+                       //"NrOfSolutions":$('#nrOfSolutions').val(), 
                        "predefined":false};
              /**
                 // Get file type to determine command
@@ -510,6 +510,17 @@ $(document).ready(function() {
                     	
                     	//$('#outputSolutionArea').html('<table class="table table-bordered table-hover" id="solutionList"><tr><td>p, c, r, t</td></tr><tr><td>p, c, t, r</td></tr><tr><td>p, r, c, t</td></tr><tr><td>p, r, t, c</td></tr><tr><td>p, t, c, r</td></tr><tr><td>p, t, r, c</td></tr><tr><td>r, c, p, t</td></tr><tr><td>r, c, t, p</td></tr><tr><td>r, p, t, c</td></tr><tr><td>r, p, c, t</td></tr><tr><td>r, t, c, p</td></tr><tr><td>r, t, p, c</td></tr><tr><td>c, p, r, t</td></tr><tr><td>c, p, t, r</td></tr><tr><td>c, r, p, t</td></tr><tr><td>c, r, t, p</td></tr><tr><td>c, t, r, p</td></tr><tr><td>c, t, p, r</td></tr><tr><td>t, c, p, r</td></tr><tr><td>t, c, r, p</td></tr><tr><td>t, r, p, c</td></tr><tr><td>t, r, c, p</td></tr><tr><td>t, p, r, c</td></tr><tr><td>t, p, c, r</td></tr></table>');
                     	// visualize the designs using pigeon
+
+                    	/**
+                    	var image = '<div><img src="';
+                        $.each(response["results"], function() {
+                            image = image + this["pigeon-uri"];
+                        }
+                        );
+                        image = image + '"/></div>';
+                        $('#outputImageArea').html(image);
+                        **/
+
                         var pigeonLinks = [];
                         var imageHeader = '<div id="outputCarousel" class="slide carousel"><ol class="carousel-indicators">';
                         var images = '<div class="carousel-inner">';
@@ -529,8 +540,8 @@ $(document).ready(function() {
                         imageHeader = imageHeader + '</ol>';
                         images = images + '</div><a class="carousel-control left" href="#outputCarousel" data-slide="prev">&lsaquo;</a> <a class="carousel-control right" href="#outputCarousel" data-slide="next">&rsaquo;</a></div>';
                         var slideShow = imageHeader + images;
-                        $('#outputImageArea').html(slideShow);
                         $('#outputCarousel').carousel({interval: 5000});
+                        $('#outputImageArea').html(images);
                         //render new parts list
                         
                         
@@ -571,11 +582,11 @@ $(document).ready(function() {
                 	// clean the other tabs
                     $("#outputStatsArea").html('');
                     $("#outputImageArea").html('');
-                    $("#outputListArea").html('');
+                    $("#outputSolutionArea").html('');
                     
                     // print the exception
                 	$('#outputExceptionArea').html("Exception: " + response["results"]);
-                    //$('#outputExceptionArea').collapse('show');
+                	$('#outputExceptionArea').show();
                     //$('#outputExceptionTab').collapse('show');
                 }
             });

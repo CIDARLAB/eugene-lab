@@ -23,6 +23,7 @@ ENHANCEMENTS, OR MODIFICATIONS.
 package org.cidarlab.minieugene;
 
 import java.net.URI;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -131,24 +132,24 @@ public class MiniEugene {
 				long T1 = System.nanoTime();
 				solutions = new JaCoPSolver(this.symbols).solve(N, symbolIds, predicates);
 				long T2 = System.nanoTime();
-				stats.add(EugeneConstants.SOLUTION_FINDING_TIME, (T2-T1)*Math.pow(10, -9));
 				stats.add(EugeneConstants.NUMBER_OF_SOLUTIONS, solutions.size());
 
 				/*
 				 * next, we iterate over the predicates and check if there are any
 				 * SOME_REVERSE directionality predicates
 				 */
-				if(this.SOME_REVERSE_RULE) {
+				if(SOME_REVERSE_RULE) {
 					solutions = this.solveSomeReverse(predicates, solutions);
 				}
+				stats.add(EugeneConstants.SOLUTION_FINDING_TIME, (T2-T1)*Math.pow(10, -9));
 
 				
 				if(null == solutions || solutions.size()==0) {
 					throw new EugeneException("no solutions found!");
 				} else if(!TEST_MODE) {	
 					long T3 = System.nanoTime();
-					if(solutions.size() > 100) {
-						imageUris = new SolutionExporter().pigeonizeSolutions(solutions, 100);
+					if(solutions.size() > 40) {
+						imageUris = new SolutionExporter().pigeonizeSolutions(solutions, 40);
 					} else {
 						imageUris = new SolutionExporter().pigeonizeSolutions(solutions, solutions.size());
 					}
@@ -156,6 +157,7 @@ public class MiniEugene {
 					stats.add("Solution Visualization Time", (T4-T3)*Math.pow(10, -9));
 				}
 			} catch(Exception e) {
+				e.printStackTrace();
 				throw new EugeneException(e.getMessage());
 			}
 				
@@ -171,6 +173,8 @@ public class MiniEugene {
 	
 	private List<Symbol[]>  solveSomeReverse(Predicate[] predicates, List<Symbol[]> solutions) {
 		
+		System.out.println ("[solveSomeReverse]");
+		
 		/*
 		 * this needs to be enhanced...
 		 * 
@@ -178,7 +182,7 @@ public class MiniEugene {
 		 * finding process of the solver... 
 		 * i.e. define appropriate variables...
 		 */
-		Predicate[] ps = null;
+//		Predicate[] ps = null;
 		for(Predicate p : predicates) {
 			
 			/*
@@ -188,6 +192,8 @@ public class MiniEugene {
 			 * has a reverse directions
 			 */
 			if(p instanceof SomeReverse) {
+				
+				System.out.println("SOME_REVERSE -> "+((SomeReverse)p).getA());
 				
 				for(Symbol[] solution : solutions) {
 					

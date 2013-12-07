@@ -40,7 +40,8 @@ public class SolutionExporter {
             
             /* 
              * we visualize always 20 designs 
-             */           
+             */    
+        	System.out.println(lst.size());
             if(lst.size() > 20) {
                 int k=0;
                 while(k<lst.size()) {   

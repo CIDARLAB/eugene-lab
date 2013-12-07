@@ -254,21 +254,21 @@ public class EugeneServlet extends HttpServlet {
                     
                     JSONObject result = new JSONObject();
                     
-                    int nrOfSolutions = -1;
-                    if(!request.getParameter("NrOfSolutions").trim().isEmpty()) {
-                    	try {
-                    		nrOfSolutions = Integer.parseInt(
-                    				request.getParameter("NrOfSolutions"));
-                    		if(nrOfSolutions < 0) {
-                    			throw new Exception();
-                    		}
-                    	} catch(Exception e) {
-                    		result.put("status", "exception");
-                    		result.put("results", "Invalid Number of Solutions!");
-                    		out.write(result.toString());
-                    		bOk = false;
-                    	}
-                    }
+                    int nrOfSolutions = 1;
+//                    if(!request.getParameter("NrOfSolutions").trim().isEmpty()) {
+//                    	try {
+//                    		nrOfSolutions = Integer.parseInt(
+//                    				request.getParameter("NrOfSolutions"));
+//                    		if(nrOfSolutions < 0) {
+//                    			throw new Exception();
+//                    		}
+//                    	} catch(Exception e) {
+//                    		result.put("status", "exception");
+//                    		result.put("results", "Invalid Number of Solutions!");
+//                    		out.write(result.toString());
+//                    		bOk = false;
+//                    	}
+//                    }
                     
                     if(bOk) {
                     	result = executeMiniEugene(
@@ -403,9 +403,9 @@ public class EugeneServlet extends HttpServlet {
         
         try {
             /*
-             * currently we only return 100 randomly choosen solutions
+             * currently we only return 1 randomly chosen solution
              */
-            MiniEugeneReturn eugeneReturn = new MiniEugene(N, nrOfSolutions, predefined).execute(input);
+            MiniEugeneReturn eugeneReturn = new MiniEugene(N, -1, predefined).execute(input);
 
             List<JSONObject> lstUriJSON = new ArrayList<JSONObject>();
             List<JSONObject> lstStatsJSON = new ArrayList<JSONObject>();
@@ -417,6 +417,7 @@ public class EugeneServlet extends HttpServlet {
 	             * the result is a list of URIs that refer to 
 	             * pigeon images
 	             */
+            	System.out.println(eugeneReturn.getURIs().size());
 	            if (null != eugeneReturn.getURIs() && !eugeneReturn.getURIs().isEmpty()) {
 	                for(URI uri : eugeneReturn.getURIs()) {
 	                    JSONObject json = new JSONObject();
@@ -473,7 +474,7 @@ public class EugeneServlet extends HttpServlet {
         } catch(Exception e) {
             try {
                 returnJSON.put("status", "exception");
-                returnJSON.put("results", e.getMessage());
+                returnJSON.put("results", e.toString());
             } catch(JSONException jse) {}
         }
         

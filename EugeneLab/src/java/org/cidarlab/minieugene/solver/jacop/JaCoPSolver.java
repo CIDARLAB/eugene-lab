@@ -123,6 +123,8 @@ public class JaCoPSolver
 							new MostConstrainedDynamic<IntVar>(), 
 							new IndomainSimpleRandom<IntVar>());  
 
+        //search.getSolutionListener().setSolutionLimit(1);
+
         /*
          * we want to find ALL solutions
          */

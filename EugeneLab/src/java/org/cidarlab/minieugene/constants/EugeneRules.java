@@ -4,6 +4,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.cidarlab.minieugene.rules.RuleOperator;
+
 public class EugeneRules {
 
 	/*
@@ -44,7 +46,8 @@ public class EugeneRules {
 
 	private static final Set<String> setUnaryRules = new HashSet<String>(
 			Arrays.asList(new String[] { 
-					"CONTAINS", "NOTCONTAINS", "STARTSWITH", "ENDSWITH"}));
+					"CONTAINS", "NOTCONTAINS", "STARTSWITH", "ENDSWITH", RuleOperator.REVERSE.toString(), 
+					RuleOperator.SOME_REVERSE.toString()}));
 
 	public static boolean isUnaryRule(String s) {
 		return setUnaryRules.contains(s);

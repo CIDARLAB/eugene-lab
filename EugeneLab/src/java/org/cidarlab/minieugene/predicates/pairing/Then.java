@@ -58,11 +58,12 @@ public class Then
 				}			
 			}
 			
-			pcA[posA] = new IfThen(new XeqC(variables[posA], a),
-							new Or(pcB));
+			store.impose(new IfThen(new XeqC(variables[posA], a),
+							new Or(pcB)));
 		}
 		
-		return new Or(pcA);
+		return null;
+		//return new Or(pcA);
 	}
 
 }

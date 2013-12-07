@@ -6,7 +6,7 @@ import org.cidarlab.minieugene.constants.EugeneConstants;
 
 public class ThenEvaluator {
 
-	private static final int MAX_DESIGN_SIZE = 20; 
+	private static final int MAX_DESIGN_SIZE = 10; 
 	
 	public void evaluate() {
 		for(int i=2; i<=MAX_DESIGN_SIZE; i++) {

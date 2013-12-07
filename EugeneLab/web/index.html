@@ -1,57 +1,258 @@
+
 <!DOCTYPE html>
 <html>
     <head>
-        <title>EugeneLab</title>
+        <title>miniEugene</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <link rel="shortcut icon" href="images/icon.ico">
         <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
         <link href="css/bootstrap-responsive.min.css" rel="stylesheet" media="screen">
-        <script>
-        </script>
+        <link rel="stylesheet" href="css/codemirror.css">
+        <link rel="stylesheet" href="css/neat.css">
+        <script src="jsLibraries/jquery-1.9.1.min.js"></script>
+        <script src="jsLibraries/jquery-ui.min.js"></script>
+        <link rel="stylesheet" href="css/dynatree/ui.dynatree.css">
+
+        <style>
+            ul.device {
+                list-style-type: none;
+            }
+            ul.device li{
+                display: inline-block;
+            }
+            .thumbnail{
+                background-color: white;
+            }
+            .selected{opacity: 0.5}
+            .rotatedText{
+                -webkit-transform: rotate(-90deg); 
+                -moz-transform: rotate(-90deg); 
+                -ms-transform: rotate(-90deg); 
+                -o-transform: rotate(-90deg); 
+                transform: rotate(-90deg);
+            }           
+        </style>  
     </head>
     <body>
         <div class="navbar navbar-fixed-top navbar-inverse">
-            <div class="navbar-inner"><a class="brand" href="index.html">EugeneLab</a>
+            <div class="navbar-inner"> 
                 <ul class="nav">
                     <!-- <li><a href="eugenelab.html">Design</a></li> -->
-                    <li><a href="miniEugene.html">Learn Eugene</a></li>
+                    <li class="active"><a href="miniEugene.html">miniEugene</a></li>
                     <li><a href="documentation.html">How to</a></li>
                     <li><a href="contact.html">Contact</a></li>
-                   <!-- <p> class="pull-right">You are logged in as <strong>jenhan</strong> <a id="logout">Log Out</a></p> -->
-                </ul>     
-                <!--  <p class="pull-right"></a></p> -->
+                </ul>
             </div>
         </div>
         <div class="page-header" style="margin-top:50px">
-            <h1>EugeneLab <small>Solving Combinatorial Design Problems Made Easy!</small></h1>
+            <h1>miniEugene</h1>
         </div>
-        <div class="container">
-            <div class="hero-unit" align="center">
-                <h2>Welcome to</h2>
-                <h1><strong>EugeneLab</strong></h1>
-                <h2>Design your genetic device here</h2>
-                <br>
-                <p> <a id="startLink" class="btn btn-primary btn-large" href="miniEugene.html"> Get Started</a> </p>
-            </div>
-            <hr/>
-<!--                 <p> <a id="startLink" class="btn btn-primary btn-large" href="eugenelab.html"> Get Started</a> </p>  -->
-            </div>
-            <hr/>
-            <h2 class="text-center">Why EugeneLab?</h2>
-           <h4 class="text-center muted">Eugene is a human- and machine-readable language developed to speed up and 
-                innovate the design of novel biological devices. The Eugene language provides facilities to specify 
-                a system of parts and devices, as well as rules to constraining their composition. The overarching 
-                goal is that Eugene becomes the clear language of choice for user-level design specifications within 
-                the synthetic biology domain.</h4>
-            <hr/>
+        <div class="row-fluid">
+            <div class="span2 well">
+                <div class="tabbable">
+                    <!--
+                    <ul id="leftTabHeader" class="nav nav-tabs">
+                        <li><a href="#partsTab" data-toggle="tab">Parts</a></li>
+                        <li class="active"><a  href="#filesTab" data-toggle="tab">Files</a></li>
+                        <li class="pull-right"><button id="refreshButton"><i class="icon-refresh"></i></button></li>
+                    </ul>
+                    -->
+                    <!--
+                    <div id="leftTabs" class="tab-content">
+                        <div class="tab-pane" id="partsTab">                          
+                            <div id="partsListArea"></div>
+                            <hr/>
+                        </div>
+                        <div class="tab-pane active" id="filesTab">
+                            <div class ="row-fluid">
+                                <div id="filesArea" style="height:400px">
+                                </div>
+                            </div>
+                            <br/>
+                            <div class="row-fluid">
+                                <div class="btn-group btn-group-vertical">
+                                    <button id="loadButton" class="btn btn-primary" style="width:126px">Load File</button>
+                                    <a href="#newFileModal" role="button" class="btn btn-success" data-toggle="modal" style="width:100px">New File</a>
+                                    <a href="#deleteFileModal" id="deleteModalButton" class="btn btn-danger" style="width:100px" role="button" data-toggle="modal">Delete File</a>
+                                </div>
+                            </div>
+                            <div id="newFileModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="newFileModalLabel" aria-hidden="true">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                                    <h4 id="newFileModalLabel">New File</h4>
+                                </div>
+                                <div class="modal-body">
+                                    <p>You can either upload an existing file.</p>
 
-        <!--scripts placed at the end to enhance page loading speed--> 
-        <script type="text/javascript" src="jsLibraries/jquery-1.9.1.min.js"></script> 
-        <script src="jsLibraries/bootstrap.min.js"></script> 
-        <script src='javascript/indexController.js'></script>
+                                    <form id="uploadForm" method="POST" action="EugeneServlet" enctype="multipart/form-data">
+                                        <input type="file" name="file" id="file" multiple/>
+                                        <input type="submit" value="Upload File" name="upload" id="uploadFileButton" class="btn" style="width:150px" />
+                                    </form>
+                                    <p>Or....</p>
+                                    <p>Create a new file</p>
+                                    <input id="newFileNameInput" placeholder="New File Name"/>
+                                    <br>
+                                    <input type="radio" name="file-type" value="eug" checked> Eugene File
+                                    <br>
+                                    <input type="radio" name="file-type" value="sbol"> SBOL File
+                                </div>
+                                <div class="modal-footer">
+                                    <button id="createNewButton" class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Create New File</button>
+                                    <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+                                </div>
+                            </div>
+
+                            <div id="deleteFileModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="deleteFileModalLabel" aria-hidden="true">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                                    <h4 id="deleteFileModalLabel">Delete File</h4>
+                                </div>
+                                <div class="modal-body">                                      
+                                    <p id="toDeleteName"></p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button id="deleteButton" class="btn btn-danger" data-dismiss="modal" aria-hidden="true">Delete File</button>
+                                    <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    -->
+                </div>
+            </div>
+            <div class="span8">
+                <div class="tabbable">
+                    <ul id="dataTableHeader" class="nav nav-tabs nav-pills">
+                        <!-- <li ><a href="#spectaclesEditorTab" data-toggle="tab">Graphical Editor</a></li> -->
+                        <!-- <li class="active"><a  href="#textEditorTab" data-toggle="tab">Text Editor</a></li> -->
+                        <!-- <li><a>Current Open File: <Strong id="fileName">New File.eug</Strong></a></li> -->
+                        <!-- <li class="pull-right"><button style="width:150px" id="saveButton" class="btn btn-success">Save</button></li> -->
+
+                        
+                        <li class="pull-left">
+	                        Size of the Design: 
+							<select name="sizeOfDesign" id="sizeOfDesign" style="width:50px"></select>
+						    <script>
+						    var $select = $('#sizeOfDesign');
+						    for ( var i = 1; i <= 10; i++ ) {
+						        $select.append($('<option/>', { value: i, text: i }));
+						    }
+						   	</script>                        
+                        </li>
+                        <!--  
+                        <li class="pull-middle">
+	                        &nbsp;&nbsp;&nbsp;&nbsp;Number of Solutions: <input type="text" style="width:150px" id="nrOfSolutions" /> 
+  					 	</li>                        
+  					 	-->
+                        <li class="pull-right">
+                        	<button style="width:150px" id="runButton" class="btn btn-danger">Solve</button>
+                        </li>
+                    </ul>
+
+                    <div id="dataTableContent" class="tab-content">
+                        <!--
+                        <div class="tab-pane" id="spectaclesEditorTab">
+                            <button style="width:150px" id="newDeviceButton" class="btn btn-primary">Create New Device</button>
+
+                            <div id="spectaclesEditorArea" style="height:500px">
+                                <ul id="trash" style="list-style:none;position:absolute;right:300px;bottom:100px"><li style="height:100px;width:100px;border:black solid 1px;background-color: #999999"><strong>Trash</strong></li></ul>'
+                            </div>
+                        </div>
+                        -->
+                        <div class="tab-pane active" id="textEditorTab">
+                            <div class="accordion" id="accoridion">
+                                <div class="accordion-group">
+                                    <div class="accordion-heading">
+                                        <h5><a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#editorArea">
+                                                Editor
+                                            </a>
+                                        </h5>
+                                    </div>
+                                    <div id="editorArea" class="accordion-body collapse in">
+                                        <div class="accordion-inner">
+                                            <textarea id="textEditor">CONTAINS p
+CONTAINS r
+CONTAINS c
+CONTAINS t
+</textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="accordion-group">
+                                    <div class="accordion-heading">
+                                        <h5>
+                                            <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#outputArea">
+                                                Output 
+                                            </a>
+                                        </h5>
+                                    </div>
+                                    
+                                    <!-- OUTPUT -->
+                                    <div id="outputArea" class="accordion-body collapse out">
+                                        <div class= "accordion-inner">
+                                            <div id="output" class="well">
+                                                <div class="tabbable">
+                                                    <ul class="nav nav-tabs" id="outputTabs">
+                                                        <li class="active"><a href="#outputImageTab" data-toggle="tab">Visual</a></li>
+                                                        <li><a href="#outputSolutionsTab" data-toggle="tab">Textual</a></li>
+                                                        <li><a href="#outputStatsTab" data-toggle="tab">Statistics</a></li>
+                                                        <li><a href="#outputExceptionTab" data-toggle="tab">Errors</a></li>
+                                                    </ul>
+
+                                                    <div class="tab-content">
+                                                        <div class="tab-pane active" id="outputImageTab">
+                                                            <div id="outputImageArea"></div>
+                                                        </div>
+                                                        <div class="tab-pane" id="outputSolutionsTab">
+                                                            <div id="outputSolutionArea"></div>
+                                                        </div>
+                                                        <div class="tab-pane" id="outputStatsTab">
+                                                            <div id="outputStatsArea"></div>
+                                                        </div>
+                                                        <div class="tab-pane" id="outputExceptionTab">
+                                                            <div id="outputExceptionArea"></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr/>
+
+            </div>
+            <!--
+            <div class="span2 well">
+                <h4>Part Types</h4>
+                <hr/>
+                <div id="partIconArea" style="height:500px;overflow:auto">
+                    <ul id="iconArea" class="thumbnails"></ul>
+                </div>
+            </div>
+            -->
+        </div>
+        <iframe id="hiddenIFrame" class="hidden">
+        </iframe>
+        <script src="jsLibraries/jquery.dataTables.min.js"></script>
+        <script src="jsLibraries/bootstrap.min.js"></script>
+        <script src="javascript/ObjectIDGenerator.js"></script>
+        <script src="javascript/EugeneLabController.js"></script>
+        <script src="jsLibraries/codemirror.js"></script>
+        <!--  <script src="jsLibraries/jquery.dynatree.min.js"></script> -->
+        <!--<script src="jsLibraries/jquery.cookie.js"></script>-->
+        <script src="jsLibraries/eugene.js"></script>
+
+        <div id="tester"></div>
         <footer>
             <div class="container" align="center">
+                <!--
                 <p>Designed and built by <a href="contact.html">Jenhan Tao</a>, <a href="contact.html">Ernst Oberortner</a> and <a href="contact.html">Erik Lindgren</a></p>
+                -->
                 <p>Code licensed under <a href="license.html">LICENSE</a></p>
             </div>
         </footer>

@@ -51,7 +51,8 @@ public class PredicateBuilder {
 			return new EndsWith(id);
 		} else if(RuleOperator.ALL_REVERSE.toString().equalsIgnoreCase(p)) {
 			return new AllReverse(this.symbols, id);
-		} else if(RuleOperator.SOME_REVERSE.toString().equalsIgnoreCase(p)) {
+		} else if(RuleOperator.SOME_REVERSE.toString().equalsIgnoreCase(p) ||
+				RuleOperator.REVERSE.toString().equalsIgnoreCase(p)) {
 			return new SomeReverse(this.symbols, id);
 		}
 		

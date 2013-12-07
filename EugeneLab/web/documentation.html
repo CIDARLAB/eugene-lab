@@ -11,10 +11,10 @@
     <body data-spy="scroll" data-target="#sidebar" >
 
         <div class="navbar navbar-fixed-top navbar-inverse">
-            <div class="navbar-inner"> <a class="brand" href="index.html">EugeneLab</a>
+            <div class="navbar-inner">
                 <ul class="nav">
                     <!-- <li><a href="eugenelab.html">Design</a></li> -->
-                    <li><a href="miniEugene.html">Learn Eugene</a></li>
+                    <li><a href="index.html">miniEugene</a></li>
                     <li class="active"><a href="documentation.html">How to</a></li>
                     <li><a href="contact.html">Contact</a></li>
                 </ul>
@@ -22,10 +22,11 @@
         </div>
 
         <div class="page-header" style="margin-top:50px">
-            <h1>EugeneLab <small>Learn how our algorithms and tools can help you today</small></h1>
+            <h1>miniEugene <small><!-- Learn how our algorithms and tools can help you today --></small></h1>
         </div>
 
         <!-- NAVIGATION TOOL ON LEFT HAND SIDE OF SCREEN -->
+<!-- 
         <div class="span2">
             <div id="sidebar">
                 <ul class="nav nav-list affix">
@@ -49,9 +50,10 @@
                 </ul>
             </div>
         </div>
-
+ -->
         <div class="span10">
             <div class="row-fluid">
+ <!--  
                 <div id ="dl_run" >
                     <h3>Getting Started</h3>
                     <hr/>
@@ -90,10 +92,12 @@
                         <p> SBOL is built around the idea of a core that is used to unambiguously specify the design of a DNA molecule. Around the core are extensions that are used to increase the kind and amount of information transmitted by the language. There are six extensions under development. For example, one extension includes data and information on the performance of DNA components.
                             The adoption of SBOL offers many benefits, including: (1) enabling the use of multiple tools without rewriting designs for each tool, (2) enabling designs to be shared and published in a form other researchers can use even in a different software environment, and (3) ensuring the survival of design (and the intellectual effort put into them) beyond the lifetime of the software or the researchers that were used to create them. </p>
                     </div>
-                    <hr/>
-                    <div id="rules">
+                </div>
+                <hr/>
+-->                
+                <div id="rules">
                         <h4>Rules</h4>
-                        <p>In Eugene, we categorize the rules into the following types of constraints: counting, positional, pairing. 
+                        <p>We categorize the rules into the following types of constraints: counting, positional, pairing. 
                             To formally define the semantics of the rules, we define <i>N</i> as the length/size of the genetic design.</p>
                         <br>
                         <!-- COUNTING RULES + TABLE -->
@@ -311,8 +315,9 @@
                                 </tr>
                             </tbody>  
                         </table>
-                        <hr/>
-                        <div id="examples">
+                </div>
+                <hr/>
+                <div id="examples">
                             <h3>Examples</h3>
                             <hr/>
                             <h4>Genetic NOR Gate</h4>
@@ -345,9 +350,8 @@
                             <p>The Eugene source file can be downloaded <a title="http://eugene.sourceforge.net/examples/bug_109.eug" href="http://eugene.sourceforge.net/examples/bug_109.eug">here</a></p>
                             <center><img src="img\logic_gate.png"></center>
                             <hr/>
-                        </div>
-                    </div>
                 </div>
+            </div>
 
                 <!--          
                 <P STYLE="margin-bottom: 0in"><BR>
@@ -1764,15 +1768,16 @@
                 <P STYLE="margin-bottom: 0in; line-height: 100%"><BR>
                 </P>
                 -->
-
                 <!--scripts placed at the end to enhance page loading speed--> 
                 <script type="text/javascript" src="jsLibraries/jquery-1.9.1.min.js"></script> 
                 <script src="jsLibraries/bootstrap.min.js"></script> 
+
                 <footer>
                     <div class="container" align="center">
                         <p>Designed and built by <a href="contact.html">Jenhan Tao</a>, <a href="contact.html">Ernst Oberortner</a> and <a href="contact.html">Erik Lindgren</a></p>
                         <p>Code licensed under <a href="license.html">LICENSE</a></p>
                     </div>
                 </footer>
+ </div>
                 </body>
                 </html>
