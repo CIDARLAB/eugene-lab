@@ -101,7 +101,7 @@ public class JaCoPSolver
 				if(constraint != null) {
 					if(constraint instanceof And) {
 						for(PrimitiveConstraint pc : ((And)constraint).listOfC) {
-							store.impose(pc);
+							store.imposeWithConsistency(pc);
 						}
 					} else {
 						store.impose(constraint);

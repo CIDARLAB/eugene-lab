@@ -132,15 +132,17 @@ public class MiniEugene {
 				long T1 = System.nanoTime();
 				solutions = new JaCoPSolver(this.symbols).solve(N, symbolIds, predicates);
 				long T2 = System.nanoTime();
-				stats.add(EugeneConstants.NUMBER_OF_SOLUTIONS, solutions.size());
+				if(solutions != null) {
+					if(SOME_REVERSE_RULE) {
+						solutions = this.solveSomeReverse(predicates, solutions);
+					}
+					stats.add(EugeneConstants.NUMBER_OF_SOLUTIONS, solutions.size());
+				}
 
 				/*
 				 * next, we iterate over the predicates and check if there are any
 				 * SOME_REVERSE directionality predicates
 				 */
-				if(SOME_REVERSE_RULE) {
-					solutions = this.solveSomeReverse(predicates, solutions);
-				}
 				stats.add(EugeneConstants.SOLUTION_FINDING_TIME, (T2-T1)*Math.pow(10, -9));
 
 				
