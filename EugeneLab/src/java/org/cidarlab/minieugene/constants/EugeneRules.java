@@ -17,10 +17,10 @@ public class EugeneRules {
 					 "CONTAINS", "NOTCONTAINS", "NOTMORETHAN", "MORETHAN", "EXACTLY", "NOTEXACTLY"}));
 	
 	/*
-	 * Relational Rules ... 
+	 * Interaction Rules ... 
 	 * for regulatory interactions
 	 */
-	private static final Set<String> setRelationalRules = new HashSet<String>(
+	private static final Set<String> setInteractionRules = new HashSet<String>(
 			Arrays.asList(new String[] { 
 					"REPRESSES", "INDUCES", "DRIVES", "BINDS", "MATCHES"}));
 
@@ -63,5 +63,9 @@ public class EugeneRules {
 
 	public static boolean isPairingRule(String s) {
 		return setPairingRules.contains(s);
+	}
+	
+	public static boolean isInteractionRule(String s) {
+		return setInteractionRules.contains(s);
 	}
 }

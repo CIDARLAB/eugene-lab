@@ -1,4 +1,4 @@
-package org.cidarlab.minieugene.predicates.regulatory;
+package org.cidarlab.minieugene.predicates.interaction;
 
 import org.cidarlab.minieugene.exception.EugeneException;
 import org.cidarlab.minieugene.rules.RuleOperator;
@@ -8,7 +8,7 @@ import JaCoP.core.IntVar;
 import JaCoP.core.Store;
 
 public class Represses 
-	extends RegulatoryPredicate {
+	extends InteractionPredicate {
 	
 	public Represses(int a, int b) {
 		super(a, b);

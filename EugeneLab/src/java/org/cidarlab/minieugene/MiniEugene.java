@@ -22,6 +22,7 @@ ENHANCEMENTS, OR MODIFICATIONS.
 
 package org.cidarlab.minieugene;
 
+import java.io.File;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
@@ -50,7 +51,7 @@ public class MiniEugene {
 	private SymbolTables symbols;
 	private PredicateBuilder pb;
 	
-	private static boolean TEST_MODE = false;
+	private static boolean TEST_MODE = true;
 	
 	/*
 	 * this flag is true, if the user has 
@@ -103,6 +104,7 @@ public class MiniEugene {
 		EugeneStatistics stats = new EugeneStatistics();		
 		Set<URI> imageUris = null;
 		List<Symbol[]> solutions = null;
+		File sbol = null;
 		
 		/*
 		 * we parse the received string line by line
@@ -144,7 +146,6 @@ public class MiniEugene {
 				 * SOME_REVERSE directionality predicates
 				 */
 				stats.add(EugeneConstants.SOLUTION_FINDING_TIME, (T2-T1)*Math.pow(10, -9));
-
 				
 				if(null == solutions || solutions.size()==0) {
 					throw new EugeneException("no solutions found!");
@@ -157,6 +158,10 @@ public class MiniEugene {
 					}
 					long T4 = System.nanoTime();
 					stats.add("Solution Visualization Time", (T4-T3)*Math.pow(10, -9));
+				} else if (TEST_MODE) {
+					sbol = new SolutionExporter().sbolExport(solutions);
+
+//					stats.print();
 				}
 			} catch(Exception e) {
 				e.printStackTrace();
@@ -170,12 +175,12 @@ public class MiniEugene {
 		 */
 		//this.symbols.print();
 		
-		return new MiniEugeneReturn(imageUris, solutions, stats);
+		return new MiniEugeneReturn(imageUris, solutions, stats, sbol);
 	}
 	
 	private List<Symbol[]>  solveSomeReverse(Predicate[] predicates, List<Symbol[]> solutions) {
 		
-		System.out.println ("[solveSomeReverse]");
+//		System.out.println ("[solveSomeReverse]");
 		
 		/*
 		 * this needs to be enhanced...
@@ -195,7 +200,7 @@ public class MiniEugene {
 			 */
 			if(p instanceof SomeReverse) {
 				
-				System.out.println("SOME_REVERSE -> "+((SomeReverse)p).getA());
+//				System.out.println("SOME_REVERSE -> "+((SomeReverse)p).getA());
 				
 				for(Symbol[] solution : solutions) {
 					
@@ -330,6 +335,29 @@ public class MiniEugene {
 			 * e.g. NOT CONTAINS a
 			 */
 			return this.pb.buildNegatedUnary(X, this.symbols.getId(b));
+		} else if(RuleOperator.EQUALS.toString().equalsIgnoreCase(X) ||
+				RuleOperator.NOTEQUALS.toString().equalsIgnoreCase(X)) {
+				
+			if(!(a.startsWith("[") && a.endsWith("]") &&
+				 b.startsWith("[") && b.endsWith("]"))) {
+				throw new EugeneException("Invalid "+X+" rule!");
+			}
+			
+			
+			/*
+			 * next, we need to get the index out of the strings a and b
+			 */
+			a = a.substring(1, a.length()-1);
+			b = b.substring(1, b.length()-1);
+			
+			int idxA = this.toIndex(a);
+			int idxB = this.toIndex(b);
+			
+			return this.pb.buildBinary(idxA, X, idxB);
+			
+		} else if(EugeneRules.isInteractionRule(X)) {
+			
+			return this.pb.buildInteraction(a, X, b);
 		}
 		
 		/*
@@ -454,4 +482,20 @@ public class MiniEugene {
 		return tokens;
 	}
 
+	private int toIndex(String a) 
+			throws EugeneException {
+
+		int idx = -1;
+		try {
+			idx = Integer.parseInt(a);
+		} catch(NumberFormatException nfe) {
+			throw new EugeneException("Invalid index!");
+		}
+
+		if(idx < 0 || idx >= this.N) {
+			throw new EugeneException("Index "+idx+" is out of range!");
+		}
+		
+		return idx;
+	}
 }

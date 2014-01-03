@@ -283,6 +283,22 @@
                             </thead>  
                             <tbody>  
                                 <tr>  
+                                    <td style="font-size:12px">[i] <strong>EQUALS</strong> [j]</td>  
+                                    <td style="font-size:12px">the element at i-th index must be equal to the element at the j-th index.</td>  
+                                    <td style="font-size:12px">0 < i,j < N</td>  
+                                    <td style="font-size:12px">
+                                        <p>[0] EQUALS [1]</p>
+                                    </td>  
+                                </tr>  
+                                <tr>  
+                                    <td style="font-size:12px">[i] <strong>NOTEQUALS</strong> [j]</td>  
+                                    <td style="font-size:12px">the element at i-th index must be different to the element at the j-th index.</td>  
+                                    <td style="font-size:12px">0 < i,j < N</td>  
+                                    <td style="font-size:12px">
+                                        <p>[0] NOTEQUALS [1]</p>
+                                    </td>  
+                                </tr>  
+                                <tr>  
                                     <td style="font-size:12px">α <strong>WITH</strong> β</td>  
                                     <td style="font-size:12px">α and β must appear together</td>  
                                     <td style="font-size:12px">|α| ≥ 1 <strong>∧</strong> |β| ≥ 1</td>  
@@ -299,7 +315,6 @@
                                         <p>|β| ≥ 1 ⇒ |α| == 0</p>
                                     <td style="font-size:12px">
                                         <p>t1 NOTWITH t2</p>
-                                        <p>p1 OR p2</p>
                                     </td>  
                                 </tr>  
                                 <tr>  
@@ -310,7 +325,6 @@
                                     </td>  
                                     <td style="font-size:12px">
                                         <p>p THEN t</p>
-                                        <p>t IMPLIES p</p>
                                     </td>  
                                 </tr>
                             </tbody>  
@@ -318,8 +332,9 @@
                 </div>
                 <hr/>
                 <div id="examples">
-                            <h3>Examples</h3>
-                            <hr/>
+                    <h3>Examples (TBD)</h3>
+                    <hr/>
+<!--                     
                             <h4>Genetic NOR Gate</h4>
                             <p>A genetic NOR gate starts with two inducible promoters, which initiate – dependent on their input signals – an expression of a reporting gene, such as a green fluorescent protein (GFP). Only if both input signals are “off”, the repressor allows a downstream promoter to initiate the reporter. If both input signals are “on” or just one of them, the downstream promoter is repressed and hence, the reporter will not be expressed. A Eugene script which specifies multiple genetic NOR gates can be downloaded <a class="class1" title="http://eugene.sourceforge.net/examples/nor-gate.eug" href="http://eugene.sourceforge.net/examples/nor-gate.eug">here</a>.<span class="style_1"><br /></span></p>
                             <hr/>
@@ -350,6 +365,7 @@
                             <p>The Eugene source file can be downloaded <a title="http://eugene.sourceforge.net/examples/bug_109.eug" href="http://eugene.sourceforge.net/examples/bug_109.eug">here</a></p>
                             <center><img src="img\logic_gate.png"></center>
                             <hr/>
+-->
                 </div>
             </div>
 

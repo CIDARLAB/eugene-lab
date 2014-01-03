@@ -8,6 +8,9 @@ import org.cidarlab.minieugene.predicates.counting.Exactly;
 import org.cidarlab.minieugene.predicates.counting.MoreThan;
 import org.cidarlab.minieugene.predicates.direction.AllReverse;
 import org.cidarlab.minieugene.predicates.direction.SomeReverse;
+import org.cidarlab.minieugene.predicates.interaction.Induces;
+import org.cidarlab.minieugene.predicates.interaction.Represses;
+import org.cidarlab.minieugene.predicates.pairing.Equals;
 import org.cidarlab.minieugene.predicates.pairing.Then;
 import org.cidarlab.minieugene.predicates.pairing.With;
 import org.cidarlab.minieugene.predicates.positional.StartsWith;
@@ -104,9 +107,49 @@ public class PredicateBuilder {
 			return new MoreThan(idA, idB);
 		} else if(RuleOperator.NOTMORETHAN.toString().equalsIgnoreCase(X)) {
 			return new LogicalNot(new MoreThan(idA, idB));
+		} else if(RuleOperator.EQUALS.toString().equalsIgnoreCase(X)) {
+			return new Equals(idA, idB);
+		} else if(RuleOperator.NOTEQUALS.toString().equalsIgnoreCase(X)) {
+			return new LogicalNot(new Equals(idA, idB));
 		}
 
 		throw new EugeneException("Invalid Binary Rule!");
+	}
+	
+	public Predicate buildInteraction(String a, String X, String b)
+		throws EugeneException {
+		
+		if(a.startsWith("[") && a.endsWith("]")) {
+			if(b.startsWith("[") && b.endsWith("]")) {
+				
+				// [i] X [j]
+				// X :={REPRESSES, DRIVES}
+			} else {
+				
+				// [i] X b
+				// X := {}
+			}
+		} else if(b.startsWith("[") && b.endsWith("]")) {
+			
+			// a X [j]
+			// X := {INDUCES}
+			
+		} else {
+			// a X b
+			// X := {INDUCES, REPRESSES}
+			if(RuleOperator.INDUCES.toString().equalsIgnoreCase(X)) {
+				return new Induces(
+						this.symbols.getId(a),
+						this.symbols.getId(b));
+			} else if(RuleOperator.REPRESSES.toString().equalsIgnoreCase(X)) {
+				return new Represses(
+						this.symbols.getId(a),
+						this.symbols.getId(b));
+			}			
+		}
+		
+		throw new EugeneException("Invalid Interaction Rule!");
+ 
 	}
 
 }

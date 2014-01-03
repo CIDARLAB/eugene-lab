@@ -1,5 +1,6 @@
 package org.cidarlab.minieugene;
 
+import java.io.File;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
@@ -13,11 +14,13 @@ public class MiniEugeneReturn {
 	private EugeneStatistics stats;
 	private Set<URI> uris;
 	private List<Symbol[]> solutions;
+	private File sbol;
 	
-	public MiniEugeneReturn(Set<URI> uris, List<Symbol[]> solutions, EugeneStatistics stats) {
+	public MiniEugeneReturn(Set<URI> uris, List<Symbol[]> solutions, EugeneStatistics stats, File sbol) {
 		this.stats = stats;
 		this.uris = uris;
 		this.solutions = solutions;
+		this.sbol = sbol;
 	}
 	
 	public Set<URI> getURIs() {
@@ -30,6 +33,10 @@ public class MiniEugeneReturn {
 
 	public EugeneStatistics getStatistics() {
 		return this.stats;
+	}
+	
+	public File getSBOL() {
+		return sbol;
 	}
 	
 	

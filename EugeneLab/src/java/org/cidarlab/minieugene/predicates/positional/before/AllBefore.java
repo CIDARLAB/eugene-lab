@@ -64,8 +64,8 @@ public class AllBefore
 		 * contains(a) => for all a, b: position(a) < position(b)
 		 */
 
-		PrimitiveConstraint pc[] = new PrimitiveConstraint[N];
-		for(int i=0; i<N; i++) {
+		PrimitiveConstraint pc[] = new PrimitiveConstraint[N-1];
+		for(int i=1; i<N; i++) {
 			if(i > 0) {
 				PrimitiveConstraint[] pcB = new PrimitiveConstraint[i];
 				for(int j=0; j<i; j++) {
@@ -76,11 +76,13 @@ public class AllBefore
 //						new IfThen(
 //								new XeqC(variables[i], a),
 //								new And(pcB)));
-				pc[i] = new IfThen(
+				pc[i-1] = new IfThen(
 							new XeqC(variables[i], a),
 							new And(pcB));
 			} else {
 
+				//store.impose(
+				//		new XneqC(variables[i], b));
 				store.impose(
 						new IfThen(
 								new XeqC(variables[i], a),

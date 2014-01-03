@@ -417,7 +417,7 @@ public class EugeneServlet extends HttpServlet {
 	             * the result is a list of URIs that refer to 
 	             * pigeon images
 	             */
-            	System.out.println(eugeneReturn.getURIs().size());
+//            	System.out.println(eugeneReturn.getURIs().size());
 	            if (null != eugeneReturn.getURIs() && !eugeneReturn.getURIs().isEmpty()) {
 	                for(URI uri : eugeneReturn.getURIs()) {
 	                    JSONObject json = new JSONObject();
@@ -459,10 +459,22 @@ public class EugeneServlet extends HttpServlet {
 	            	}
 	            	sb.append("</table>");
 	            	
-	            	System.out.println(sb.toString());
+//	            	System.out.println(sb.toString());
 	            	
 	            	solutionsJSON.put("solution", sb.toString());
 	            }
+            }
+            
+            // SBOL
+            if(null != eugeneReturn.getSBOL()) {
+            	
+            	String s = eugeneReturn.getSBOL().getPath();
+            	
+            	/*
+            	 * remove web/
+            	 */
+            	s = s.substring("./web/".length());
+            	returnJSON.put("sbol", s);
             }
             
             returnJSON.put("results", lstUriJSON);
@@ -472,6 +484,7 @@ public class EugeneServlet extends HttpServlet {
             returnJSON.put("status", "good");
 
         } catch(Exception e) {
+        	e.printStackTrace();
             try {
                 returnJSON.put("status", "exception");
                 returnJSON.put("results", e.toString());

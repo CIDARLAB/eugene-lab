@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package org.cidarlab.eugene.jetc;
+package org.cidarlab.eugene.rules;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,5 +1,6 @@
 package org.cidarlab.minieugene;
 
+import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -7,7 +8,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import java.util.UUID;
 
+import org.cidarlab.eugenelab.data.sbol.SBOLExporter;
 import org.cidarlab.minieugene.data.pigeon.Pigeonizer;
 import org.cidarlab.minieugene.exception.EugeneException;
 import org.cidarlab.minieugene.symbol.Symbol;
@@ -72,4 +75,12 @@ public class SolutionExporter {
 	}
 	
 
+	public File sbolExport(List<Symbol[]> solutions) 
+			throws EugeneException {
+		try {
+			return new SBOLExporter().serialize(solutions);
+		} catch(EugeneException ee) {
+			throw new EugeneException(ee.getMessage());
+		}
+	}
 }

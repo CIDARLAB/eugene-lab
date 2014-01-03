@@ -1,4 +1,4 @@
-package org.cidarlab.eugene.jetc;
+package org.cidarlab.eugene.rules;
 
 import org.cidarlab.minieugene.MiniEugene;
 

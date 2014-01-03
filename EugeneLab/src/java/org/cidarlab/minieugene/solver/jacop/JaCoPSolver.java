@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.cidarlab.minieugene.exception.EugeneException;
 import org.cidarlab.minieugene.predicates.Predicate;
+import org.cidarlab.minieugene.predicates.interaction.InteractionPredicate;
 import org.cidarlab.minieugene.solver.Solver;
 import org.cidarlab.minieugene.symbol.Symbol;
 import org.cidarlab.minieugene.symbol.SymbolTables;
@@ -97,14 +98,20 @@ public class JaCoPSolver
 			throws EugeneException {
 		for(int i=0; i<predicates.length; i++) {
 			try {
-				Constraint constraint = predicates[i].toJaCoP(this.store, variables);
-				if(constraint != null) {
-					if(constraint instanceof And) {
-						for(PrimitiveConstraint pc : ((And)constraint).listOfC) {
-							store.imposeWithConsistency(pc);
+				if(predicates[i] instanceof InteractionPredicate) {
+					/*
+					 * ignore them ... 
+					 */
+				} else {
+					Constraint constraint = predicates[i].toJaCoP(this.store, variables);
+					if(constraint != null) {
+						if(constraint instanceof And) {
+							for(PrimitiveConstraint pc : ((And)constraint).listOfC) {
+								store.imposeWithConsistency(pc);
+							}
+						} else {
+							store.impose(constraint);
 						}
-					} else {
-						store.impose(constraint);
 					}
 				}
 			} catch(Exception e) {
