@@ -1,12 +1,9 @@
 package org.cidarlab.minieugene.predicates.positional.after;
 
-import java.util.List;
-
 import org.cidarlab.minieugene.exception.EugeneException;
 import org.cidarlab.minieugene.predicates.BinaryPredicate;
 import org.cidarlab.minieugene.predicates.positional.before.SomeBefore;
 import org.cidarlab.minieugene.rules.RuleOperator;
-import org.cidarlab.minieugene.symbol.SymbolTables;
 
 import JaCoP.constraints.Constraint;
 import JaCoP.core.IntVar;
@@ -54,7 +51,7 @@ public class SomeAfter
 	}
 
 	@Override
-	public Constraint toJaCoP(Store store, IntVar[] variables) 
+	public Constraint toJaCoP(Store store, IntVar[][] variables) 
 			throws EugeneException {
 		return this.before.toJaCoP(store, variables);
 	}

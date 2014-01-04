@@ -13,7 +13,7 @@ public interface Solver {
 	 * ids        ... the domains of the variables
 	 * predicates ... the Eugene constraints
 	 */
-	public List<Symbol[]> solve(int N, int[] ids, Predicate[] predicates)
+	public List<Symbol[]> solve(int N, Symbol[] symbols, Predicate[] predicates)
 			throws EugeneException;
 	
 	/*

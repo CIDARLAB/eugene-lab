@@ -38,7 +38,7 @@ public class LogicalNot
 	
 	@Override
 	public Constraint toJaCoP(
-			Store store, IntVar[] variables) 
+			Store store, IntVar[][] variables) 
 				throws EugeneException {
 
 		if(this.getPredicate() instanceof CountingPredicate) {

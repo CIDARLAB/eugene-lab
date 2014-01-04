@@ -2,6 +2,7 @@ package org.cidarlab.minieugene.predicates.counting;
 
 import org.cidarlab.minieugene.exception.EugeneException;
 import org.cidarlab.minieugene.rules.RuleOperator;
+import org.cidarlab.minieugene.solver.jacop.Variables;
 
 import JaCoP.constraints.Constraint;
 import JaCoP.constraints.Count;
@@ -31,38 +32,30 @@ public class Exactly
 	}
 
 	@Override
-	public Constraint toJaCoP(Store store, IntVar[] variables) 
+	public Constraint toJaCoP(Store store, IntVar[][] variables) 
 				throws EugeneException {
 
-//		System.out.println("[Exactly] "+this.getA()+" EXACTLY "+this.getN());
-		
 		// a EXACTLY N
 		IntVar count = new IntVar(store, this.getA()+"_EXACTLY_"+this.getN()+"-counter", this.getN(), this.getN()); 
-		return new Count(variables, count, (int)this.getA());
+		store.impose(new Count(variables[Variables.PART], count, (int)this.getA()));
+		
+		return null;
 	}
 
 	@Override
-	public Constraint toJaCoPNot(Store store, IntVar[] variables)
+	public Constraint toJaCoPNot(Store store, IntVar[][] variables)
 			throws EugeneException {
 		/*
 		 * NOT a EXACTLY N
 		 */
-		// a EXACTLY N
-		
-		/*
-		 * this is not a nice solution...
-		 * however, it works...
-		 */
-		
-		/*
-		 * counter for 0...n-1
-		 */
+
 		IntVar count1 = new IntVar(store, this.getA()+"_NOT-EXACTLY_"+this.getN()+"-counter1", 0, this.getN()-1); 
-		store.impose(new Count(variables, count1, (int)this.getA()));
+		store.impose(new Count(variables[Variables.PART], count1, (int)this.getA()));
 		
 		IntVar count2 = new IntVar(store, this.getA()+"_NOT-EXACTLY_"+this.getN()+"-counter2", this.getN()+1, variables.length); 
-		return new Count(variables, count2, (int)this.getA());
-
+		store.impose(new Count(variables[Variables.PART], count2, (int)this.getA()));
+		
+		return null;
 	}
 
 }

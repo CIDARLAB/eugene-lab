@@ -9,6 +9,6 @@ public interface Predicate {
 	
 	public String getOperator();
 	
-	public Constraint toJaCoP(Store store, IntVar[] variables) 
+	public Constraint toJaCoP(Store store, IntVar[][] variables) 
 		throws EugeneException;
 }

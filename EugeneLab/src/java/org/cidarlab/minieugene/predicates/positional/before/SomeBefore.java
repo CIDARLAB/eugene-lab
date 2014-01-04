@@ -3,6 +3,7 @@ package org.cidarlab.minieugene.predicates.positional.before;
 import org.cidarlab.minieugene.exception.EugeneException;
 import org.cidarlab.minieugene.predicates.BinaryPredicate;
 import org.cidarlab.minieugene.rules.RuleOperator;
+import org.cidarlab.minieugene.solver.jacop.Variables;
 
 import JaCoP.constraints.And;
 import JaCoP.constraints.Constraint;
@@ -50,12 +51,12 @@ public class SomeBefore
 	}
 	
 	@Override
-	public Constraint toJaCoP(Store store, IntVar[] variables) 
+	public Constraint toJaCoP(Store store, IntVar[][] variables) 
 			throws EugeneException {
 		
 		int a = (int)this.getA();
 		int b = (int)this.getB();
-		int N = variables.length;
+		int N = variables[Variables.PART].length;
 
 		/*
 		 * a SOME_BEFORE b
@@ -70,11 +71,11 @@ public class SomeBefore
 		 */
 		PrimitiveConstraint[] pcB = new PrimitiveConstraint[N];
 		for(int j=0; j<N; j++) {
-			pcB[j] = new XneqC(variables[j], b);
+			pcB[j] = new XneqC(variables[Variables.PART][j], b);
 		} 
 		
 		return new IfThen(
-					new XeqC(variables[N-1], a),
+					new XeqC(variables[Variables.PART][N-1], a),
 					new And(pcB));			
 	}
 		

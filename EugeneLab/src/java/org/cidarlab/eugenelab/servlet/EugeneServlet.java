@@ -196,7 +196,7 @@ public class EugeneServlet extends HttpServlet {
     protected void processPostRequest(HttpServletRequest request, HttpServletResponse response) 
                throws IOException {
         
-        System.out.println("[EugeneServlet.processPostRequest] sessionId -> " + request.getSession().getId());
+//        System.out.println("[EugeneServlet.processPostRequest] sessionId -> " + request.getSession().getId());
 
         if (ServletFileUpload.isMultipartContent(request)) {
             try {

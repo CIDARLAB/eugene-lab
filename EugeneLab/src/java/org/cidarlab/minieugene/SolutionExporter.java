@@ -20,7 +20,7 @@ public class SolutionExporter {
 	/*
 	 * visualize (using pigeon) N solutions
 	 */
-	public Set<URI> pigeonizeSolutions(List<Symbol[]> solutions, int N) 
+	public URI pigeonizeSolutions(List<Symbol[]> solutions, int N) 
 			throws EugeneException {
 		int[] idx = null;
 		if(N != -1 && N < solutions.size()) {
@@ -38,29 +38,14 @@ public class SolutionExporter {
 		}
 		
         try {
-            Set<URI> uris = new HashSet<URI>();
         	Pigeonizer pigeon = new Pigeonizer();
             
             /* 
-             * we visualize always 20 designs 
-             */    
-        	System.out.println(lst.size());
-            if(lst.size() > 20) {
-                int k=0;
-                while(k<lst.size()) {   
-                    if(k+20 >= solutions.size()) {
-                        uris.add(pigeon.pigeonize(lst.subList(k, solutions.size())));
-                    } else {
-                        uris.add(pigeon.pigeonize(lst.subList(k, k+20)));
-                    }
-                    k+=20;
-                }
-            } else {
-                uris.add(pigeon.pigeonize(lst));
-            }
-            
-            return uris;
+             * we visualize always 40 designs 
+             */
+        	return pigeon.pigeonize(lst);
         } catch(Exception e) {
+        	e.printStackTrace();
             throw new EugeneException(e.getMessage());
         }
 	}

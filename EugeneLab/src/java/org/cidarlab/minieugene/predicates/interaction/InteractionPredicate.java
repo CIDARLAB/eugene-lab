@@ -13,5 +13,4 @@ public abstract class InteractionPredicate
 		super(a, b);
 	}
 
-	
 }

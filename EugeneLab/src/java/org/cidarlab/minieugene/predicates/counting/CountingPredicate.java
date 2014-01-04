@@ -29,7 +29,7 @@ public abstract class CountingPredicate
 		return this.n;
 	}
 
-	public abstract Constraint toJaCoPNot(Store store, IntVar[] variables) 
+	public abstract Constraint toJaCoPNot(Store store, IntVar[][] variables) 
 				throws EugeneException;
 
 }

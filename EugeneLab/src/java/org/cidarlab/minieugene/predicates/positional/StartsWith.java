@@ -3,6 +3,7 @@ package org.cidarlab.minieugene.predicates.positional;
 import org.cidarlab.minieugene.exception.EugeneException;
 import org.cidarlab.minieugene.predicates.UnaryPredicate;
 import org.cidarlab.minieugene.rules.RuleOperator;
+import org.cidarlab.minieugene.solver.jacop.Variables;
 
 import JaCoP.constraints.Constraint;
 import JaCoP.constraints.XeqC;
@@ -36,9 +37,9 @@ public class StartsWith
 
 
 	@Override
-	public Constraint toJaCoP(Store store, IntVar[] variables) 
+	public Constraint toJaCoP(Store store, IntVar[][] variables) 
 				throws EugeneException {
-		return new XeqC(variables[0], this.getA());
+		return new XeqC(variables[Variables.PART][0], this.getA());
 	}
 
 }

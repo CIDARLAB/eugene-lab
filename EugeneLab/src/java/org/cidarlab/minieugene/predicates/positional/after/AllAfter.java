@@ -50,7 +50,7 @@ public class AllAfter
 	}
 
 	@Override
-	public Constraint toJaCoP(Store store, IntVar[] variables) 
+	public Constraint toJaCoP(Store store, IntVar[][] variables) 
 			throws EugeneException {
 		return this.before.toJaCoP(store, variables);
 	}

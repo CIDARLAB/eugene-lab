@@ -3,6 +3,7 @@ package org.cidarlab.minieugene.predicates.positional.before;
 import org.cidarlab.minieugene.exception.EugeneException;
 import org.cidarlab.minieugene.predicates.BinaryPredicate;
 import org.cidarlab.minieugene.rules.RuleOperator;
+import org.cidarlab.minieugene.solver.jacop.Variables;
 
 import JaCoP.constraints.And;
 import JaCoP.constraints.Constraint;
@@ -50,13 +51,13 @@ public class AllBefore
 	}
 
 	@Override
-	public Constraint toJaCoP(Store store, IntVar[] variables) 
+	public Constraint toJaCoP(Store store, IntVar[][] variables) 
 				throws EugeneException {
 
 		int a = (int)this.getA();
 		int b = (int)this.getB();
 
-		int N = variables.length;
+		int N = variables[Variables.PART].length;
 
 		/*
 		 * a ALLBEFORE b
@@ -69,7 +70,7 @@ public class AllBefore
 			if(i > 0) {
 				PrimitiveConstraint[] pcB = new PrimitiveConstraint[i];
 				for(int j=0; j<i; j++) {
-					pcB[j] = new XneqC(variables[j], b);
+					pcB[j] = new XneqC(variables[Variables.PART][j], b);
 				}
 				
 //				store.impose(
@@ -77,7 +78,7 @@ public class AllBefore
 //								new XeqC(variables[i], a),
 //								new And(pcB)));
 				pc[i-1] = new IfThen(
-							new XeqC(variables[i], a),
+							new XeqC(variables[Variables.PART][i], a),
 							new And(pcB));
 			} else {
 
@@ -85,12 +86,12 @@ public class AllBefore
 				//		new XneqC(variables[i], b));
 				store.impose(
 						new IfThen(
-								new XeqC(variables[i], a),
-								new XneqC(variables[i], b)));
+								new XeqC(variables[Variables.PART][i], a),
+								new XneqC(variables[Variables.PART][i], b)));
 				
 				pc[i] = new IfThen(
-							new XeqC(variables[i], a),
-							new XneqC(variables[i], b));
+							new XeqC(variables[Variables.PART][i], a),
+							new XneqC(variables[Variables.PART][i], b));
 			}							
 		}			
 		

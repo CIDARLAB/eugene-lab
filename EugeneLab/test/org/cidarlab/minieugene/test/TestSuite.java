@@ -4,17 +4,23 @@ import java.io.File;
 import java.io.FilenameFilter;
 
 import org.cidarlab.minieugene.MiniEugene;
+import org.cidarlab.minieugene.MiniEugeneReturn;
 import org.cidarlab.eugene.util.EugeneUtil;
 
 
 public class TestSuite {
 
 	public static void main(String[] args) {
-		new TestSuite().test(new File("./examples/nor-gate.eug"));
+//		new TestSuite().test(new File("./tests/drives.eug"));
+
+//		new TestSuite().test(new File("./designs/priority-encoder/rev3/cassette01.eug"));
+//		new TestSuite().test(new File("./designs/priority-encoder/rev3/cassette02.eug"));
+		new TestSuite().test(new File("./designs/priority-encoder/rev3/basic_composition.eug"));
+//		new TestSuite().test(new File("./examples/nor-gate.eug"));
 //		new TestSuite().test(new File("./examples/transcriptional-unit.eug"));
 
 		/*** TESTS ***/
-		new TestSuite().testAll("./tests");
+//		new TestSuite().testAll("./tests");
 	}
 
 	public void test(File f) {
@@ -24,9 +30,12 @@ public class TestSuite {
 			 */
 			String script = EugeneUtil.readFile(f);
 			long t1 = System.nanoTime();
-			new MiniEugene(-1, -1, false).execute(script);
+			MiniEugeneReturn mer = new MiniEugene(-1, -1, false).execute(script);
 			long tProcessing = System.nanoTime() - t1;
 			
+			mer.printSolutions();
+			mer.getStatistics().print();
+			System.out.println(mer.getURIs());
 			System.out.println("[TestSuite.test] full processing time: "+tProcessing*Math.pow(10, -9)+"sec");
 		} catch(Exception e) {
 			e.printStackTrace();

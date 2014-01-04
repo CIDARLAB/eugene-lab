@@ -10,9 +10,13 @@ import org.cidarlab.minieugene.solver.Solver;
 import org.cidarlab.minieugene.symbol.Symbol;
 import org.cidarlab.minieugene.symbol.SymbolTables;
 
+import JaCoP.constraints.Alldifferent;
 import JaCoP.constraints.Constraint;
 import JaCoP.constraints.And;
+import JaCoP.constraints.IfThen;
+import JaCoP.constraints.Or;
 import JaCoP.constraints.PrimitiveConstraint;
+import JaCoP.constraints.XeqC;
 import JaCoP.core.Domain;
 import JaCoP.core.IntVar;
 import JaCoP.core.Store;
@@ -22,6 +26,7 @@ import JaCoP.search.IndomainSimpleRandom;
 import JaCoP.search.MostConstrainedDynamic;
 import JaCoP.search.Search;
 import JaCoP.search.SelectChoicePoint;
+import JaCoP.search.SimpleMatrixSelect;
 import JaCoP.search.SimpleSelect;
 
 
@@ -30,20 +35,23 @@ public class JaCoPSolver
 
 	private Store store;
 	private SymbolTables symbols;
+	private int N;
 	
 	public JaCoPSolver(SymbolTables symbols) {
 		this.store = new Store();
 		this.symbols = symbols;
 	}
 	
-	public List<Symbol[]> solve(int N, int[] ids, Predicate[] predicates)
+	public List<Symbol[]> solve(int N, Symbol[] symbols, Predicate[] predicates)
 			throws EugeneException {
 
+		this.N = N;
+		
     	/*
     	 * create the variables of the constraint solving problem
     	 * i.e. the parts
     	 */
-    	IntVar[] variables = this.model(N, ids);
+    	IntVar[][] variables = this.model(symbols);
 
     	/*
     	 * map the Eugene rules onto JaCoP constraints
@@ -65,7 +73,6 @@ public class JaCoPSolver
     	/*
     	 * finally, we process and return the solutions
     	 */
-//    	return null;
     	if(null != solutions) {
     		try {
     			return this.processSolutions(solutions);
@@ -77,41 +84,83 @@ public class JaCoPSolver
     	return null;
 	}
     
-	public IntVar[] model(int N, int[] ids) 
+	private IntVar[][] model(Symbol[] symbols) 
 			throws EugeneException {
-		/**
-		if(Math.pow(ids.length, N) > Math.pow(10, 7)) {
-			throw new EugeneException("I'm sorry! This problem is currently too big for me to solve!");
-		}
-		**/
-		IntVar[] variables = new IntVar[N];
+		
+		IntVar[][] variables = new IntVar[3][N];
+				/*
+				 * 0 ... Parts
+				 * 1 ... Types
+				 * 2 ... Orientation
+				 */
+		
+		/*
+		 * PARTS
+		 */
+		variables[Variables.PART] = new IntVar[N];
+		variables[Variables.TYPE] = new IntVar[N];
+		variables[Variables.ORIENTATION] = new IntVar[N];
+		
+		/*
+		 * for every position i (0 <= i < N), 
+		 * we have three variables:
+		 * P_i ... parts
+		 * T_i ... types
+		 * O_i ... orientation
+		 */
 		for(int i=0; i<N; i++) {
-			variables[i] = new IntVar(store, "X"+i);
-			for(int j=0; j<ids.length; j++) {
-				variables[i].addDom(ids[j], ids[j]);
+
+			variables[Variables.PART][i] = new IntVar(store, "P"+i);
+			variables[Variables.TYPE][i] = new IntVar(store, "T"+i);
+			variables[Variables.ORIENTATION][i] = new IntVar(store, "O"+i);
+			
+			PrimitiveConstraint[] pc = new PrimitiveConstraint[symbols.length];
+			
+			for(int j=0; j<symbols.length; j++) {						
+				variables[Variables.PART][i].addDom(symbols[j].getId(), symbols[j].getId());
+				variables[Variables.TYPE][i].addDom(symbols[j].getType(), symbols[j].getType());
+			
+				/*
+				 * we also impose constraints that part and type match
+				 * so we avoid various permutations were the part and type do not match
+				 */
+				pc[j] = new And(
+								new XeqC(variables[Variables.PART][i], symbols[j].getId()),
+								new XeqC(variables[Variables.TYPE][i], symbols[j].getType()));
 			}
+			store.impose(new Or(pc));
+
+			variables[Variables.ORIENTATION][i].addDom(-1, -1);
+			variables[Variables.ORIENTATION][i].addDom( 1,  1);
+				/*
+				 * -1 ... reverse
+				 *  1 ... forward
+				 */			
 		}
+		
 		return variables;
 	}
 
-	public void imposeConstraints(IntVar[] variables, Predicate[] predicates) 
+	public void imposeConstraints(IntVar[][] variables, Predicate[] predicates) 
 			throws EugeneException {
+		/*
+		 * per default, all parts have a FORWARD orientation
+		 */
+//		for(int i=0; i<variables[Variables.ORIENTATION].length; i++) {
+//			store.impose(new XeqC(variables[Variables.ORIENTATION][i], 1));
+//		}
+		
 		for(int i=0; i<predicates.length; i++) {
 			try {
-				if(predicates[i] instanceof InteractionPredicate) {
-					/*
-					 * ignore them ... 
-					 */
-				} else {
-					Constraint constraint = predicates[i].toJaCoP(this.store, variables);
-					if(constraint != null) {
-						if(constraint instanceof And) {
-							for(PrimitiveConstraint pc : ((And)constraint).listOfC) {
-								store.imposeWithConsistency(pc);
-							}
-						} else {
-							store.impose(constraint);
+				Constraint constraint = predicates[i].toJaCoP(this.store, variables);
+				if(constraint != null) {
+					if(constraint instanceof And) {
+						for(PrimitiveConstraint pc : ((And)constraint).listOfC) {
+							//store.imposeWithConsistency(pc);
+							store.impose(pc);
 						}
+					} else {
+						store.impose(constraint);
 					}
 				}
 			} catch(Exception e) {
@@ -121,16 +170,15 @@ public class JaCoPSolver
 		}
 	}
 	
-    private Domain[][] search(IntVar[] variables) 
+    private Domain[][] search(IntVar[][] variables) 
     		throws EugeneException {
     	Search<IntVar> search = new DepthFirstSearch<IntVar>(); 
 
-        SelectChoicePoint<IntVar> select = new SimpleSelect<IntVar>(
-							variables, 
-							new MostConstrainedDynamic<IntVar>(), 
-							new IndomainSimpleRandom<IntVar>());  
-
-        //search.getSolutionListener().setSolutionLimit(1);
+        SelectChoicePoint<IntVar> select =  new SimpleMatrixSelect<IntVar>(
+				variables, 
+				new MostConstrainedDynamic<IntVar>(), 
+				new IndomainSimpleRandom<IntVar>());  
+  
 
         /*
          * we want to find ALL solutions
@@ -158,17 +206,37 @@ public class JaCoPSolver
 
 		
 	public List<Symbol[]> processSolutions(Domain[][] solutions) {
-
+		
 		List<Symbol[]> lst = new ArrayList<Symbol[]>();
 		for(int i=0; i<solutions.length && solutions[i]!=null; i++) {
 			
 			Domain[] solution = solutions[i];
-			Symbol[] sol = new Symbol[solution.length];
-			for(int j=0; j<solution.length; j++) {
+			
+			Symbol[] sol = new Symbol[this.N];
+
+			for(int j=0; j<this.N; j++) {
+				Symbol symbol = null;
+				
+				/*
+				 * PART
+				 */
 				ValueEnumeration ve = solution[j].valueEnumeration();
 				while(ve.hasMoreElements()) {
-					sol[j] = this.symbols.get(ve.nextElement());
+					Symbol old = this.symbols.get(ve.nextElement());
+					symbol = new Symbol(old.getName());
 				}
+				
+				/*
+				 * ORIENTATION
+				 */
+				ve = solution[j+(Variables.ORIENTATION * N)].valueEnumeration();
+				while(ve.hasMoreElements()) {
+					if(ve.nextElement() == (-1)) {
+						symbol.setForward(false);
+					}
+				}				
+
+				sol[j] = symbol;
 			}
 			
 			lst.add(sol);

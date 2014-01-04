@@ -3,6 +3,7 @@ package org.cidarlab.minieugene.predicates.positional.nextto;
 import org.cidarlab.minieugene.exception.EugeneException;
 import org.cidarlab.minieugene.predicates.BinaryPredicate;
 import org.cidarlab.minieugene.rules.RuleOperator;
+import org.cidarlab.minieugene.solver.jacop.Variables;
 
 import JaCoP.constraints.And;
 import JaCoP.constraints.Constraint;
@@ -40,11 +41,11 @@ public class AllNextTo
 	}
 
 	@Override
-	public Constraint toJaCoP(Store store, IntVar[] variables) 
+	public Constraint toJaCoP(Store store, IntVar[][] variables) 
 				throws EugeneException {
 		int a = (int)this.getA();
 		int b = (int)this.getB();
-		int N = variables.length;
+		int N = variables[Variables.PART].length;
 		
 		int[] idxA = new int[N];
 		for(int i=0; i<N; i++) {
@@ -54,21 +55,21 @@ public class AllNextTo
 		/*
 		 * a NEXTTO b
 		 */
-		PrimitiveConstraint[] pc = constraintIndices(variables, idxA, a, b);
-		if(null != pc) {
-			for(int i=0; i<pc.length; i++) {
-				store.impose(pc[i]);
-			}
-		}
+		PrimitiveConstraint[] pc = constraintIndices(variables[Variables.PART], idxA, a, b);
+//		if(null != pc) {
+//			for(int i=0; i<pc.length; i++) {
+//				store.impose(pc[i]);
+//			}
+//		}
 		
-		return null;
+		return new And(pc);
 	}
 
 	/*
 	 * a NEXTTO b
 	 */
-	private static PrimitiveConstraint[] constraintIndices(IntVar[] variables, int[] indices, int a, int b) {
-		int N = variables.length;
+	private static PrimitiveConstraint[] constraintIndices(IntVar[] parts, int[] indices, int a, int b) {
+		int N = parts.length;
 		PrimitiveConstraint[] pc = new PrimitiveConstraint[indices.length];
 		for(int i=0; i<indices.length; i++) {
 			int idx = indices[i];
@@ -80,18 +81,18 @@ public class AllNextTo
 				 *                     at the position immediately after
 				 */
 				pc[i] = new IfThen(
-						new XeqC(variables[idx], a),
+						new XeqC(parts[idx], a),
 						new Or(
-								new XeqC(variables[idx-1], b),
-								new XeqC(variables[idx+1], b)));
+								new XeqC(parts[idx-1], b),
+								new XeqC(parts[idx+1], b)));
 			} else if(idx == 0) {
 				/*
 				 * if a is placed at the first position,
 				 * then place b at the second position
 				 */
 				pc[i] = new IfThen(
-							new XeqC(variables[idx], a),
-							new XeqC(variables[idx+1], b));
+							new XeqC(parts[idx], a),
+							new XeqC(parts[idx+1], b));
 			} else if(idx == N-1) {
 				
 				/*
@@ -99,8 +100,8 @@ public class AllNextTo
 				 * then place b at the second last position
 				 */
 				pc[i] = new IfThen(
-								new XeqC(variables[idx], a),
-								new XeqC(variables[idx-1], b));
+								new XeqC(parts[idx], a),
+								new XeqC(parts[idx-1], b));
 			}
 		}
 		

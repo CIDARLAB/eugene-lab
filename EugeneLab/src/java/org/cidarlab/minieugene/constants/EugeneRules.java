@@ -46,8 +46,13 @@ public class EugeneRules {
 
 	private static final Set<String> setUnaryRules = new HashSet<String>(
 			Arrays.asList(new String[] { 
-					"CONTAINS", "NOTCONTAINS", "STARTSWITH", "ENDSWITH", RuleOperator.REVERSE.toString(), 
-					RuleOperator.SOME_REVERSE.toString()}));
+					"CONTAINS", "NOTCONTAINS", "STARTSWITH", "ENDSWITH", 
+					RuleOperator.ALL_REVERSE.toString(),
+					RuleOperator.REVERSE.toString(), 
+					RuleOperator.SOME_REVERSE.toString(),
+					RuleOperator.ALL_FORWARD.toString(),
+					RuleOperator.FORWARD.toString(), 
+					RuleOperator.SOME_FORWARD.toString()}));
 
 	public static boolean isUnaryRule(String s) {
 		return setUnaryRules.contains(s);

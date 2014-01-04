@@ -6,6 +6,7 @@ import java.util.List;
 import org.apache.commons.lang3.ArrayUtils;
 import org.cidarlab.minieugene.exception.EugeneException;
 import org.cidarlab.minieugene.rules.RuleOperator;
+import org.cidarlab.minieugene.solver.jacop.Variables;
 import org.cidarlab.minieugene.symbol.SymbolTables;
 
 import JaCoP.constraints.Constraint;
@@ -39,20 +40,24 @@ public class MoreThan
 	}
 
 	@Override
-	public Constraint toJaCoP(Store store, IntVar[] variables) 
+	public Constraint toJaCoP(Store store, IntVar[][] variables) 
 				throws EugeneException {
 		
 		// a MORETHAN N
 		IntVar count = new IntVar(store, this.getA()+"_MORETHAN_"+this.getN()+"-counter", this.getN()+1, variables.length); 
-		return new Count(variables, count, (int)this.getA());
+		store.impose(new Count(variables[Variables.PART], count, (int)this.getA()));
+		
+		return null;
 	}
 
 	@Override
-	public Constraint toJaCoPNot(Store store, IntVar[] variables) 
+	public Constraint toJaCoPNot(Store store, IntVar[][] variables) 
 				throws EugeneException {
 
 		// a NOTMORETHAN N
 		IntVar count = new IntVar(store, this.getA()+"_NOTMORETHAN_"+this.getN()+"-counter", 0, this.getN()); 
-		return new Count(variables, count, (int)this.getA());
+		store.impose(new Count(variables[Variables.PART], count, (int)this.getA()));
+		
+		return null;
 	}
 }

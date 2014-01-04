@@ -1,10 +1,13 @@
 package org.cidarlab.minieugene.data.pigeon;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 import org.cidarlab.minieugene.exception.EugeneException;
 import org.cidarlab.minieugene.symbol.Symbol;
@@ -21,62 +24,101 @@ public class Pigeonizer {
 		colors = new HashMap<String, Integer>();
 	}
 	
+	public URI pigeonize(Symbol[] solution) 
+			throws EugeneException {
+		
+		StringBuilder sb = new StringBuilder();
+		for(int i=0; i<solution.length; i++) {
+			sb.append(toPigeon(solution[i])).append("\r\n");
+		}
+		
+		/*
+		 * finally, we add the arcs line
+		 */
+		sb.append("# Arcs").append("\r\n");
+
+		/*
+		 * here, we need to figure out the ``regulatory interactions''
+		 * therefore, we need some access to the symbol tables in 
+		 * that we keep track of all user-specified interactions ...
+		 */
+		
+		WeyekinPoster.setPigeonText(sb.toString());
+		
+		return WeyekinPoster.getMyBirdsURL();		
+	}
+	
 	public URI pigeonize(List<Symbol[]> solutions) 
 			throws EugeneException {
 
 		StringBuilder sb = new StringBuilder();
 
 		for(int k=0; k<solutions.size(); k++) {
+			
 			Symbol[] solution = solutions.get(k);
-			for(int i=0; i<solution.length; i++) {
-				sb.append(toPigeon(solution[i])).append("\r\n");
+			for(Symbol symbol : solution) {
+				sb.append(toPigeon(symbol)).append("\r\n");
 			}
-			if(k != solutions.size() - 1) {
+			
+			if(k < solutions.size() - 1) {
 				sb.append("\r\n");
 			}
 		}
+
 		/*
 		 * finally, we add the arcs line
 		 */
-		sb.append("# Arcs");
-
+		sb.append("# Arcs").append("\r\n");
+		
+//		System.out.println(sb.toString());
 		WeyekinPoster.setPigeonText(sb.toString());
 		
-		return WeyekinPoster.getMyBirdsURL();
+		return WeyekinPoster.getMyBirdsURL();		
 	}
 	
 	private String toPigeon(Symbol symbol) {
+
 		String s = symbol.getName();
 		StringBuilder sb = new StringBuilder();
-		if(!symbol.isForward()) {
-			sb.append("<");
-		}
-		
-		if(s.startsWith("p")) {
+		if(s.startsWith("p") || s.startsWith("P")) {
 			/*
 			 * promoter
 			 */
+			if(!symbol.isForward()) {
+				sb.append("<");
+			}			
 			sb.append("p ").append(s).append(" ").append(getColor(s));
 		} else if(s.startsWith("r")) {
 			/*
 			 * rbs
 			 */
+			if(!symbol.isForward()) {
+				sb.append("<");
+			}			
 			sb.append("r ").append(s).append(" ").append(getColor(s));
-		} else if(s.startsWith("c") || s.startsWith("g")) {
+		} else if(s.startsWith("c") || s.startsWith("g")  || s.startsWith("C")  || s.startsWith("G")) {
 			/*
 			 * coding sequence v gene
 			 */
+			if(!symbol.isForward()) {
+				sb.append("<");
+			}			
 			sb.append("c ").append(s).append(" ").append(getColor(s));
-		} else if(s.startsWith("t")) {
+		} else if(s.startsWith("t") || s.startsWith("T")) {
 			/*
 			 * terminator
 			 */
+			if(!symbol.isForward()) {
+				sb.append("<");
+			}			
 			sb.append("t ").append(s).append(" ").append(getColor(s));
 		} else {
 			char type = getPigeonType(s);
 			if(type != '>') {
 				sb.append(type);
-			} 
+			} if(!symbol.isForward() && type!='?') {
+				sb.append("<");
+			}			
 			sb.append(" ").append(s).append(" ").append(getColor(s));
 		}
 		

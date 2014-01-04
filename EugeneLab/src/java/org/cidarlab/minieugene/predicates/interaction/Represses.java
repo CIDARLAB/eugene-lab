@@ -23,15 +23,15 @@ public class Represses
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append(this.getA())
-			.append(" ").append(RuleOperator.INDUCES).append(" ")
+			.append(" ").append(RuleOperator.REPRESSES).append(" ")
 			.append(this.getB());
 		return sb.toString();
 	}
 
 	@Override
-	public Constraint toJaCoP(Store store, IntVar[] variables) 
+	public Constraint toJaCoP(Store store, IntVar[][] variables) 
 				throws EugeneException {
-		throw new UnsupportedOperationException("THIS DOES NOT WORK YET!");
+		return null;
 	}
 	
 }

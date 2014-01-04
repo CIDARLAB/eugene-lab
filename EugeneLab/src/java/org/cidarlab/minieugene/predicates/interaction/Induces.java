@@ -10,10 +10,16 @@ import JaCoP.core.Store;
 public class Induces 
 	extends InteractionPredicate {
 	
-	public Induces(int a, int b) {
-		super(a, b);
+	private String inducer;
+	
+	public Induces(String inducer, int b) {
+		super(-1, b);
+		this.inducer = inducer;
 	}
-		
+
+	public String getInducer() {
+		return this.inducer;
+	}
 
 	@Override
 	public String getOperator() {
@@ -30,9 +36,9 @@ public class Induces
 	}
 
 	@Override
-	public Constraint toJaCoP(Store store, IntVar[] variables) 
+	public Constraint toJaCoP(Store store, IntVar[][] variables) 
 				throws EugeneException {
-		throw new UnsupportedOperationException("THIS DOES NOT WORK YET!");
+		return null;
 	}
-	
+
 }

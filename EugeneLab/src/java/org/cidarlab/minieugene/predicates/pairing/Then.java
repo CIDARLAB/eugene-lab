@@ -3,6 +3,7 @@ package org.cidarlab.minieugene.predicates.pairing;
 import org.cidarlab.minieugene.exception.EugeneException;
 import org.cidarlab.minieugene.predicates.BinaryPredicate;
 import org.cidarlab.minieugene.rules.RuleOperator;
+import org.cidarlab.minieugene.solver.jacop.Variables;
 
 import JaCoP.constraints.Constraint;
 import JaCoP.constraints.IfThen;
@@ -36,7 +37,7 @@ public class Then
 	}
 
 	@Override
-	public Constraint toJaCoP(Store store, IntVar[] variables) 
+	public Constraint toJaCoP(Store store, IntVar[][] variables) 
 				throws EugeneException {
 
 		int a = (int)this.getA();
@@ -48,22 +49,22 @@ public class Then
 		 * 
 		 * IF CONTAINS a THEN CONTAINS b
 		 */
-		PrimitiveConstraint[] pcA = new PrimitiveConstraint[NR_OF_VARIABLES];
+
 		for(int posA = 0; posA<NR_OF_VARIABLES; posA ++) {
 			
 			PrimitiveConstraint[] pcB = new PrimitiveConstraint[NR_OF_VARIABLES-1];
 			for(int posB = 0, i=0; posB<NR_OF_VARIABLES; posB++) {
 				if(posB != posA) {
-					pcB[i++] = new XeqC(variables[posB], b);
+					pcB[i++] = new XeqC(variables[Variables.PART][posB], b);
 				}			
 			}
 			
-			store.impose(new IfThen(new XeqC(variables[posA], a),
-							new Or(pcB)));
+			store.impose(new IfThen(
+					new XeqC(variables[Variables.PART][posA], a),
+					new Or(pcB)));
 		}
 		
 		return null;
-		//return new Or(pcA);
 	}
 
 }

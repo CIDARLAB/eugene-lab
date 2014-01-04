@@ -3,6 +3,7 @@ package org.cidarlab.minieugene.predicates.pairing;
 import org.cidarlab.minieugene.exception.EugeneException;
 import org.cidarlab.minieugene.predicates.BinaryPredicate;
 import org.cidarlab.minieugene.rules.RuleOperator;
+import org.cidarlab.minieugene.solver.jacop.Variables;
 
 import JaCoP.constraints.And;
 import JaCoP.constraints.Constraint;
@@ -39,7 +40,7 @@ public class Equals
 
 
 	@Override
-	public Constraint toJaCoP(Store store, IntVar[] variables) 
+	public Constraint toJaCoP(Store store, IntVar[][] variables) 
 				throws EugeneException {
 
 		/*
@@ -47,7 +48,9 @@ public class Equals
 		 * equal to the element at index idxB
 		 */
 		
-		return new XeqY(variables[this.getA()], variables[this.getB()]);
+		store.impose(new XeqY(variables[Variables.PART][this.getA()], variables[Variables.PART][this.getB()]));
+		
+		return null;
 		
 	}
 

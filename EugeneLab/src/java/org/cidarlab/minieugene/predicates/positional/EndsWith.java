@@ -1,12 +1,9 @@
 package org.cidarlab.minieugene.predicates.positional;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.cidarlab.minieugene.exception.EugeneException;
 import org.cidarlab.minieugene.predicates.UnaryPredicate;
 import org.cidarlab.minieugene.rules.RuleOperator;
-import org.cidarlab.minieugene.symbol.SymbolTables;
+import org.cidarlab.minieugene.solver.jacop.Variables;
 
 import JaCoP.constraints.Constraint;
 import JaCoP.constraints.XeqC;
@@ -38,9 +35,10 @@ public class EndsWith
 	}
 
 	@Override
-	public Constraint toJaCoP(Store store, IntVar[] variables) 
+	public Constraint toJaCoP(Store store, IntVar[][] variables) 
 				throws EugeneException {
-		return new XeqC(variables[variables.length-1], this.getA());
+		int N = variables[Variables.PART].length;
+		return new XeqC(variables[Variables.PART][N-1], this.getA());
 	}
 
 }

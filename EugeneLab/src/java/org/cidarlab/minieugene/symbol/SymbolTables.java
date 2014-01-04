@@ -30,8 +30,8 @@ import java.util.Set;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.cidarlab.minieugene.exception.EugeneException;
-import org.cidarlab.minieugene.fact.Fact;
 import org.cidarlab.minieugene.predicates.Predicate;
+import org.cidarlab.minieugene.predicates.interaction.InteractionPredicate;
 
 
 /**
@@ -56,7 +56,6 @@ public class SymbolTables {
 	private Map<Integer, Symbol> symbols;
 	private Set<Predicate> predicates;
 	
-
 	/*
 	 * N ... the length of the device
 	 *       -1 ... random length
@@ -114,7 +113,12 @@ public class SymbolTables {
 		return ArrayUtils.toPrimitive(ids);
 	}
 	
+	public Symbol[] getSymbols() {
+		Symbol[] s = new Symbol[this.symbols.keySet().size()];
+		return this.symbols.values().toArray(s);
+	}
 	public int getId(String s) {
+		
 		/*
 		 * get b's id from the symbol
 		 */
@@ -172,4 +176,11 @@ public class SymbolTables {
 		this.symbols.get(a).setForward(true);
 	}
 
+	
+	/*
+	 * methods to store information on regulatory interactions
+	 */
+	public void putFact(InteractionPredicate ip) {
+		
+	}
 }

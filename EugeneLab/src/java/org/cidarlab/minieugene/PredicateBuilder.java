@@ -6,8 +6,11 @@ import org.cidarlab.minieugene.predicates.Predicate;
 import org.cidarlab.minieugene.predicates.counting.Contains;
 import org.cidarlab.minieugene.predicates.counting.Exactly;
 import org.cidarlab.minieugene.predicates.counting.MoreThan;
+import org.cidarlab.minieugene.predicates.direction.AllForward;
 import org.cidarlab.minieugene.predicates.direction.AllReverse;
+import org.cidarlab.minieugene.predicates.direction.SomeForward;
 import org.cidarlab.minieugene.predicates.direction.SomeReverse;
+import org.cidarlab.minieugene.predicates.interaction.Drives;
 import org.cidarlab.minieugene.predicates.interaction.Induces;
 import org.cidarlab.minieugene.predicates.interaction.Represses;
 import org.cidarlab.minieugene.predicates.pairing.Equals;
@@ -34,7 +37,9 @@ public class PredicateBuilder {
 	public Predicate buildPredicate(String p) 
 			throws EugeneException {
 		if(RuleOperator.ALL_REVERSE.toString().equalsIgnoreCase(p)) {
-			return new AllReverse(this.symbols, -1);
+			return new AllReverse(-1);
+		} else if(RuleOperator.ALL_FORWARD.toString().equalsIgnoreCase(p)) {
+			return new AllForward(-1);
 		}
 		
 		throw new EugeneException("Invalid Rule!");
@@ -52,11 +57,16 @@ public class PredicateBuilder {
 			return new StartsWith(id);
 		} else if(RuleOperator.ENDSWITH.toString().equalsIgnoreCase(p)) {
 			return new EndsWith(id);
-		} else if(RuleOperator.ALL_REVERSE.toString().equalsIgnoreCase(p)) {
-			return new AllReverse(this.symbols, id);
-		} else if(RuleOperator.SOME_REVERSE.toString().equalsIgnoreCase(p) ||
+		} else if(RuleOperator.ALL_REVERSE.toString().equalsIgnoreCase(p) ||
 				RuleOperator.REVERSE.toString().equalsIgnoreCase(p)) {
-			return new SomeReverse(this.symbols, id);
+			return new AllReverse(id);
+		} else if(RuleOperator.SOME_REVERSE.toString().equalsIgnoreCase(p)) {
+			return new SomeReverse(id);
+		} else if(RuleOperator.ALL_FORWARD.toString().equalsIgnoreCase(p) ||
+				RuleOperator.FORWARD.toString().equalsIgnoreCase(p)) {
+			return new AllForward(id);
+		} else if(RuleOperator.SOME_FORWARD.toString().equalsIgnoreCase(p)) {
+			return new SomeForward(id);
 		}
 		
 		throw new EugeneException("Invalid Unary Rule!");
@@ -136,15 +146,33 @@ public class PredicateBuilder {
 			
 		} else {
 			// a X b
-			// X := {INDUCES, REPRESSES}
+			// X := {INDUCES, REPRESSES, DRIVES}
 			if(RuleOperator.INDUCES.toString().equalsIgnoreCase(X)) {
+				
+				/*
+				 * the inducer is not allowed to appear in any
+				 * non-INDUCES rule
+				 */
+				if(this.symbols.contains(a)) {
+					throw new EugeneException("Invalid INDUCES rule!");
+				}
+				
 				return new Induces(
-						this.symbols.getId(a),
+						a,
 						this.symbols.getId(b));
+				
 			} else if(RuleOperator.REPRESSES.toString().equalsIgnoreCase(X)) {
+				
 				return new Represses(
 						this.symbols.getId(a),
 						this.symbols.getId(b));
+				
+			} else if(RuleOperator.DRIVES.toString().equalsIgnoreCase(X)) {
+				
+				return new Drives(
+						this.symbols.getId(a),
+						this.symbols.getId(b));
+				
 			}			
 		}
 		

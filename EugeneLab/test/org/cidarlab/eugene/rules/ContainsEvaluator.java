@@ -4,7 +4,7 @@ import org.cidarlab.minieugene.MiniEugene;
 
 public class ContainsEvaluator {
 
-	private static final int MAX_DESIGN_SIZE = 20; 
+	private static final int MAX_DESIGN_SIZE = 30; 
 	
 	public void evaluate() {
 		for(int i=1; i<=MAX_DESIGN_SIZE; i++) {

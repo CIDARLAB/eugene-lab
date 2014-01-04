@@ -1,5 +1,7 @@
 package org.cidarlab.minieugene.symbol;
 
+import org.cidarlab.minieugene.solver.jacop.PartTypes;
+
 public class Symbol {
 
 	/*
@@ -47,6 +49,18 @@ public class Symbol {
 		return this.id;
 	}
 	
+	public int getType() {
+		if('p' == this.name.charAt(0) || 'P' == this.name.charAt(0)) {
+			return PartTypes.get("PROMOTER");
+		} else if('r' == this.name.charAt(0) || 'R' == this.name.charAt(0)) {
+			return PartTypes.get("RBS");  
+		} else if('c' == this.name.charAt(0) || 'C' == this.name.charAt(0)) {
+			return PartTypes.get("GENE");  
+		} else if('t' == this.name.charAt(0) || 'T' == this.name.charAt(0)) {
+			return PartTypes.get("TERMINATOR");  
+		} 
+		return 5;
+	}
 	public String toPigeon() {
 		if(!this.isForward()) {
 			return "<"+this.getName();

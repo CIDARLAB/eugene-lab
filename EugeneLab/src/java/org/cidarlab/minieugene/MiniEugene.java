@@ -24,7 +24,7 @@ package org.cidarlab.minieugene;
 
 import java.io.File;
 import java.net.URI;
-import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -34,9 +34,8 @@ import org.cidarlab.minieugene.constants.EugeneRules;
 import org.cidarlab.minieugene.exception.EugeneException;
 import org.cidarlab.minieugene.predicates.LogicalNot;
 import org.cidarlab.minieugene.predicates.Predicate;
+import org.cidarlab.minieugene.predicates.direction.AllForward;
 import org.cidarlab.minieugene.predicates.direction.AllReverse;
-import org.cidarlab.minieugene.predicates.direction.DirectionalityPredicate;
-import org.cidarlab.minieugene.predicates.direction.SomeReverse;
 import org.cidarlab.minieugene.rules.RuleOperator;
 import org.cidarlab.minieugene.solver.jacop.JaCoPSolver;
 import org.cidarlab.minieugene.stats.EugeneStatistics;
@@ -51,7 +50,7 @@ public class MiniEugene {
 	private SymbolTables symbols;
 	private PredicateBuilder pb;
 	
-	private static boolean TEST_MODE = true;
+	private static boolean TEST_MODE = false;
 	
 	/*
 	 * this flag is true, if the user has 
@@ -102,7 +101,7 @@ public class MiniEugene {
 		}
 		
 		EugeneStatistics stats = new EugeneStatistics();		
-		Set<URI> imageUris = null;
+		Set<URI> imageUri = new HashSet<URI>();
 		List<Symbol[]> solutions = null;
 		File sbol = null;
 		
@@ -119,27 +118,21 @@ public class MiniEugene {
 				/*
 				 * finally, we solve the problem
 				 */
-				int[] symbolIds = this.symbols.getIds();
-				if(null == symbolIds || symbolIds.length==0) {
+				Symbol[] symbols = this.symbols.getSymbols();
+				if(null == symbols || symbols.length==0) {
 					throw new EugeneException("no solutions found!");
 				}
 
-				stats.add("Number of Parts", symbolIds.length);
-				stats.add("Possible Solutions", Math.pow(symbolIds.length, this.N));
+				stats.add("Number of Parts", symbols.length);
+				stats.add("Possible Solutions", Math.pow(symbols.length, this.N));
 				stats.add("Number of Rules", predicates.length);
 				
 				/*
 				 * SOLUTION FINDING
 				 */
 				long T1 = System.nanoTime();
-				solutions = new JaCoPSolver(this.symbols).solve(N, symbolIds, predicates);
+				solutions = new JaCoPSolver(this.symbols).solve(this.N, symbols, predicates);
 				long T2 = System.nanoTime();
-				if(solutions != null) {
-					if(SOME_REVERSE_RULE) {
-						solutions = this.solveSomeReverse(predicates, solutions);
-					}
-					stats.add(EugeneConstants.NUMBER_OF_SOLUTIONS, solutions.size());
-				}
 
 				/*
 				 * next, we iterate over the predicates and check if there are any
@@ -151,18 +144,30 @@ public class MiniEugene {
 					throw new EugeneException("no solutions found!");
 				} else if(!TEST_MODE) {	
 					long T3 = System.nanoTime();
-					if(solutions.size() > 40) {
-						imageUris = new SolutionExporter().pigeonizeSolutions(solutions, 40);
+					/*
+					 * for the time being, we only visualize max. 40 (randomly chosen) solution
+					 * using pigeon
+					 */
+					SolutionExporter se = new SolutionExporter();
+					if(solutions.size() > 60) {
+						imageUri.add(se.pigeonizeSolutions(solutions, 60));
 					} else {
-						imageUris = new SolutionExporter().pigeonizeSolutions(solutions, solutions.size());
+						imageUri.add(se.pigeonizeSolutions(solutions, solutions.size()));
 					}
 					long T4 = System.nanoTime();
+					
 					stats.add("Solution Visualization Time", (T4-T3)*Math.pow(10, -9));
-				} else if (TEST_MODE) {
-					sbol = new SolutionExporter().sbolExport(solutions);
+					stats.add(EugeneConstants.NUMBER_OF_SOLUTIONS, solutions.size());
+					
+					/*
+					 * SBOL EXPORT
+					 */
+					sbol = se.sbolExport(solutions);
 
-//					stats.print();
+				} else if (TEST_MODE) {
+					stats.print();
 				}
+				
 			} catch(Exception e) {
 				e.printStackTrace();
 				throw new EugeneException(e.getMessage());
@@ -175,53 +180,9 @@ public class MiniEugene {
 		 */
 		//this.symbols.print();
 		
-		return new MiniEugeneReturn(imageUris, solutions, stats, sbol);
+		return new MiniEugeneReturn(imageUri, solutions, stats, sbol);
 	}
-	
-	private List<Symbol[]>  solveSomeReverse(Predicate[] predicates, List<Symbol[]> solutions) {
-		
-//		System.out.println ("[solveSomeReverse]");
-		
-		/*
-		 * this needs to be enhanced...
-		 * 
-		 * we need to integrate the directionality into the solution 
-		 * finding process of the solver... 
-		 * i.e. define appropriate variables...
-		 */
-//		Predicate[] ps = null;
-		for(Predicate p : predicates) {
-			
-			/*
-			 * if we have a SomeReverse predicate, then
-			 * we need to modify all solutions so that 
-			 * in every solution is at least one symbol that 
-			 * has a reverse directions
-			 */
-			if(p instanceof SomeReverse) {
-				
-//				System.out.println("SOME_REVERSE -> "+((SomeReverse)p).getA());
-				
-				for(Symbol[] solution : solutions) {
-					
-					/*
-					 * we set the direction of a's first occurrence to '-'
-					 */
-					boolean bFound = false;
-					for(int i=0; i<solution.length && !bFound; i++) {
-						if(solution[i].getId() == ((SomeReverse)p).getA()) {
-							solution[i].setForward(false);
-							bFound = true;
-							
-						}
-					}
-				}
 
-			}
-		}
-		
-		return solutions;
-	}
 	
 	/*
 	 * N = ( <number> | '*' )
@@ -297,8 +258,11 @@ public class MiniEugene {
 		if("NOT".equalsIgnoreCase(p)) {
 			
 			if(RuleOperator.ALL_REVERSE.toString().equalsIgnoreCase(s)) {
-				return new LogicalNot(new AllReverse(this.symbols, -1));
+				return new LogicalNot(new AllReverse(-1));
+			} else if(RuleOperator.ALL_FORWARD.toString().equalsIgnoreCase(s)) {
+				return new LogicalNot(new AllForward(-1));
 			}
+
 			
 		} else if(EugeneRules.isUnaryRule(p)) {
 			/*

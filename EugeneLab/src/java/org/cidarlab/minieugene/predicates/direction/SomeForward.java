@@ -16,10 +16,10 @@ import JaCoP.core.Store;
  * a element_of X
  * exists a : direction(a) = '-'
  */
-public class SomeReverse 
+public class SomeForward 
 	extends DirectionalityPredicate {
 
-	public SomeReverse(int a) {
+	public SomeForward(int a) {
 		super(a);
 	}
 
