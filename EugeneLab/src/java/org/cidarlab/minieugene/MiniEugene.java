@@ -41,6 +41,7 @@ import org.cidarlab.minieugene.solver.jacop.JaCoPSolver;
 import org.cidarlab.minieugene.stats.EugeneStatistics;
 import org.cidarlab.minieugene.symbol.Symbol;
 import org.cidarlab.minieugene.symbol.SymbolTables;
+import org.sbolstandard.core.SBOLDocument;
 
 public class MiniEugene {
 
@@ -103,7 +104,7 @@ public class MiniEugene {
 		EugeneStatistics stats = new EugeneStatistics();		
 		Set<URI> imageUri = new HashSet<URI>();
 		List<Symbol[]> solutions = null;
-		File sbol = null;
+		SBOLDocument sbol = null;
 		
 		/*
 		 * we parse the received string line by line
@@ -144,15 +145,21 @@ public class MiniEugene {
 					throw new EugeneException("no solutions found!");
 				} else if(!TEST_MODE) {	
 					long T3 = System.nanoTime();
+					
+					
 					/*
 					 * for the time being, we only visualize max. 40 (randomly chosen) solution
 					 * using pigeon
 					 */
-					SolutionExporter se = new SolutionExporter();
+					
+					// we need to give the set of interactions as
+					// input to the SolutionExporter
+					
+					SolutionExporter se = new SolutionExporter(solutions, this.symbols.getInteractions());
 					if(solutions.size() > 60) {
-						imageUri.add(se.pigeonizeSolutions(solutions, 60));
+						imageUri.add(se.pigeonizeSolutions(60));
 					} else {
-						imageUri.add(se.pigeonizeSolutions(solutions, solutions.size()));
+						imageUri.add(se.pigeonizeSolutions(solutions.size()));
 					}
 					long T4 = System.nanoTime();
 					
@@ -162,7 +169,7 @@ public class MiniEugene {
 					/*
 					 * SBOL EXPORT
 					 */
-					sbol = se.sbolExport(solutions);
+					sbol = se.sbolExport();
 
 				} else if (TEST_MODE) {
 					stats.print();

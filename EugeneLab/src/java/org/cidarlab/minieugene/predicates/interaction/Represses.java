@@ -31,6 +31,7 @@ public class Represses
 	@Override
 	public Constraint toJaCoP(Store store, IntVar[][] variables) 
 				throws EugeneException {
+		System.out.println(this.toString());
 		return null;
 	}
 	

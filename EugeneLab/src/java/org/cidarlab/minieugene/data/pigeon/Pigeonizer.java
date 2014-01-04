@@ -4,11 +4,13 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
+import org.cidarlab.minieugene.dom.interaction.Interaction;
 import org.cidarlab.minieugene.exception.EugeneException;
 import org.cidarlab.minieugene.symbol.Symbol;
 
@@ -48,7 +50,7 @@ public class Pigeonizer {
 		return WeyekinPoster.getMyBirdsURL();		
 	}
 	
-	public URI pigeonize(List<Symbol[]> solutions) 
+	public URI pigeonize(List<Symbol[]> solutions, Set<Interaction> interactions) 
 			throws EugeneException {
 
 		StringBuilder sb = new StringBuilder();
@@ -69,6 +71,16 @@ public class Pigeonizer {
 		 * finally, we add the arcs line
 		 */
 		sb.append("# Arcs").append("\r\n");
+		
+		/*
+		 * here, we iterate of the interactions
+		 */
+		if(null != interactions && !(interactions.isEmpty())) {
+			Iterator<Interaction> it = interactions.iterator();
+			while(it.hasNext()) {
+				sb.append((it.next()).toPigeon()).append("\r\n");
+			}
+		}
 		
 //		System.out.println(sb.toString());
 		WeyekinPoster.setPigeonText(sb.toString());

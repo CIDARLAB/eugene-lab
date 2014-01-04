@@ -29,9 +29,12 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.cidarlab.minieugene.dom.interaction.Interaction;
 import org.cidarlab.minieugene.exception.EugeneException;
 import org.cidarlab.minieugene.predicates.Predicate;
+import org.cidarlab.minieugene.predicates.interaction.Induces;
 import org.cidarlab.minieugene.predicates.interaction.InteractionPredicate;
+import org.cidarlab.minieugene.predicates.interaction.Represses;
 
 
 /**
@@ -55,6 +58,7 @@ public class SymbolTables {
 	 */
 	private Map<Integer, Symbol> symbols;
 	private Set<Predicate> predicates;
+	private Set<InteractionPredicate> interactions;
 	
 	/*
 	 * N ... the length of the device
@@ -70,6 +74,8 @@ public class SymbolTables {
 		this.symbols = new HashMap<Integer, Symbol>();
 	
 		this.predicates = new HashSet<Predicate>();
+		
+		this.interactions = new HashSet<InteractionPredicate>();
 	}
 	
 	/* 
@@ -117,6 +123,7 @@ public class SymbolTables {
 		Symbol[] s = new Symbol[this.symbols.keySet().size()];
 		return this.symbols.values().toArray(s);
 	}
+	
 	public int getId(String s) {
 		
 		/*
@@ -180,7 +187,26 @@ public class SymbolTables {
 	/*
 	 * methods to store information on regulatory interactions
 	 */
-	public void putFact(InteractionPredicate ip) {
-		
+	public void putInteraction(InteractionPredicate ip) {		
+		if(!this.interactions.contains(ip)) {
+			this.interactions.add(ip);
+		}		
+	}
+	
+	public Set<Interaction> getInteractions() {
+		Set<Interaction> inters = new HashSet<Interaction>();
+		Iterator<InteractionPredicate> it = this.interactions.iterator();
+		while(it.hasNext()) {
+			InteractionPredicate ip = it.next();
+			Symbol a = null;
+			if(ip instanceof Represses) {
+				a = this.symbols.get(ip.getA());
+			} else if(ip instanceof Induces) {
+				a = new Symbol(((Induces)ip).getInducer());
+			}
+			Symbol b = this.symbols.get(ip.getB());
+			inters.add(new Interaction(a.getName(), ip.getOperator(), b.getName()));
+		}
+		return inters;
 	}
 }

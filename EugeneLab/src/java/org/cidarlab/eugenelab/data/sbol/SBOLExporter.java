@@ -22,8 +22,6 @@ ENHANCEMENTS, OR MODIFICATIONS.
 
 package org.cidarlab.eugenelab.data.sbol;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.net.URI;
 import java.util.List;
 import java.util.UUID;
@@ -55,14 +53,10 @@ public class SBOLExporter {
 	 * - always we create an SBOL Collection (also if there is only 1 solution!)
 	 */
 
-	public File serialize(List<Symbol[]> solutions) 
+	public SBOLDocument serialize(List<Symbol[]> solutions) 
 			throws EugeneException {
 		
-		File f = null;
-		
 		try {
-			FileOutputStream fos;
-			
 			// create an empty document populated with the SBOL objects
 			// from the given collection
 			SBOLDocument document = SBOLFactory.createDocument();
@@ -85,15 +79,12 @@ public class SBOLExporter {
 			// add the DnaComponent to this document
 			document.addContent(col);
 
-			f = new File("./web/data/sbol/"+uuid+".sbol"); 
-			fos = new FileOutputStream(f);
-			SBOLFactory.write(document, fos);
+			return document;
+
 		} catch (Exception e) {
-			e.printStackTrace();
+//			e.printStackTrace();
 			throw new EugeneException(e.getMessage());
 		}
-
-		return f;
 	}
 	
 	private DnaComponent toSBOL(Symbol[] solution, String uuid, int i) {

@@ -12,10 +12,11 @@ public class TestSuite {
 
 	public static void main(String[] args) {
 //		new TestSuite().test(new File("./tests/drives.eug"));
+		new TestSuite().test(new File("./tests/interactions.eug"));
 
 //		new TestSuite().test(new File("./designs/priority-encoder/rev3/cassette01.eug"));
 //		new TestSuite().test(new File("./designs/priority-encoder/rev3/cassette02.eug"));
-		new TestSuite().test(new File("./designs/priority-encoder/rev3/basic_composition.eug"));
+//		new TestSuite().test(new File("./designs/priority-encoder/rev3/basic_composition.eug"));
 //		new TestSuite().test(new File("./examples/nor-gate.eug"));
 //		new TestSuite().test(new File("./examples/transcriptional-unit.eug"));
 

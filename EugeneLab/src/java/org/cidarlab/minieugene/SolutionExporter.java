@@ -12,29 +12,39 @@ import java.util.UUID;
 
 import org.cidarlab.eugenelab.data.sbol.SBOLExporter;
 import org.cidarlab.minieugene.data.pigeon.Pigeonizer;
+import org.cidarlab.minieugene.dom.interaction.Interaction;
 import org.cidarlab.minieugene.exception.EugeneException;
 import org.cidarlab.minieugene.symbol.Symbol;
+import org.sbolstandard.core.SBOLDocument;
 
 public class SolutionExporter {
+	
+	private List<Symbol[]> solutions;
+	private Set<Interaction> interactions;
+	
+	public SolutionExporter(List<Symbol[]> solutions, Set<Interaction> interactions) {
+		this.solutions = solutions;
+		this.interactions = interactions;
+	}
 	
 	/*
 	 * visualize (using pigeon) N solutions
 	 */
-	public URI pigeonizeSolutions(List<Symbol[]> solutions, int N) 
+	public URI pigeonizeSolutions(int N) 
 			throws EugeneException {
 		int[] idx = null;
-		if(N != -1 && N < solutions.size()) {
-			idx = generateRandomIndices(N, solutions.size());
+		if(N != -1 && N < this.solutions.size()) {
+			idx = generateRandomIndices(N, this.solutions.size());
 		} else {
-			idx = new int[solutions.size()];
-			for(int i=0; i<solutions.size(); i++) {
+			idx = new int[this.solutions.size()];
+			for(int i=0; i<this.solutions.size(); i++) {
 				idx[i] = i;
 			}
 		}
 		
 		List<Symbol[]> lst = new ArrayList<Symbol[]>(idx.length);
 		for(int i=0; i<idx.length; i++) {
-			lst.add(solutions.get(idx[i]));
+			lst.add(this.solutions.get(idx[i]));
 		}
 		
         try {
@@ -43,7 +53,7 @@ public class SolutionExporter {
             /* 
              * we visualize always 40 designs 
              */
-        	return pigeon.pigeonize(lst);
+        	return pigeon.pigeonize(lst, this.interactions);
         } catch(Exception e) {
         	e.printStackTrace();
             throw new EugeneException(e.getMessage());
@@ -60,10 +70,10 @@ public class SolutionExporter {
 	}
 	
 
-	public File sbolExport(List<Symbol[]> solutions) 
+	public SBOLDocument sbolExport() 
 			throws EugeneException {
 		try {
-			return new SBOLExporter().serialize(solutions);
+			return new SBOLExporter().serialize(this.solutions);
 		} catch(EugeneException ee) {
 			throw new EugeneException(ee.getMessage());
 		}

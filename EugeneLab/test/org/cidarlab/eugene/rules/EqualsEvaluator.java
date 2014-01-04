@@ -20,7 +20,7 @@ public class EqualsEvaluator {
 				System.out.println(
 						mer.getStatistics().getValueByKey(EugeneConstants.NUMBER_OF_SOLUTIONS));
 //				mer.printSolutions();
-				System.out.println(mer.getSBOL().getPath());
+//				System.out.println(mer.getSBOL().getPath());
 			} catch(Exception e) {
 				e.printStackTrace();
 			}
