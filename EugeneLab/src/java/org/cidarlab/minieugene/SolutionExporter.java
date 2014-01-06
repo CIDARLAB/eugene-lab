@@ -16,6 +16,7 @@ import org.cidarlab.minieugene.dom.interaction.Interaction;
 import org.cidarlab.minieugene.exception.EugeneException;
 import org.cidarlab.minieugene.symbol.Symbol;
 import org.sbolstandard.core.SBOLDocument;
+import org.sbolstandard.core.SBOLFactory;
 
 public class SolutionExporter {
 	
@@ -30,34 +31,30 @@ public class SolutionExporter {
 	/*
 	 * visualize (using pigeon) N solutions
 	 */
-	public URI pigeonizeSolutions(int N) 
+	public URI pigeonizeSolutions() 
 			throws EugeneException {
-		int[] idx = null;
-		if(N != -1 && N < this.solutions.size()) {
-			idx = generateRandomIndices(N, this.solutions.size());
-		} else {
-			idx = new int[this.solutions.size()];
-			for(int i=0; i<this.solutions.size(); i++) {
-				idx[i] = i;
-			}
+
+		if(null != solutions) {
+			
+			try {
+	        	Pigeonizer pigeon = new Pigeonizer();
+	            
+	            /* 
+	             * we visualize up to 10 designs 
+	             */
+	        	if(this.solutions.size() > 10) {
+	            	return pigeon.pigeonize(this.getRandomSolutions(10), this.interactions);
+	        	}
+	        	
+	        	return pigeon.pigeonize(this.solutions, this.interactions);
+	        	
+	        } catch(Exception e) {
+	        	e.printStackTrace();
+	            throw new EugeneException(e.getMessage());
+	        }
 		}
 		
-		List<Symbol[]> lst = new ArrayList<Symbol[]>(idx.length);
-		for(int i=0; i<idx.length; i++) {
-			lst.add(this.solutions.get(idx[i]));
-		}
-		
-        try {
-        	Pigeonizer pigeon = new Pigeonizer();
-            
-            /* 
-             * we visualize always 40 designs 
-             */
-        	return pigeon.pigeonize(lst, this.interactions);
-        } catch(Exception e) {
-        	e.printStackTrace();
-            throw new EugeneException(e.getMessage());
-        }
+		return URI.create("");
 	}
 
 	private int[] generateRandomIndices(int N, int range) {
@@ -72,10 +69,43 @@ public class SolutionExporter {
 
 	public SBOLDocument sbolExport() 
 			throws EugeneException {
-		try {
-			return new SBOLExporter().serialize(this.solutions);
-		} catch(EugeneException ee) {
-			throw new EugeneException(ee.getMessage());
+		if(null != this.solutions) {
+			try {
+				
+	            /* 
+	             * we SBOL up to 100 designs 
+	             */
+				if(this.solutions.size() > 100) {
+					return new SBOLExporter().serialize(this.getRandomSolutions(100));
+				} 
+				return new SBOLExporter().serialize(this.solutions);
+				
+			} catch(EugeneException ee) {
+				throw new EugeneException(ee.getMessage());
+			}
 		}
+		/*
+		 * we return an empty document if there 
+		 * are no solutions
+		 */
+		return SBOLFactory.createDocument();
+	}
+	
+	private List<Symbol[]> getRandomSolutions(int N) {
+		int[] idx = null;
+		if(N != -1 && N < this.solutions.size()) {
+			idx = generateRandomIndices(N, this.solutions.size());
+		} else {
+			idx = new int[this.solutions.size()];
+			for(int i=0; i<this.solutions.size(); i++) {
+				idx[i] = i;
+			}
+		}
+		
+		List<Symbol[]> lst = new ArrayList<Symbol[]>(idx.length);
+		for(int i=0; i<idx.length; i++) {
+			lst.add(this.solutions.get(idx[i]));
+		}
+		return lst;
 	}
 }

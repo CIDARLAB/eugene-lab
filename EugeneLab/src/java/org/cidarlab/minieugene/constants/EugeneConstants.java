@@ -128,6 +128,6 @@ public class EugeneConstants {
 	
 	/** STATS **/
 	public static final String NUMBER_OF_SOLUTIONS = "Number of Solutions";
-	public static final String SOLUTION_FINDING_TIME = "Solution Finding Time";
+	public static final String SOLUTION_FINDING_TIME = "Solution Finding Time [sec]";
 	
 }

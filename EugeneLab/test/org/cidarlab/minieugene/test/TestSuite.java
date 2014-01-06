@@ -12,12 +12,25 @@ public class TestSuite {
 
 	public static void main(String[] args) {
 //		new TestSuite().test(new File("./tests/drives.eug"));
-		new TestSuite().test(new File("./tests/interactions.eug"));
+//		new TestSuite().test(new File("./tests/interactions.eug"));
 
 //		new TestSuite().test(new File("./designs/priority-encoder/rev3/cassette01.eug"));
 //		new TestSuite().test(new File("./designs/priority-encoder/rev3/cassette02.eug"));
+//		new TestSuite().test(new File("./designs/priority-encoder/rev3/cassette03.eug"));
 //		new TestSuite().test(new File("./designs/priority-encoder/rev3/basic_composition.eug"));
-//		new TestSuite().test(new File("./examples/nor-gate.eug"));
+
+		/*
+		 * NOR GATE EXAMPLE
+		 */
+//		new TestSuite().test(new File("./designs/nor-gate/repressing-cassette.eug"));
+//		new TestSuite().test(new File("./designs/nor-gate/reporting-cassette.eug"));
+//		new TestSuite().test(new File("./designs/nor-gate/nor-gate.eug"));
+
+//		new TestSuite().test(new File("./designs/nor-gate/rev1/repressing-cassette.eug"));
+//		new TestSuite().test(new File("./designs/nor-gate/rev1/reporting-cassette.eug"));
+		new TestSuite().test(new File("./designs/nor-gate/rev1/nor-gate.eug"));
+
+		//		new TestSuite().test(new File("./designs/nor-gate/nor-gate.eug"));
 //		new TestSuite().test(new File("./examples/transcriptional-unit.eug"));
 
 		/*** TESTS ***/

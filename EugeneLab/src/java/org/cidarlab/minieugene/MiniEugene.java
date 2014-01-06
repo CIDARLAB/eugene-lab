@@ -125,7 +125,7 @@ public class MiniEugene {
 				}
 
 				stats.add("Number of Parts", symbols.length);
-				stats.add("Possible Solutions", Math.pow(symbols.length, this.N));
+				stats.add("Possible Solutions", Math.pow(symbols.length, this.N) * Math.pow(2, N));
 				stats.add("Number of Rules", predicates.length);
 				
 				/*
@@ -154,22 +154,24 @@ public class MiniEugene {
 					
 					// we need to give the set of interactions as
 					// input to the SolutionExporter
-					
-					SolutionExporter se = new SolutionExporter(solutions, this.symbols.getInteractions());
-					if(solutions.size() > 60) {
-						imageUri.add(se.pigeonizeSolutions(60));
-					} else {
-						imageUri.add(se.pigeonizeSolutions(solutions.size()));
+					if(null != solutions) {
+						SolutionExporter se = new SolutionExporter(solutions, this.symbols.getInteractions());
+						
+						/*
+						 * PIGEONIZATION
+						 */
+						imageUri.add(se.pigeonizeSolutions());
+
+						/*
+						 * SBOL EXPORT
+						 */
+						sbol = se.sbolExport();
 					}
 					long T4 = System.nanoTime();
 					
-					stats.add("Solution Visualization Time", (T4-T3)*Math.pow(10, -9));
+					stats.add("Solution Visualization Time [sec]", (T4-T3)*Math.pow(10, -9));
 					stats.add(EugeneConstants.NUMBER_OF_SOLUTIONS, solutions.size());
 					
-					/*
-					 * SBOL EXPORT
-					 */
-					sbol = se.sbolExport();
 
 				} else if (TEST_MODE) {
 					stats.print();
