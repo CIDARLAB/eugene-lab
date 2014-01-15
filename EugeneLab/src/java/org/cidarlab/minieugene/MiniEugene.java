@@ -71,14 +71,21 @@ public class MiniEugene {
 	private int N;
 	private int NR_OF_SOLUTIONS;
 	
+	public MiniEugene(int N, int NR_OF_SOLUTIONS) {
+		this.symbols = new SymbolTables();
+		this.pb = new PredicateBuilder(this.symbols);
+		
+		this.N = N;
+		this.NR_OF_SOLUTIONS = NR_OF_SOLUTIONS;
+	}
+
 	public MiniEugene(int N, int NR_OF_SOLUTIONS, boolean usePredefined) {
 		this.symbols = new SymbolTables();
 		this.pb = new PredicateBuilder(this.symbols);
 		
 		this.N = N;
 		this.NR_OF_SOLUTIONS = NR_OF_SOLUTIONS;
-		
-		SOME_REVERSE_RULE = false;
+
 		/*
 		 * use our predefined symbols
 		 */
@@ -88,7 +95,6 @@ public class MiniEugene {
 			this.symbols.put("c");
 			this.symbols.put("t");
 		}
-
 	}
 	
 	/*
@@ -113,12 +119,16 @@ public class MiniEugene {
 		
 		if(lines.length>0) {
 			
+			/*
+			 * parsing
+			 */
 			Predicate[] predicates = this.parsePredicates(lines);
 			
+			
+			/*
+			 * solving
+			 */
 			try {
-				/*
-				 * finally, we solve the problem
-				 */
 				Symbol[] symbols = this.symbols.getSymbols();
 				if(null == symbols || symbols.length==0) {
 					throw new EugeneException("no solutions found!");

@@ -60,9 +60,10 @@ public class AllBefore
 		int N = variables[Variables.PART].length;
 
 		/*
-		 * a ALLBEFORE b
+		 * a ALL_BEFORE b
 		 * 
-		 * contains(a) => for all a, b: position(a) < position(b)
+		 * contains(a) /\ contains (b) => 
+		 * 		for all a, b: position(a) < position(b)
 		 */
 
 		PrimitiveConstraint pc[] = new PrimitiveConstraint[N-1];
@@ -84,10 +85,10 @@ public class AllBefore
 
 				//store.impose(
 				//		new XneqC(variables[i], b));
-				store.impose(
-						new IfThen(
-								new XeqC(variables[Variables.PART][i], a),
-								new XneqC(variables[Variables.PART][i], b)));
+//				store.impose(
+//						new IfThen(
+//								new XeqC(variables[Variables.PART][i], a),
+//								new XneqC(variables[Variables.PART][i], b)));
 				
 				pc[i] = new IfThen(
 							new XeqC(variables[Variables.PART][i], a),

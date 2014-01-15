@@ -82,7 +82,7 @@ public class Pigeonizer {
 			}
 		}
 		
-//		System.out.println(sb.toString());
+		System.out.println(sb.toString());
 		WeyekinPoster.setPigeonText(sb.toString());
 		
 		return WeyekinPoster.getMyBirdsURL();		
