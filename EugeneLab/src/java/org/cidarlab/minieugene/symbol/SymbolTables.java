@@ -209,4 +209,16 @@ public class SymbolTables {
 		}
 		return inters;
 	}
+	
+	public void clear() {
+		if(this.interactions != null) {
+			this.interactions.clear();
+		}
+		if(this.predicates != null) {
+			this.predicates.clear();
+		}
+		if(this.symbols != null) {
+			this.symbols.clear();
+		}
+	}
 }

@@ -10,7 +10,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.cidarlab.minieugene.MiniEugene;
+import org.cidarlab.minieugene.MiniEugeneFactory;
 import org.cidarlab.minieugene.MiniEugeneReturn;
 import org.cidarlab.minieugene.exception.EugeneException;
 
@@ -100,7 +102,8 @@ public class NumericalRuleEvaluator {
         List<String> ruleDisjunction = getRuleDisjunction(k, constrainedPart);
         long totalDevices = 0;
         for(String rule : ruleDisjunction) {
-            MiniEugeneReturn mer = new MiniEugene(N, -1, false).execute(rule);
+			MiniEugene me = MiniEugeneFactory.instantiate();				
+            MiniEugeneReturn mer = me.execute(rule, N, -1);
             totalDevices += (long) mer.getStatistics().getValueByKey("NumSolutions");
         }
 
@@ -127,7 +130,8 @@ public class NumericalRuleEvaluator {
         long totalDevices = 0;
         for (String rule : ruleDisjunction) {
             try {
-                MiniEugeneReturn mer = new MiniEugene(N, -1, false).execute(rule);
+    			MiniEugene me = MiniEugeneFactory.instantiate();				
+                MiniEugeneReturn mer = me.execute(rule, N, -1);
                 totalDevices += (long) mer.getStatistics().getValueByKey("NumSolutions");
             } catch(EugeneException e) {
                 totalDevices += 0;
@@ -154,7 +158,8 @@ public class NumericalRuleEvaluator {
         long totalDevices = 0;
         for (String rule : ruleDisjunction) {
             try {
-                MiniEugeneReturn mer = new MiniEugene(N, -1, false).execute(rule);
+    			MiniEugene me = MiniEugeneFactory.instantiate();				
+                MiniEugeneReturn mer = me.execute(rule, N, -1);
                 totalDevices += (long) mer.getStatistics().getValueByKey("NumSolutions");
             } catch(EugeneException e) {
                 totalDevices += 0;
@@ -181,7 +186,8 @@ public class NumericalRuleEvaluator {
         long totalDevices = 0;
         for(String rule : ruleDisjunction) {
             try {
-                MiniEugeneReturn mer = new MiniEugene(N, -1, false).execute(rule);
+    			MiniEugene me = MiniEugeneFactory.instantiate();				
+                MiniEugeneReturn mer = me.execute(rule, N, -1);
                 totalDevices += (long) mer.getStatistics().getValueByKey("NumSolutions");
             } catch(EugeneException e) {
                 totalDevices += 0;
@@ -211,7 +217,8 @@ public class NumericalRuleEvaluator {
         long totalDevices = 0;
         for(String rule : ruleDisjunction) {
             try {
-                MiniEugeneReturn mer = new MiniEugene(N, -1, false).execute(rule);
+    			MiniEugene me = MiniEugeneFactory.instantiate();				
+                MiniEugeneReturn mer = me.execute(rule, N, -1);
                 totalDevices += (long) mer.getStatistics().getValueByKey("NumSolutions");
             } catch(EugeneException e) {
                 totalDevices += 0;
@@ -241,7 +248,8 @@ public class NumericalRuleEvaluator {
         long totalDevices = 0;
         for(String rule : ruleDisjunction) {
             try {
-                MiniEugeneReturn mer = new MiniEugene(N, -1, false).execute(rule);
+    			MiniEugene me = MiniEugeneFactory.instantiate();				
+                MiniEugeneReturn mer = me.execute(rule, N, -1);
                 totalDevices += (long) mer.getStatistics().getValueByKey("NumSolutions");
             } catch(EugeneException e) {
                 totalDevices += 0;
@@ -271,7 +279,8 @@ public class NumericalRuleEvaluator {
         long totalDevices = 0;
         for(String rule : ruleDisjunction) {
             try {
-                MiniEugeneReturn mer = new MiniEugene(N, -1, false).execute(rule);
+    			MiniEugene me = MiniEugeneFactory.instantiate();				
+                MiniEugeneReturn mer = me.execute(rule, N, -1);
                 totalDevices += (long) mer.getStatistics().getValueByKey("NumSolutions");
             } catch(EugeneException e) {
                 totalDevices += 0;
@@ -301,7 +310,8 @@ public class NumericalRuleEvaluator {
         long totalDevices = 0;
         for(String rule : ruleDisjunction) {
             try {
-                MiniEugeneReturn mer = new MiniEugene(N, -1, false).execute(rule);
+    			MiniEugene me = MiniEugeneFactory.instantiate();				
+                MiniEugeneReturn mer = me.execute(rule, N, -1);
                 totalDevices += (long) mer.getStatistics().getValueByKey("NumSolutions");
             } catch(EugeneException e) {
                 totalDevices += 0;

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FilenameFilter;
 
 import org.cidarlab.minieugene.MiniEugene;
+import org.cidarlab.minieugene.MiniEugeneFactory;
 import org.cidarlab.minieugene.MiniEugeneReturn;
 import org.cidarlab.eugene.util.EugeneUtil;
 
@@ -44,7 +45,11 @@ public class TestSuite {
 			 */
 			String script = EugeneUtil.readFile(f);
 			long t1 = System.nanoTime();
-			MiniEugeneReturn mer = new MiniEugene(-1, -1, false).execute(script);
+			
+			MiniEugene me = MiniEugeneFactory.instantiate();				
+			MiniEugeneReturn mer = me.execute(script, -1, -1);
+
+//			MiniEugeneReturn mer = new MiniEugene(-1, -1, false).execute(script);
 			long tProcessing = System.nanoTime() - t1;
 			
 			mer.printSolutions();

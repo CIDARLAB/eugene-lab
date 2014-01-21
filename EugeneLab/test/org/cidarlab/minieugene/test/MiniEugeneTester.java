@@ -1,7 +1,9 @@
 package org.cidarlab.minieugene.test;
 
 import org.cidarlab.minieugene.MiniEugene;
+import org.cidarlab.minieugene.MiniEugeneFactory;
 import org.cidarlab.minieugene.MiniEugeneReturn;
+import org.cidarlab.minieugene.impl.MiniEugeneImpl;
 
 public class MiniEugeneTester {
 
@@ -40,7 +42,7 @@ public class MiniEugeneTester {
 		int validIdx = 0;		
 		for(int i=0; i<testN.length; i++) {
 			try {
-				new MiniEugene(-1, -1, false).parseN(testN[i]);
+				new MiniEugeneImpl(/*-1, -1, false*/).parseN(testN[i]);
 				valid[validIdx++] = i;
 			} catch(Exception e) {
 			}
@@ -75,7 +77,10 @@ public class MiniEugeneTester {
 		for(int i=2; i<=10; i++) {
 			String s = new String("N="+i+NEWLINE+"a BEFORE b");
 			try {
-				new MiniEugene(-1, -1, false).execute(s);
+				MiniEugene me = MiniEugeneFactory.instantiate();				
+				me.execute(s, -1, -1);
+//
+//				new MiniEugene(-1, -1, false).execute(s);
 			} catch(Exception e) {
 				System.err.println(e.getMessage());
 			}
@@ -88,7 +93,9 @@ public class MiniEugeneTester {
 		for(int i=2; i<=10; i++) {
 			String s = new String("N="+i+NEWLINE+"a SOME_BEFORE b");
 			try {
-				new MiniEugene(-1, -1, false).execute(s);
+				MiniEugene me = MiniEugeneFactory.instantiate();				
+				me.execute(s, -1, -1);
+//				new MiniEugene(-1, -1, false).execute(s);
 			} catch(Exception e) {
 				System.err.println(e.getMessage());
 			}
@@ -110,7 +117,9 @@ public class MiniEugeneTester {
 
 		for(int i=0; i<testN.length; i++) {
 			try {
-				new MiniEugene(-1, -1, true).execute(testN[i]);
+				MiniEugene me = MiniEugeneFactory.instantiate();				
+				me.execute(testN[i], -1, -1);
+//				new MiniEugene(-1, -1, true).execute(testN[i]);
 			} catch(Exception e) {
 				System.err.println(e.getMessage());
 			}
@@ -133,8 +142,11 @@ public class MiniEugeneTester {
 		sb.append(this.buildContains(10, letters.length));
 		sb.append("ALL_REVERSE");
 		try {
-			MiniEugeneReturn mer = new MiniEugene(-1, -1, true).execute(sb.toString());
-			mer.printSolutions();
+			MiniEugene me = MiniEugeneFactory.instantiate();				
+			MiniEugeneReturn mer = me.execute(sb.toString(), -1, -1);
+
+//			MiniEugeneReturn mer = new MiniEugene(-1, -1, true).execute(sb.toString());
+//			mer.printSolutions();
 		} catch(Exception e) {
 			e.printStackTrace();
 		}		

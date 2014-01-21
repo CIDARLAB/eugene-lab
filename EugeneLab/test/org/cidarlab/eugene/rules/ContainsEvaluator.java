@@ -1,6 +1,7 @@
 package org.cidarlab.eugene.rules;
 
 import org.cidarlab.minieugene.MiniEugene;
+import org.cidarlab.minieugene.MiniEugeneFactory;
 
 public class ContainsEvaluator {
 
@@ -12,7 +13,8 @@ public class ContainsEvaluator {
 			String s=buildScript(i);
 			
 			try {
-				new MiniEugene(i, -1, false).execute(s);
+				MiniEugene me = MiniEugeneFactory.instantiate();				
+				me.execute(s, i, -1);
 			} catch(Exception e) {
 				e.printStackTrace();
 			}

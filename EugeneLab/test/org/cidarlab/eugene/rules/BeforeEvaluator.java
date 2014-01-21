@@ -1,6 +1,7 @@
 package org.cidarlab.eugene.rules;
 
 import org.cidarlab.minieugene.MiniEugene;
+import org.cidarlab.minieugene.MiniEugeneFactory;
 import org.cidarlab.minieugene.MiniEugeneReturn;
 import org.cidarlab.minieugene.constants.EugeneConstants;
 
@@ -16,7 +17,8 @@ public class BeforeEvaluator {
 			System.out.println(s);
 			
 			try {
-				MiniEugeneReturn mer = new MiniEugene(i, -1, false).execute(s);
+				MiniEugene me = MiniEugeneFactory.instantiate();				
+				MiniEugeneReturn mer = me.execute(s, i, -1);
 				System.out.println(
 						mer.getStatistics().getValueByKey(EugeneConstants.NUMBER_OF_SOLUTIONS));
 			} catch(Exception e) {

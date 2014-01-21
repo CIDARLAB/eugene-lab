@@ -46,6 +46,7 @@ import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.SequenceIterator;
 import org.biojava.bio.seq.io.SeqIOTools;
 import org.cidarlab.minieugene.MiniEugene;
+import org.cidarlab.minieugene.MiniEugeneFactory;
 import org.cidarlab.minieugene.MiniEugeneReturn;
 import org.cidarlab.minieugene.stats.Measurement;
 import org.cidarlab.minieugene.symbol.Symbol;
@@ -409,7 +410,9 @@ public class EugeneServlet extends HttpServlet {
             /*
              * currently we only return 1 randomly chosen solution
              */
-            MiniEugeneReturn eugeneReturn = new MiniEugene(N, -1, predefined).execute(input);
+        	MiniEugene me = MiniEugeneFactory.instantiate();
+            MiniEugeneReturn eugeneReturn = me.execute(input, N, -1);
+ 
 
             List<JSONObject> lstUriJSON = new ArrayList<JSONObject>();
             List<JSONObject> lstStatsJSON = new ArrayList<JSONObject>();

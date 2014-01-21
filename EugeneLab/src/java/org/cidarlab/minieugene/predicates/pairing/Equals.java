@@ -48,10 +48,11 @@ public class Equals
 		 * equal to the element at index idxB
 		 */
 		
-		store.impose(new XeqY(variables[Variables.PART][this.getA()], variables[Variables.PART][this.getB()]));
-		
-		return null;
-		
+		return new And(
+				new XeqY(variables[Variables.PART][this.getA()], variables[Variables.PART][this.getB()]),
+				new And(
+						new XeqY(variables[Variables.TYPE][this.getA()], variables[Variables.TYPE][this.getB()]),
+						new XeqY(variables[Variables.ORIENTATION][this.getA()], variables[Variables.ORIENTATION][this.getB()])));
 	}
 
 }

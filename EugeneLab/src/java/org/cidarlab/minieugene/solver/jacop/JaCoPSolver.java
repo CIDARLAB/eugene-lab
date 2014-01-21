@@ -12,10 +12,8 @@ import org.cidarlab.minieugene.solver.Solver;
 import org.cidarlab.minieugene.symbol.Symbol;
 import org.cidarlab.minieugene.symbol.SymbolTables;
 
-import JaCoP.constraints.Alldifferent;
-import JaCoP.constraints.Constraint;
 import JaCoP.constraints.And;
-import JaCoP.constraints.IfThen;
+import JaCoP.constraints.Constraint;
 import JaCoP.constraints.Or;
 import JaCoP.constraints.PrimitiveConstraint;
 import JaCoP.constraints.XeqC;
@@ -29,7 +27,6 @@ import JaCoP.search.MostConstrainedDynamic;
 import JaCoP.search.Search;
 import JaCoP.search.SelectChoicePoint;
 import JaCoP.search.SimpleMatrixSelect;
-import JaCoP.search.SimpleSelect;
 
 
 public class JaCoPSolver 
@@ -44,7 +41,7 @@ public class JaCoPSolver
 		this.symbols = symbols;
 	}
 	
-	public List<Symbol[]> solve(int N, Symbol[] symbols, Predicate[] predicates)
+	public List<Symbol[]> solve(int N, Symbol[] symbols, Predicate[] predicates, int NR_OF_SOLUTIONS)
 			throws EugeneException {
 
 		this.N = N;
@@ -70,7 +67,7 @@ public class JaCoPSolver
     	/*
     	 * now, let's solve the problem
     	 */
-    	Domain[][] solutions = this.search(variables);
+    	Domain[][] solutions = this.search(variables, NR_OF_SOLUTIONS);
     	
     	/*
     	 * finally, we process and return the solutions
@@ -148,10 +145,6 @@ public class JaCoPSolver
 		/*
 		 * per default, all parts have a FORWARD orientation
 		 */
-//		for(int i=0; i<variables[Variables.ORIENTATION].length; i++) {
-//			store.impose(new XeqC(variables[Variables.ORIENTATION][i], 1));
-//		}
-		
 		for(int i=0; i<predicates.length; i++) {
 			try {
 				if(predicates[i] instanceof Represses ||
@@ -177,23 +170,23 @@ public class JaCoPSolver
 		}
 	}
 	
-    private Domain[][] search(IntVar[][] variables) 
+    private Domain[][] search(IntVar[][] variables, int NR_OF_SOLUTIONS) 
     		throws EugeneException {
     	Search<IntVar> search = new DepthFirstSearch<IntVar>(); 
 
-        SelectChoicePoint<IntVar> select =  new SimpleMatrixSelect<IntVar>(
+        SelectChoicePoint<IntVar> select = new SimpleMatrixSelect<IntVar>(
 				variables, 
 				new MostConstrainedDynamic<IntVar>(), 
 				new IndomainSimpleRandom<IntVar>());  
+
+        
+        if(NR_OF_SOLUTIONS != (-1)) {
+        	search.getSolutionListener().setSolutionLimit(NR_OF_SOLUTIONS);
+        } else {
+            search.getSolutionListener().searchAll(true);   
+        }
   
 
-        /*
-         * we want to find ALL solutions
-         */
-
-        // only for the ACM JETC Priority Encoder
-        //search.getSolutionListener().setSolutionLimit(1);
-        search.getSolutionListener().searchAll(true);   
         search.setPrintInfo(false);
         search.getSolutionListener().recordSolutions(true);
                 
