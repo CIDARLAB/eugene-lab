@@ -190,6 +190,9 @@ public class JaCoPSolver
         /*
          * we want to find ALL solutions
          */
+
+        // only for the ACM JETC Priority Encoder
+        //search.getSolutionListener().setSolutionLimit(1);
         search.getSolutionListener().searchAll(true);   
         search.setPrintInfo(false);
         search.getSolutionListener().recordSolutions(true);
