@@ -8,6 +8,7 @@
     <servlet-name>EugeneServlet</servlet-name>
     <url-pattern>/EugeneServlet</url-pattern>
   </servlet-mapping>
+	<!-- A session should never expire -->
   <session-config>
     <session-timeout>30</session-timeout>
   </session-config>

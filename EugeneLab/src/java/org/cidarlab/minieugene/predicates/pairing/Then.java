@@ -53,7 +53,7 @@ public class Then
 		for(int posA = 0; posA<NR_OF_VARIABLES; posA ++) {
 			
 			PrimitiveConstraint[] pcB = new PrimitiveConstraint[NR_OF_VARIABLES-1];
-			for(int posB = 0, i=0; posB<NR_OF_VARIABLES; posB++) {
+			for(int posB = 0, i=0; posB<NR_OF_VARIABLES-1; posB++) {
 				if(posB != posA) {
 					pcB[i++] = new XeqC(variables[Variables.PART][posB], b);
 				}			
