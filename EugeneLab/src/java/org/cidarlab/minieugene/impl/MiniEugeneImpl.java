@@ -152,7 +152,7 @@ public class MiniEugeneImpl
 						/*
 						 * SBOL EXPORT
 						 */
-						sbol = se.sbolExport();
+						//sbol = se.sbolExport();
 					}
 					long T4 = System.nanoTime();
 					

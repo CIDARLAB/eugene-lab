@@ -45,6 +45,7 @@ import org.biojava.bio.seq.Feature;
 import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.SequenceIterator;
 import org.biojava.bio.seq.io.SeqIOTools;
+import org.cidarlab.eugenelab.data.ScriptCollector;
 import org.cidarlab.minieugene.MiniEugene;
 import org.cidarlab.minieugene.MiniEugeneFactory;
 import org.cidarlab.minieugene.MiniEugeneReturn;
@@ -259,7 +260,13 @@ public class EugeneServlet extends HttpServlet {
                     
                     JSONObject result = new JSONObject();
                     
-                    int nrOfSolutions = 1;
+                    /*
+                     * currently, we find all solutions
+                     * -> we plan on allowing the user to specify a
+                     *    desired number of solutions
+                     */
+                    int nrOfSolutions = -1;
+                    
 //                    if(!request.getParameter("NrOfSolutions").trim().isEmpty()) {
 //                    	try {
 //                    		nrOfSolutions = Integer.parseInt(
@@ -280,6 +287,14 @@ public class EugeneServlet extends HttpServlet {
                             	request.getSession().getId(), 
                             	sizeOfDesign, input, predefined, nrOfSolutions);
                     
+                    	/*
+                    	 * for ``data'' collection
+                    	 */                    
+                    	collectScript(
+                    			request.getSession().getId(), 
+                    			sizeOfDesign, 
+                    			input);
+
                     	out.write(result.toString());
                     }
                     
@@ -292,65 +307,14 @@ public class EugeneServlet extends HttpServlet {
                     String sPigeon = request.getParameter("Pigeon");
                     WeyekinPoster.setPigeonText(sPigeon);
                     WeyekinPoster.postMyBird();
-                } else if (command.equals("executeSBOL")) {
-                    /***
-                    String fileName = request.getParameter("input");
-                    fileName = getFileExtension(fileName, true);
-                    NamedElement eugeneConversion;
-                    JSONObject toWrite = new JSONObject();
-                    try {
-                        eugeneConversion = convertSBOL(fileName);
-<<<<<<< HEAD
-                        if(eugeneConversion instanceof Component) {
-//                           JSONObject json = EugeneJSON.toJSON(eugeneConversion);
-//                            resultsArray.put(json);
-                        } else if(eugeneConversion instanceof EugeneCollection) {
-=======
-                        if (eugeneConversion instanceof Component) {
-                            //result = EugeneJSON.toJSON((Component)eugeneConversion); //@TODO: Get Example file
-                        } else if (eugeneConversion instanceof EugeneCollection) {
->>>>>>> 3914bc1cdc8b8bcba4cf44a64e35cbaf35d8dc66
-                            Set<Device> deviceList = ((EugeneCollection) eugeneConversion).getDevices();
-                            JSONArray resultsArray = new JSONArray();
-                            for (Device d : deviceList) {
-                                resultsArray.put(EugeneJSON.toJSON(d));
-                            }
-                            toWrite.put("results", resultsArray);
-                            toWrite.put("status", "good");
-                        }
-                    } catch (Exception e) {
-                        String exceptionAsString = e.toString().replaceAll("[\r\n\t]+", " ");
-                        exceptionAsString = exceptionAsString.replaceAll("[\"]+", "'");
-                        toWrite.put("results", "***Exception-Dummy-String***");
-                        toWrite.put("status", "exception");
-                    }
-                    out.write(toWrite.toString());
-                    ***/
+                } 
+/**                
+                else if (command.equals("executeSBOL")) {
+
                 } else if (command.equals("executeGenBank")) {
-                    /***
-                    //response.setContentType("text/plain");
-                    JSONObject toWrite = new JSONObject();
-                    String fileName = request.getParameter("input");
-                    fileName = getFileExtension(fileName, true);
-                    try {
-                        Component c = loadGenBank(new File(fileName));
-                        JSONArray componentArray = EugeneJSON.toJSONPartArray(c);
-                        JSONObject results = new JSONObject();
-                        results.put("name", ((Device) c).getName());
-                        results.put("type", "PartCollection");
-                        results.put("components", componentArray);
-                        JSONArray resultsArray = new JSONArray();
-                        resultsArray.put(results);
-                        toWrite.put("results", resultsArray);
-                        toWrite.put("status", "good");
-                    } catch (Exception e) {
-                        toWrite.put("results", "***Exception-Dummy-String***");
-                        toWrite.put("status", "exception");
-                    }
-                    out.write(toWrite.toString());
-<<<<<<< HEAD
-                    ***/ 
+
                 }
+ **/                
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
@@ -361,18 +325,6 @@ public class EugeneServlet extends HttpServlet {
     }
 
     private String run(String sessionId, String devices){
-        /***
-=======
-    private String run(String sessionId, String devices)
-            throws RecognitionException, Exception {
->>>>>>> 3914bc1cdc8b8bcba4cf44a64e35cbaf35d8dc66
-        System.out.println(devices);
-        String[] deviceArray = devices.split("\\|");
-        for (int i = 0; i < deviceArray.length; i++) {
-            System.out.println(deviceArray[i]);
-        }
-        String[] results = (String[]) new EugeneExecutor(sessionId).execute("eugeneString", 1);
-        ***/
         return null;
     }
 
@@ -407,10 +359,11 @@ public class EugeneServlet extends HttpServlet {
         JSONObject returnJSON = new JSONObject();
         
         try {
-            /*
-             * currently we only return 1 randomly chosen solution
-             */
+        	
         	MiniEugene me = MiniEugeneFactory.instantiate();
+            /*
+             * -1 ... currently we find all solutions 
+             */
             MiniEugeneReturn eugeneReturn = me.execute(input, N, -1);
  
 
@@ -482,6 +435,7 @@ public class EugeneServlet extends HttpServlet {
                 new File(sbolFilePath).mkdir();
 
                 String uuid = UUID.randomUUID().toString();
+
                 String filename = sbolFilePath+"/"+uuid+".sbol";
                 eugeneReturn.serializeSBOL(filename);
 
@@ -503,6 +457,23 @@ public class EugeneServlet extends HttpServlet {
         }
         
         return returnJSON;
+    }
+    
+    private void collectScript(String sessionId, int N, String script) {
+    	/*
+    	 * get the path (of the servlet context)
+    	 */
+        String scriptPath = Paths.get(
+        		this.getServletContext().getRealPath(""), 
+        		"data", 
+        		"scripts", 
+        		sessionId).toString();
+
+        /*
+         * start a thread (the script collector) that 
+         * writes the script to the given file
+         */
+    	new ScriptCollector(scriptPath, N, script).run();    	
     }
     
     public JSONObject executeEugene(String sessionId, String input) {
@@ -689,204 +660,7 @@ public class EugeneServlet extends HttpServlet {
         return sb.toString();
     }
 
-    /***
-=======
 
->>>>>>> 3914bc1cdc8b8bcba4cf44a64e35cbaf35d8dc66
-    public static JSONObject toJSON(Device objDevice)
-            throws Exception {
-        String NEWLINE = System.getProperty("line.separator");
-        StringBuilder sbPigeon = new StringBuilder();
-        StringBuilder sbPigeonArcs = new StringBuilder();
-
-        sbPigeonArcs.append("# Arcs").append(NEWLINE);
-
-        JSONObject deviceJSON = new JSONObject();
-        deviceJSON.put("name", objDevice.getName());
-        deviceJSON.put("schema", "CompositePart");
-        deviceJSON.put("type", "composite");
-        List<Component> lstComponents = objDevice.getAllComponents();
-        List<JSONObject> lstComponentsJSON = new ArrayList<JSONObject>();
-
-        for (Component component : lstComponents) {
-            JSONObject componentJSON = new JSONObject();
-            componentJSON.put("name", component.getName());
-            componentJSON.put("schema", "BasicPart");
-            if (component instanceof Device) {
-                componentJSON = toJSON((Device) component);
-            } else if (component instanceof PartType) {
-                //componentJSON.put("name", lstComponents)
-            } else if (component instanceof Part) {
-                Part objPart = (Part) component;
-                List<JSONObject> lstPropertyValuesJSON = new ArrayList<JSONObject>();
-                componentJSON.put("Pigeon", objPart.get("Pigeon"));
-                sbPigeon.append(objPart.get("Pigeon")).append(NEWLINE);
-                if (objPart.get("Sequence") != null) {
-                    componentJSON.put("sequence", objPart.get("Sequence").toString().replaceAll("\n", ""));
-                } //XXX: this is a tremendous atrocity against science
-                // aka it is a hack for a demo video
-                else {
-                    componentJSON.put("sequence", getRandomSequence());
-                }
-                componentJSON.put("type", objPart.getPartType().getName());
-                if (null != objPart.get("Represses")) {
-                    sbPigeonArcs.append(objPart.getName())
-                            .append(" rep ")
-                            .append(objPart.get("Represses"))
-                            .append(NEWLINE);
-                }
-            }
-            lstComponentsJSON.add(componentJSON);
-        }
-        deviceJSON.put("components", lstComponentsJSON);
-
-        String sPigeon = sbPigeon.toString() + sbPigeonArcs.toString();
-        deviceJSON.put("Pigeon", sPigeon);
-
-        return deviceJSON;
-    }
-    ***/
-    
-    /**
-    // Takes an SBOL file and converts it into a eugene device
-    private NamedElement convertSBOL(String sbolFileName) throws Exception {
-        return SBOLImporter.importSBOL(sbolFileName);
-    }
-<<<<<<< HEAD
-    **/
-    
-    /***
-    
-    // Interface that loads a GenBank component straight from the website
-    private Component loadGenBank(String componentName) throws MalformedURLException, IOException,
-            NoSuchElementException, BioException, EugeneException {
-
-        URL url = new URL("http:www.ncbi.nlm.nih.gov/nuccore/" + componentName);
-        BufferedReader br = new BufferedReader(new InputStreamReader(url.openStream()));
-        return readGenBankComponent(br);
-    }
-
-    // Interface that loads a GenBank component from a file
-    private Component loadGenBank(File file) throws FileNotFoundException,
-            NoSuchElementException, BioException, EugeneException {
-        BufferedReader br = new BufferedReader(new FileReader(file));
-        return readGenBankComponent(br);
-    }
-
-    // Converts a GenBank component to a Eugene component
-    // Do not call directly; use above APIs
-    private Component readGenBankComponent(BufferedReader br) throws
-            NoSuchElementException, BioException, EugeneException {
-        SequenceIterator sequences = SeqIOTools.readGenbank(br);
-        List<Component> parts = new ArrayList<Component>();
-        String deviceName = "UnnamedDevice";
-        // Should only have one sequence
-        boolean firstPass = true;
-        // Get a list of all features
-        while (sequences.hasNext()) {
-            Sequence seq = sequences.nextSequence();
-            if (firstPass) {
-                deviceName = seq.getName();
-                firstPass = false;
-
-            } else {
-                deviceName += "|" + seq.getName();
-            }
-            Iterator it = seq.features();
-
-            while (it.hasNext()) {
-                Feature feature = (Feature) it.next();
-                parts.add(buildPart(feature));
-            }
-        }
-        if (parts.isEmpty()) {
-            return null;
-        } else if (parts.size() == 1) {
-            // Size 1 imples just one part
-            return parts.get(0);
-        } else {
-            //@TODO: get a real device name
-            return new Device(deviceName, parts);
-            //return EugeneBuilder.buildDevice(deviceName, parts);
-        }
-    }
-
-    private Part buildPart(Feature feature)
-            throws EugeneException {
-        PartType partType = new PartType(feature.getType());
-        String partName = getPartName(feature);
-        Part part = new Part(partType, partName);
-        part.setSequence(feature.getSequence().seqString());
-        return part;
-    }
-
-    private String getPartName(Feature feature) {
-        return feature.getType() + "_at_" + feature.getLocation().getMin();
-    }
-***/
-    
-    /* Temporarily saved for reference
-     private Component importGenbankComponent(String sFileName) throws MalformedURLException, IOException, 
-     NoSuchElementException, BioException, InvalidEugeneAssignmentException {
-     //Website has files embedded in the website so need to find a way to isolate the file from the rest of the website
-     //Currently using direct file upload to test
-     //URL url = new URL("http://www.ncbi.nlm.nih.gov/nuccore/" + sFileName);
-     BufferedReader in = new BufferedReader(new FileReader(sFileName));//new InputStreamReader(url.openStream()));
-     SequenceIterator sequences = SeqIOTools.readGenbank(in);
-     List<Component> parts = new ArrayList<Component>();
-     int i = 0;
-     // Can this lead to multiple devices?
-     while(sequences.hasNext()) {
-     Sequence seq = sequences.nextSequence();
-     Iterator it = seq.features();
-     while(it.hasNext()) {
-     Feature feature = (Feature) it.next();
-     //Feature is essentially the Genbank version of a part
-     PartType partType = new PartType(feature.getType());
-     // Still need a part name
-     String partName = feature.getType() + "_part" + i;
-     Part part = new Part(partType, partName);
-     // Add the sequence to the part
-     Property property = new Property("sequence", "txt");
-     PropertyValue propertyValue = new PropertyValue("sequence", "txt");
-     propertyValue.setTxt(feature.getSequence().seqString());
-     part.setValue(property, propertyValue);
-     parts.add(part);
-     i++;
-     }
-     }
-     if(parts.isEmpty()) {
-     return null;
-     } else if(parts.size() == 1) {
-     // File is just a device
-     return parts.get(0);
-     } else {
-     //Will be able to get actual device name when website file upload works
-     return Device.newInstance("DeviceName", parts);
-     =======
-     while (it.hasNext()) {
-     Feature feature = (Feature) it.next();
-     features.add(feature);
-     }
-     }
-     // Process the features to remove overlaps and make it more natural for a Eugene device
-     //removeOverlap(features); //Currently just return list of parts
-     List<Component> parts = new ArrayList<Component>();
-     // Convert features to Eugene parts
-     for (Feature feature : features) {
-     parts.add(buildPart(feature));
-     }
-     if (parts.isEmpty()) {
-     return null;
-     } else if (parts.size() == 1) {
-     // Size 1 imples just one part
-     return new Part(deviceName, (Part) parts.get(0));
-     } else {
-     return Device.newInstance(deviceName, parts);
-     }
-		
-     }
-     * */
     private void removeOverlap(List<Feature> features) {
         // Sort the features based on when they start in the sequence
         Collections.sort(features, new Comparator<Feature>() {
