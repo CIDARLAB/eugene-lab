@@ -149,9 +149,6 @@ public class MiniEugeneServlet
 
         JSONObject returnJSON = new JSONObject();
         
-        System.out.println("N = "+N);
-        System.out.println(input);
-        
         try {
         	
         	/*
