@@ -460,13 +460,13 @@ $(document).ready(function() {
         } else {
             //Clicking run button sends current text to server
             //May want to modify to send file or collection of files to server(if Eugene program spans multiple files)
-            var input = editor.getValue();
+
             $('#runButton').attr("disabled", "disabled");
             
             var command;
              
             command = {"input": editor.getValue(), 
-                       "command":"execute-miniEugene", 
+                       "command":"solve", 
                        "N":$('#sizeOfDesign').val(),
                        //"NrOfSolutions":$('#nrOfSolutions').val(), 
                        "predefined":false};
