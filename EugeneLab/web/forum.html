@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
     <head>
@@ -16,29 +15,29 @@
                     <li><a href="index.html">miniEugene</a></li>
                     <li><a href="documentation.html">How to</a></li>
                     <li><a href="downloads.html">Downloads</a></li>
-                    <li><a href="forum.html">Q&amp;A Forum</a></li>
-                    <li class="active"><a href="contact.html">Contact</a></li>
+                    <li class="active"><a href="forum.html">Q&amp;A Forum</a></li>
+                    <li><a href="contact.html">Contact</a></li>
                 </ul>
             </div>
         </div>
         <div class="page-header" style="margin-top:50px">
-            <h1>miniEugene <small>Let us know how to solve your problems!</small></h1>
+            <h1>miniEugene <small>Q&amp;A Forum</small></h1>
         </div>
 
-                <div id="creators">
-                        <div class="span3">
-                            <h5>Ernst Oberortner</h5>
-                            <a href="http://people.bu.edu/ernstl" target="_blank">
-                            	<img class="img-polaroid" src="images/ernst.png">
-                            </a>
-                        </div>
-                        <div class="span3">
-                            <h5>Douglas Densmore</h5>
-                            <a href="http://ddensmore.net" target="_blank">
-                            	<img class="img-polaroid" src="images/doug.jpg">
-                            </a>
-                        </div>
-                </div>
+<!--  -->
+		<iframe id="forum_embed"
+		  src="javascript:void(0)"
+		  scrolling="no"
+		  frameborder="0"
+		  width="900"
+		  height="700">
+		</iframe>
+		<script type="text/javascript">
+		  document.getElementById('forum_embed').src =
+		     'https://groups.google.com/forum/embed/?place=forum/minieugene-users'
+		     + '&showsearch=true&showpopout=true&showtabs=false'
+		     + '&parenturl=' + encodeURIComponent(window.location.href);
+		</script>
 
         <!--scripts placed at the end to enhance page loading speed--> 
         <script type="text/javascript" src="jsLibraries/jquery-1.9.1.min.js"></script> 
