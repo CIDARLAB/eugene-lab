@@ -172,7 +172,7 @@ public class MiniEugeneServlet
  
 
             /*
-             * how can I get the interactions from the miniEugene object?
+             * SolutionExporter, what else?
              */
             SolutionExporter se = new SolutionExporter(
             		me.getSolutions(), 
@@ -184,15 +184,17 @@ public class MiniEugeneServlet
             pigeon.put("pigeon-uri", se.pigeonizeSolutions());
             lstPigeon.add(pigeon);
             returnJSON.put("results", lstPigeon);
-//            returnJSON.put("results", pigeonizeSolutions(solutions));
 
             // textual 
             returnJSON.put("solutions", this.textualizeSolutions(me.getSolutions()));
             
             // SBOL
-            String filename = this.getSBOLFilename();
+            String sbolFilePath = Paths.get(this.getServletContext().getRealPath(""), "data", "sbol").toString();
+            new File(sbolFilePath).mkdir();
+            String uuid = UUID.randomUUID().toString();
+            String filename = sbolFilePath+"/"+uuid+".sbol";
             if(se.toSBOL(filename)) {            
-            	returnJSON.put("sbol", filename);
+            	returnJSON.put("sbol", "data/sbol/"+uuid+".sbol");
             }
         	
             // statistics
@@ -233,17 +235,6 @@ public class MiniEugeneServlet
     	return lstStatsJSON;
     }
     
-    private String getSBOLFilename() {
-        String sbolFilePath = Paths.get(this.getServletContext().getRealPath(""), "data", "sbol").toString();
-        new File(sbolFilePath).mkdir();
-
-        String uuid = UUID.randomUUID().toString();
-
-        String filename = sbolFilePath+"/"+uuid+".sbol";
-        
-        return filename;
-    }
-
     private JSONObject textualizeSolutions(List<Symbol[]> solutions) {
         
     	StringBuilder sb = new StringBuilder();
