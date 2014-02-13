@@ -82,7 +82,6 @@ public class SBOLExporter {
 			return document;
 
 		} catch (Exception e) {
-//			e.printStackTrace();
 			throw new EugeneException(e.getMessage());
 		}
 	}
@@ -105,6 +104,15 @@ public class SBOLExporter {
 			sa.setURI(
 					URI.create("http://www.cidarlab.org/miniEugene/designs/"+uuid+"/solution_"+i+"/"+pos));
 
+			/*
+			 * miniEugene orientation --> SBOL SequenceAnnotation strand
+			 */
+			if(symbol.isForward()) {
+				sa.setStrand(StrandType.POSITIVE);
+			} else {
+				sa.setStrand(StrandType.NEGATIVE);
+			}
+			
 			/*
 			 * the sub-component
 			 */
