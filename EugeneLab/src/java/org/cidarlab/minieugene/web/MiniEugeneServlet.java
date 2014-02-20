@@ -13,15 +13,17 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+
+
 /*
  * miniEugene imports
  */
 import org.cidarlab.minieugene.MiniEugene;
 import org.cidarlab.minieugene.MiniEugeneStatistics;
-import org.cidarlab.minieugene.Symbol;
+import org.cidarlab.minieugene.dom.Component;
 import org.cidarlab.minieugene.stats.Measurement;
+import org.cidarlab.minieugene.util.SolutionExporter;
 import org.cidarlab.minieugene.web.data.ScriptCollector;
-import org.cidarlab.minieugene.web.util.SolutionExporter;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -175,27 +177,30 @@ public class MiniEugeneServlet
              * SolutionExporter, what else?
              */
             SolutionExporter se = new SolutionExporter(
-            		me.getSolutions(), 
+            		me.getSolutions(),
             		me.getInteractions());
             
             // pigeon
             List<JSONObject> lstPigeon = new ArrayList<JSONObject>();
             JSONObject pigeon = new JSONObject();
-            pigeon.put("pigeon-uri", se.pigeonizeSolutions());
+            pigeon.put("pigeon-uri", se.toPigeon());
             lstPigeon.add(pigeon);
             returnJSON.put("results", lstPigeon);
 
-            // textual 
-            returnJSON.put("solutions", this.textualizeSolutions(me.getSolutions()));
+            // Eugene 
+            String eugeneFilePath = Paths.get(this.getServletContext().getRealPath(""), "data", "eugene").toString();
+            new File(eugeneFilePath).mkdirs();
+            String uuid = UUID.randomUUID().toString();
+            String eugeneFile = eugeneFilePath+"/"+uuid+".eug";
+            se.toEugene(eugeneFile);
+            returnJSON.put("eugene", "data/eugene/"+uuid+".eug");
             
             // SBOL
             String sbolFilePath = Paths.get(this.getServletContext().getRealPath(""), "data", "sbol").toString();
-            new File(sbolFilePath).mkdir();
-            String uuid = UUID.randomUUID().toString();
-            String filename = sbolFilePath+"/"+uuid+".sbol";
-            if(se.toSBOL(filename)) {            
-            	returnJSON.put("sbol", "data/sbol/"+uuid+".sbol");
-            }
+            new File(sbolFilePath).mkdirs();
+            String sbolFile = sbolFilePath+"/"+uuid+".sbol";
+            se.toSBOL(sbolFile);            
+            returnJSON.put("sbol", "data/sbol/"+uuid+".sbol");
         	
             // statistics
             returnJSON.put("stats", processStatistics(me.getStatistics()));
@@ -235,20 +240,20 @@ public class MiniEugeneServlet
     	return lstStatsJSON;
     }
     
-    private JSONObject textualizeSolutions(List<Symbol[]> solutions) {
+    private JSONObject textualizeSolutions(List<Component[]> solutions) {
         
     	StringBuilder sb = new StringBuilder();
     	sb.append("<table class=\"table table-bordered table-hover\" id=\"solutionList\">");
     	if (null != solutions && !solutions.isEmpty()) {
 
-        	for(Symbol[] solution :  solutions) {	 
+        	for(Component[] solution :  solutions) {	 
         		sb.append("<tr><td>");
         		for(int i=0; i<solution.length; i++) {
-        			Symbol symbol = solution[i];
-        			if(!symbol.isForward()) {
+        			Component component = solution[i];
+        			if(!component.isForward()) {
         				sb.append("-");
         			} 
-        			sb.append(symbol.getName());
+        			sb.append(component.getName());
         			if(i != solution.length - 1) {
         				sb.append(", ");
         			}
@@ -257,6 +262,8 @@ public class MiniEugeneServlet
         	}
         }
     	sb.append("</table>");
+    	
+    	System.out.println(sb.toString());
     	
     	/*
     	 * put the HTML of the textual solutions table into JSON format

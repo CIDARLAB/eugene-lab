@@ -106,9 +106,9 @@
                                                 <div class="tabbable">
                                                     <ul class="nav nav-tabs" id="outputTabs">
                                                         <li class="active"><a href="#outputImageTab" data-toggle="tab">Visual</a></li>
-                                                        <li><a href="#outputSolutionsTab" data-toggle="tab">Textual</a></li>
-                                                        <li><a href="#outputStatsTab" data-toggle="tab">Statistics</a></li>
+                                                        <li><a href="#outputEugeneTab" data-toggle="tab">Eugene</a></li>
                                                         <li><a href="#outputSBOLTab" data-toggle="tab">SBOL</a></li>
+                                                        <li><a href="#outputStatsTab" data-toggle="tab">Statistics</a></li>
                                                         <li><a href="#outputExceptionTab" data-toggle="tab">Errors</a></li>
                                                     </ul>
 
@@ -116,8 +116,8 @@
                                                         <div class="tab-pane active" id="outputImageTab">
                                                             <div id="outputImageArea"></div>
                                                         </div>
-                                                        <div class="tab-pane" id="outputSolutionsTab">
-                                                            <div id="outputSolutionArea"></div>
+                                                        <div class="tab-pane" id="outputEugeneTab">
+                                                            <div id="outputEugeneArea"></div>
                                                         </div>
                                                         <div class="tab-pane" id="outputSBOLTab">
                                                             <div id="outputSBOLArea"></div>
@@ -155,12 +155,9 @@
 	        This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/deed.en_US">Creative Commons Attribution 4.0 International License</a>.
 		</div>
 
-        <iframe id="hiddenIFrame" class="hidden">
-        </iframe>
-        <script src="jsLibraries/jquery.dataTables.min.js"></script>
+        <!--   <script src="jsLibraries/jquery.dataTables.min.js"></script>-->
         <script src="jsLibraries/bootstrap.min.js"></script>
-        <script src="javascript/ObjectIDGenerator.js"></script>
-        <script src="javascript/EugeneLabController.js"></script>
+        <script src="scripts/miniEugeneController.js"></script>
         <script src="jsLibraries/codemirror.js"></script>
         <!--  <script src="jsLibraries/jquery.dynatree.min.js"></script> -->
         <!--<script src="jsLibraries/jquery.cookie.js"></script>-->
