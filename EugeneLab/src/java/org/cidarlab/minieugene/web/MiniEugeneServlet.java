@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 
 
 
+
 /*
  * miniEugene imports
  */
@@ -151,26 +152,30 @@ public class MiniEugeneServlet
 
         JSONObject returnJSON = new JSONObject();
         
-        try {
+    	/*
+    	 * first, we instantiate miniEugene
+    	 */
+    	MiniEugene me = new MiniEugene();
+
+    	/*
+    	 * then, we turn the input string into 
+    	 * an array of strings
+    	 */
+    	String[] rules = input.split(
+    			System.getProperty("line.separator"));
+
+    	try {
         	
         	/*
-        	 * first, we instantiate miniEugene
+        	 * then, we build the script
         	 */
-        	MiniEugene me = new MiniEugene();
-        	
-        	
-        	/*
-        	 * then, we turn the input string into 
-        	 * an array of strings
-        	 */
-        	String[] rules = input.split(
-        			System.getProperty("line.separator"));
+        	String script = this.buildScript(N, rules);
         	
             /*
              * then, we solve the problem
              * finding ALL solutions 
              */    
-            me.solve(rules, N);
+        	me.solve(script);
  
 
             /*
@@ -215,9 +220,41 @@ public class MiniEugeneServlet
             } catch(JSONException jse) {}
         }
 
-        
+        /*
+         * regardless what happened, we visualize the ACT
+         */
+    	try {
+    		returnJSON.put("act-uri", me.visualizeACT().toString());
+    	} catch(Exception e) {
+    		// ignore
+    	}
         return returnJSON;
     }
+    
+    /**
+     * 
+     * @param N
+     * @param rules
+     * @return
+     */
+	public String buildScript(int N, String[] rules) {
+		StringBuilder sb = new StringBuilder();
+
+		// N = number .
+		sb.append("N=").append(N).append(".").append("\r\n");
+		
+		// rules
+		for(int i=0; i<rules.length; i++) {
+			if(!rules[i].trim().isEmpty()) {
+				sb.append(rules[i]);
+				if(!rules[i].endsWith(".")) {
+					sb.append(".").append("\r\n");
+				}
+			}
+		}
+		
+		return sb.toString();
+	}
     
     private List<JSONObject> processStatistics(MiniEugeneStatistics mes) {
         List<JSONObject> lstStatsJSON = new ArrayList<JSONObject>();

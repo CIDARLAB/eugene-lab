@@ -101,29 +101,10 @@ $(document).ready(function() {
                     	//$('#outputSolutionArea').html('<table class="table table-bordered table-hover" id="solutionList"><tr><td>p, c, r, t</td></tr><tr><td>p, c, t, r</td></tr><tr><td>p, r, c, t</td></tr><tr><td>p, r, t, c</td></tr><tr><td>p, t, c, r</td></tr><tr><td>p, t, r, c</td></tr><tr><td>r, c, p, t</td></tr><tr><td>r, c, t, p</td></tr><tr><td>r, p, t, c</td></tr><tr><td>r, p, c, t</td></tr><tr><td>r, t, c, p</td></tr><tr><td>r, t, p, c</td></tr><tr><td>c, p, r, t</td></tr><tr><td>c, p, t, r</td></tr><tr><td>c, r, p, t</td></tr><tr><td>c, r, t, p</td></tr><tr><td>c, t, r, p</td></tr><tr><td>c, t, p, r</td></tr><tr><td>t, c, p, r</td></tr><tr><td>t, c, r, p</td></tr><tr><td>t, r, p, c</td></tr><tr><td>t, r, c, p</td></tr><tr><td>t, p, r, c</td></tr><tr><td>t, p, c, r</td></tr></table>');
                     	// visualize the designs using pigeon
 
-                        var pigeonLinks = [];
-//                        var imageHeader = '<div id="outputCarousel" class="slide carousel"><ol class="carousel-indicators">';
-//                        var images = '<div class="carousel-inner">';
-                        var imageHeader = '';
-                        var images = '';
-                        var imageCount = 0;
                         $.each(response["results"], function() {
-                            pigeonLinks.push(this["pigeon-uri"]);
-                            var active = "";
-                            if (imageCount === 0) {
-                                active = "active";
-                            }
-                            imageHeader = imageHeader + '<li class="' + active + '" data-target="#outputCarousel" +data-slide-to="' + imageCount + '"></li>';
-                            images = images + '<div class="item ' + active + '"><img src="' + this["pigeon-uri"] + '"/></div>';
-                            imageCount++;
-                        }
-                        );
-                        //render images
-                        imageHeader = imageHeader + '</ol>';
-//                        images = images + '</div></div>';
-                        var slideShow = imageHeader + images;
-//                        $('#outputCarousel').carousel({interval: 5000});
-                        $('#outputImageArea').html(images);
+                            $('#outputImageArea').html('<div class="item active"><img src="' + this["pigeon-uri"] + '"/>');
+                        });
+                        
                     }
                 }
                 else if ("exception" === response["status"]) {
@@ -132,12 +113,18 @@ $(document).ready(function() {
                     $("#outputImageArea").html('');
                     $("#outputSolutionArea").html('');
                     $("#outputSBOLArea").html('');
+                    $("#outputEugeneArea").html('');
+
                     
                     // print the exception
-                	$('#outputExceptionArea').html("Exception: " + response["results"]);
-                	$('#outputExceptionArea').show();
+                	$('#outputExceptionArea').html('<div class="item active">Exception: ' + response["results"] + '</div>');
+                	$('#outputExceptionArea').tabs({ active: 1 });
                     //$('#outputExceptionTab').collapse('show');
                 }
+                
+                // regardless what happened, we visualize the ACT
+            	$('#outputACTArea').html('<div class="item active"><img src="' + response["act-uri"] + '"/></div>');
+
             });
         }
     });
