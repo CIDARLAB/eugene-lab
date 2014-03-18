@@ -117,9 +117,13 @@ $(document).ready(function() {
 
                     
                     // print the exception
-                	$('#outputExceptionArea').html('<div class="item active">Exception: ' + response["results"] + '</div>');
-                	$('#outputExceptionArea').tabs({ active: 1 });
-                    //$('#outputExceptionTab').collapse('show');
+                	//$('#outputExceptionArea').html('<div class="item active">Exception: ' + response["results"] + '</div>');
+                	$('#outputExceptionArea').html('Exception: ' + response["results"]);
+                	
+//                	var index = $('#outputTabs a[href="#outputExceptionTab"]').parent().index();
+//                	$('#outputTabs').tabs('select', index);
+                	
+//                	$("#outputTabs").tabs("select", "#outputExceptionTab");
                 }
                 
                 // regardless what happened, we visualize the ACT
