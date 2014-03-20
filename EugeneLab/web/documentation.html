@@ -72,8 +72,9 @@
                                         <p>NOTCONTAINS BBa_J61100</p>
                                     </td>  
                                 </tr>  
+<!--                                  
                                 <tr>  
-                                    <td style="font-size:12px">α<strong>CONTAINS</strong> β</td>  
+                                    <td style="font-size:12px">α <strong>CONTAINS</strong> β</td>  
                                     <td style="font-size:12px">if α appears in the design, then β must appear at least once within α</td>  
                                     <td style="font-size:12px">
                                         <p>Operon CONTAINS Gene</p>
@@ -81,13 +82,14 @@
                                     </td>  
                                 </tr>  
                                 <tr>  
-                                    <td style="font-size:12px">α<strong>CONTAINS</strong> β</td>  
+                                    <td style="font-size:12px">α <strong>NOTCONTAINS</strong> β</td>  
                                     <td style="font-size:12px">if α appears in the design, then β must NOT appear within α</td>  
                                     <td style="font-size:12px">
                                         <p>Operon NOTCONTAINS RBS</p>
                                         <p>ToggleSwitch NOTCONTAINS YFP</p>
                                     </td>  
                                 </tr>  
+-->                                
                                 <tr>  
                                     <td style="font-size:12px"> α <strong>EXACTLY</strong> <i>n</i> </td>  
                                     <td style="font-size:12px">the number of occurrences of α must be equal to <i>n</i></td>
@@ -311,7 +313,6 @@
                                 <tr>  
                                     <th>Rule</th>  
                                     <th>Description</th>  
-<!--                                     <th>Formalization</th>   -->
                                     <th>Examples</th>  
                                 </tr>  
                             </thead>  
@@ -320,7 +321,6 @@
                                     <td style="font-size:12px"><p><strong>ALL_FORWARD</strong></p>
                                     </td>  
                                     <td style="font-size:12px">all components in the design must have a forward orientation</td>  
-<!--                                     <td style="font-size:12px">0 < i,j < N</td>   -->
                                     <td style="font-size:12px">
                                         <p>ALL_FORWARD</p>
                                     </td>  
@@ -329,7 +329,6 @@
                                     <td style="font-size:12px"><p><strong>ALL_REVERSE</strong></p>
                                     </td>  
                                     <td style="font-size:12px">all components in the design must have a reverse orientation</td>  
-<!--                                     <td style="font-size:12px">0 < i,j < N</td>   -->
                                     <td style="font-size:12px">
                                         <p>ALL_REVERSE</p>
                                     </td>  
@@ -360,11 +359,11 @@
                                         <p>REVERSE GFP</p>
                                     </td>  
                                 </tr>  
+<!--  
                                 <tr>  
                                     <td style="font-size:12px"><p><strong>SOME_FORWARD</strong> α</p>
                                     </td>  
                                     <td style="font-size:12px">at least one occurrence of α must be forward oriented</td>  
-<!--                                     <td style="font-size:12px">0 < i,j < N</td>   -->
                                     <td style="font-size:12px">
                                         <p>SOME_FORWARD promoter</p>
                                         <p>SOME_FORWARD GFP</p>
@@ -374,12 +373,12 @@
                                     <td style="font-size:12px"><p><strong>SOME_REVERSE</strong> α</p>
                                     </td>  
                                     <td style="font-size:12px">at least one occurrence of α must be reverse oriented</td>  
-<!--                                     <td style="font-size:12px">0 < i,j < N</td>   -->
                                     <td style="font-size:12px">
                                         <p>SOME_REVERSE promoter</p>
                                         <p>SOME_REVERSE GFP</p>
                                     </td>  
-                                </tr>  
+                                </tr> 
+ -->
                                 <tr>  
                                     <td style="font-size:12px">
                                     	<p>α <strong>SAME_ORIENTATION</strong> β</p>
@@ -394,6 +393,7 @@
                                         <p>pBad ALL_SAME_ORIENTATION T7</p>
                                     </td>  
                                 </tr>  
+<!--  
                                 <tr>  
                                     <td style="font-size:12px">
                                     	<p>α <strong>SOME_SAME_ORIENTATION</strong> β</p>
@@ -405,7 +405,8 @@
                                         <p>Promoter SOME_SAME_ORIENTATION Terminator</p>
                                         <p>pBad SOME_SAME_ORIENTATION T7</p>
                                     </td>  
-                                </tr>  
+                                </tr> 
+-->                                 
                             </tbody>
                         </table>
                         
