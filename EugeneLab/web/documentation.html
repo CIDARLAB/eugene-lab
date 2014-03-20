@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>EugeneLab</title>
+        <title>miniEugene</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <link rel="shortcut icon" href="images/icon.ico?v2">
         <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
@@ -57,40 +57,68 @@
                             </thead>  
                             <tbody>  
                                 <tr>  
-                                    <td style="font-size:12px">(α)?<strong>CONTAINS</strong> β</td>  
-                                    <td style="font-size:12px">β must appear at least once (within α)</td>  
-<!--                                      <td style="font-size:12px">0 < |α| ≤ <i>N</i></td> -->  
+                                    <td style="font-size:12px"><strong>CONTAINS</strong> α</td>  
+                                    <td style="font-size:12px">α must appear at least once</td>  
                                     <td style="font-size:12px">
-                                        <p>CONTAINS p</p>
-                                        <p>CONTAINS Terminator</p>
+                                        <p>CONTAINS Gene</p>
+                                        <p>CONTAINS GFP</p>
+                                    </td>  
+                                </tr>  
+                                <tr>  
+                                    <td style="font-size:12px"><strong>NOTCONTAINS</strong> α</td>  
+                                    <td style="font-size:12px">α must NOT appear in the design</td>  
+                                    <td style="font-size:12px">
+                                        <p>NOTCONTAINS RBS</p>
+                                        <p>NOTCONTAINS BBa_J61100</p>
+                                    </td>  
+                                </tr>  
+                                <tr>  
+                                    <td style="font-size:12px">α<strong>CONTAINS</strong> β</td>  
+                                    <td style="font-size:12px">if α appears in the design, then β must appear at least once within α</td>  
+                                    <td style="font-size:12px">
                                         <p>Operon CONTAINS Gene</p>
+                                        <p>ToggleSwitch CONTAINS Reporter</p>
+                                    </td>  
+                                </tr>  
+                                <tr>  
+                                    <td style="font-size:12px">α<strong>CONTAINS</strong> β</td>  
+                                    <td style="font-size:12px">if α appears in the design, then β must NOT appear within α</td>  
+                                    <td style="font-size:12px">
+                                        <p>Operon NOTCONTAINS RBS</p>
+                                        <p>ToggleSwitch NOTCONTAINS YFP</p>
                                     </td>  
                                 </tr>  
                                 <tr>  
                                     <td style="font-size:12px"> α <strong>EXACTLY</strong> <i>n</i> </td>  
-                                    <td style="font-size:12px">α must appear exactly <i>n</i> times</td>  
-<!--                                                                         <td style="font-size:12px">
-                                        <p>|α| == <i>n</i></p>
-                                        <p>0 ≤ |α| ≤ <i>N</i></p>  -->
-                                    <td style="font-size:12px">p EXACTLY 1</td>  
+                                    <td style="font-size:12px">the number of occurrences of α must be equal to <i>n</i></td>
+                                    <td style="font-size:12px">
+                                    	<p>TranscriptionalUnit EXACTLY 4</p>  
+                                    	<p>Reporter EXACTLY 1</p>
+                                    </td>  
+                                </tr>  
+                                <tr>  
+                                    <td style="font-size:12px"> α <strong>NOTEXACTLY</strong> <i>n</i> </td>  
+                                    <td style="font-size:12px">the number of occurrences of α must be not equal to <i>n</i></td>
+                                    <td style="font-size:12px">
+                                    	<p>Operon NOTEXACTLY 4</p> 
+                                    	<p>Reporter NOTEXACTLY 1</p>
+                                    </td>  
                                 </tr>  
                                 <tr>  
                                     <td style="font-size:12px">α <strong>MORETHAN</strong> <i>n</i></td>  
                                     <td style="font-size:12px">α must appear more than <i>n</i> times</td>  
-<!--                                      <td style="font-size:12px">
-                                        <p>|α| > <i>n</i></p>
-                                        <p>0 > <i>n</i> > <i>N</i></p> 
-                                    </td>    -->
-                                    <td style="font-size:12px">c MORETHAN 1</td>
+                                    <td style="font-size:12px">
+                                    	<p>Operon MORETHAN 1</p>	
+                                    	<p>Promoter MORETHAN 1</p>
+                                    </td>
                                 </tr>
                                 <tr>  
                                     <td style="font-size:12px">α <strong>NOTMORETHAN</strong> <i>n</i></td>  
                                     <td style="font-size:12px">α must not appear more than <i>n</i> times</td>  
-<!--                                      <td style="font-size:12px">
-  <!--                                             <p>0 ≤ |α| ≤ <i>n</i></p>
-                                      <p>0 > <i>n</i> > <i>N</i></p> 
-                                    </td>  -->
-                                    <td style="font-size:12px">p NOTMORETHAN 1</td>  
+                                    <td style="font-size:12px">
+                                    	<p>Terminator NOTMORETHAN 1</p>
+                                    	<p>GFP NOTMORETHAN 1</p>
+                                    </td>  
                                 </tr>
                             </tbody>  
                         </table>
@@ -98,9 +126,6 @@
                         <!-- POSITIONAL RULES + TABLE-->
                         <p><strong>Positional Rules</strong></p>
                         <p>Positional rules constraint the location of occurrence of genetic elements. 
-<!--                         To formalize -->
-<!--                             the semantics of the positional rule, we define the <i>position</i> predicate as <i>position(α) = i</i> -->
-<!--                             with 1 ≤ <i>i</i> ≤ <i>N</i>. α can only appear on non-constraint positions in the genetic design. -->
                         </p>
                         <table class="table table-striped">  
                             <thead>  
@@ -292,51 +317,9 @@
                             </thead>  
                             <tbody>  
                                 <tr>  
-                                    <td style="font-size:12px"><p><strong>FORWARD</strong> α</p>
-                                    			<p><strong>ALL_FORWARD</strong> α</p>
-                                    </td>  
-                                    <td style="font-size:12px"><p>all occurrences of α must have a forward orientation.</p>
-                                    <p>(<strong>FORWARD</strong> is equivalent to <strong>ALL_FORWARD</strong>)
-                                    </td>  
-<!--                                     <td style="font-size:12px">0 < i,j < N</td>   -->
-                                    <td style="font-size:12px">
-                                        <p>FORWARD promoter</p>
-                                    </td>  
-                                </tr>  
-                                <tr>  
-                                    <td style="font-size:12px"><p><strong>REVERSE</strong> α</p>
-                                    			<p><strong>ALL_REVERSE</strong> α</p>
-                                    </td>  
-                                    <td style="font-size:12px">all occurrences of α must have a reverse orientation
-                                                <p>(<strong>REVERSE</strong> is equivalent to <strong>ALL_REVERSE</strong>)
-                                    </td>  
-<!--                                     <td style="font-size:12px">0 < i,j < N</td>   -->
-                                    <td style="font-size:12px">
-                                        <p>REVERSE promoter</p>
-                                    </td>  
-                                </tr>  
-                                <tr>  
-                                    <td style="font-size:12px"><p><strong>SOME_FORWARD</strong> α</p>
-                                    </td>  
-                                    <td style="font-size:12px">at least one occurrence of α must have a forward orientation</td>  
-<!--                                     <td style="font-size:12px">0 < i,j < N</td>   -->
-                                    <td style="font-size:12px">
-                                        <p>SOME_FORWARD promoter</p>
-                                    </td>  
-                                </tr>  
-                                <tr>  
-                                    <td style="font-size:12px"><p><strong>SOME_REVERSE</strong> α</p>
-                                    </td>  
-                                    <td style="font-size:12px">at least one occurrence of α must have a reverse orientation</td>  
-<!--                                     <td style="font-size:12px">0 < i,j < N</td>   -->
-                                    <td style="font-size:12px">
-                                        <p>SOME_REVERSE promoter</p>
-                                    </td>  
-                                </tr>  
-                                <tr>  
                                     <td style="font-size:12px"><p><strong>ALL_FORWARD</strong></p>
                                     </td>  
-                                    <td style="font-size:12px">all elements in the design must have a forward orientation</td>  
+                                    <td style="font-size:12px">all components in the design must have a forward orientation</td>  
 <!--                                     <td style="font-size:12px">0 < i,j < N</td>   -->
                                     <td style="font-size:12px">
                                         <p>ALL_FORWARD</p>
@@ -345,10 +328,82 @@
                                 <tr>  
                                     <td style="font-size:12px"><p><strong>ALL_REVERSE</strong></p>
                                     </td>  
-                                    <td style="font-size:12px">all elements in the design must have a reverse orientation</td>  
+                                    <td style="font-size:12px">all components in the design must have a reverse orientation</td>  
 <!--                                     <td style="font-size:12px">0 < i,j < N</td>   -->
                                     <td style="font-size:12px">
                                         <p>ALL_REVERSE</p>
+                                    </td>  
+                                </tr>  
+                                <tr>  
+                                    <td style="font-size:12px"><p><strong>FORWARD</strong> α</p>
+                                    			<p><strong>ALL_FORWARD</strong> α</p>
+                                    </td>  
+                                    <td style="font-size:12px"><p>all α must be forward oriented</p>
+                                    <p>(<strong>FORWARD</strong> is equivalent to <strong>ALL_FORWARD</strong>)
+                                    </td>  
+<!--                                     <td style="font-size:12px">0 < i,j < N</td>   -->
+                                    <td style="font-size:12px">
+                                        <p>FORWARD promoter</p>
+                                        <p>FORWARD GFP</p>
+                                    </td>  
+                                </tr>  
+                                <tr>  
+                                    <td style="font-size:12px"><p><strong>REVERSE</strong> α</p>
+                                    <p><strong>ALL_REVERSE</strong> α</p>
+                                    </td>  
+                                    <td style="font-size:12px">all α must be reverse oriented
+                                                <p>(<strong>REVERSE</strong> is equivalent to <strong>ALL_REVERSE</strong>)
+                                    </td>  
+<!--                                     <td style="font-size:12px">0 < i,j < N</td>   -->
+                                    <td style="font-size:12px">
+                                        <p>REVERSE promoter</p>
+                                        <p>REVERSE GFP</p>
+                                    </td>  
+                                </tr>  
+                                <tr>  
+                                    <td style="font-size:12px"><p><strong>SOME_FORWARD</strong> α</p>
+                                    </td>  
+                                    <td style="font-size:12px">at least one occurrence of α must be forward oriented</td>  
+<!--                                     <td style="font-size:12px">0 < i,j < N</td>   -->
+                                    <td style="font-size:12px">
+                                        <p>SOME_FORWARD promoter</p>
+                                        <p>SOME_FORWARD GFP</p>
+                                    </td>  
+                                </tr>  
+                                <tr>  
+                                    <td style="font-size:12px"><p><strong>SOME_REVERSE</strong> α</p>
+                                    </td>  
+                                    <td style="font-size:12px">at least one occurrence of α must be reverse oriented</td>  
+<!--                                     <td style="font-size:12px">0 < i,j < N</td>   -->
+                                    <td style="font-size:12px">
+                                        <p>SOME_REVERSE promoter</p>
+                                        <p>SOME_REVERSE GFP</p>
+                                    </td>  
+                                </tr>  
+                                <tr>  
+                                    <td style="font-size:12px">
+                                    	<p>α <strong>SAME_ORIENTATION</strong> β</p>
+                                    	<p>α <strong>ALL_SAME_ORIENTATION</strong> β</p>
+                                    </td>  
+                                    <td style="font-size:12px">
+                                    	if α and β appear in the design, then ALL occurrences of α must have the SAME ORIENTATION as β  
+                                        <p>(<strong>SAME_ORIENTATION</strong> is equivalent to <strong>ALL_SAME_ORIENTATION</strong>)
+                                    </td>
+                                    <td style="font-size:12px">
+                                        <p>Promoter SAME_ORIENTATION Terminator</p>
+                                        <p>pBad ALL_SAME_ORIENTATION T7</p>
+                                    </td>  
+                                </tr>  
+                                <tr>  
+                                    <td style="font-size:12px">
+                                    	<p>α <strong>SOME_SAME_ORIENTATION</strong> β</p>
+                                    </td>  
+                                    <td style="font-size:12px">
+                                    	if α and β appear in the design, then at lease one pair of α and β must have the SAME ORIENTATION
+                                    </td>
+                                    <td style="font-size:12px">
+                                        <p>Promoter SOME_SAME_ORIENTATION Terminator</p>
+                                        <p>pBad SOME_SAME_ORIENTATION T7</p>
                                     </td>  
                                 </tr>  
                             </tbody>
@@ -356,7 +411,7 @@
                         
                         <!-- INTERACTION RULES -->
                         <p><strong>Interaction Rules</strong></p>
-                        <p>Interaction rules constrain regulatory interactions among genetic elements.</p>
+                        <p>Interaction rules constrain (regulatory) interactions and relations among components in a genetic design.</p>
                         <table class="table table-striped">  
                             <thead>  
                                 <tr>  
@@ -370,7 +425,7 @@
                                 <tr>  
                                     <td style="font-size:12px"><p>α <strong>REPRESSES</strong> β</p>
                                     </td>  
-                                    <td style="font-size:12px"><p>The α element represses the β element.</p>
+                                    <td style="font-size:12px"><p>If α and β appear in the design, then the α and β have a REPRESSES relationship.</p>
                                     </td>  
 <!--                                     <td style="font-size:12px">0 < i,j < N</td>   -->
                                     <td style="font-size:12px">
@@ -380,7 +435,7 @@
                                 <tr>  
                                     <td style="font-size:12px"><p>α <strong>INDUCES</strong> β</p>
                                     </td>  
-                                    <td style="font-size:12px"><p>The α element induces the β element.</p>
+                                    <td style="font-size:12px"><p>If β appears in the design, then the α INDUCES the β component.</p>
                                     </td>  
 <!--                                     <td style="font-size:12px">0 < i,j < N</td>   -->
                                     <td style="font-size:12px">
@@ -390,10 +445,12 @@
                                 <tr>  
                                     <td style="font-size:12px"><p>α <strong>DRIVES</strong> β</p>
                                     </td>  
-                                    <td style="font-size:12px"><p>The α element drives the β element.</p>
+                                    <td style="font-size:12px"><p>If α and β appear in the design, then α and β have the same orientation and 
+                                    	between α and β does NOT appear any terminator. We say, α DRIVES the expression of the β.</p>
                                     </td>  
 <!--                                     <td style="font-size:12px">0 < i,j < N</td>   -->
                                     <td style="font-size:12px">
+                                        <p>Promoter DRIVES Repressor</p>
                                         <p>pTet DRIVES GFP</p>
                                     </td>  
                                 </tr>  
@@ -424,11 +481,14 @@
 	        CIDAR Group, Dept. of Electrical and Computer Engineering, Boston University, 2014
 			<br/>
 	        <!--  Licencse -->
-	        <a rel="license" href="http://creativecommons.org/licenses/by/4.0/deed.en_US">
-        		<img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by/4.0/88x31.png" />
-	        </a>
-	        <br/>
-	        This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/deed.en_US">Creative Commons Attribution 4.0 International License</a>.
+			<a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">
+				<img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by-sa/4.0/88x31.png" />
+			</a>
+			<br />
+			This work is licensed under a 
+				<a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">
+					Creative Commons Attribution-ShareAlike 4.0 International License
+				</a>.		
 		</div>
 
                 <!--scripts placed at the end to enhance page loading speed--> 
