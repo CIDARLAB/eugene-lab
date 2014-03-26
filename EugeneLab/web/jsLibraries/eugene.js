@@ -226,8 +226,8 @@ CodeMirror.defineMode("eugene", function(config, parserConfig) {
         name: "eugene",
         keywords: words("boolean num txt PartType Property Rule Device include " +
                 "else for if return while"+
-                " CONTAINS NOTCONTAINS AFTER ALL_AFTER SOME_AFTER BEFORE ALL_BEFORE SOME_BEFORE STARTSWITH ENDSWITH WITH NOTWITH THEN NEXTTO ALL_NEXTTO SOME_NEXTTO MORETHAN NOTMORETHAN EXACTLY NOTEXACTLY REPRESSES INDUCES BINDS DRIVES ALL_REVERSE REVERSE SOME_REVERSE ALL_FORWARD FORWARD SOME_FORWARD SAME_ORIENTATION ALL_SAME_ORIENTATION"+
-                " contains notcontains after all_after some_after before all_before some_before startswith endswith with notwith then nextto all_nextto some_nextto morethan notmorethan exactly notexactly represses induces binds drives all_reverse reverse some_reverse all_forward forward some_forward same_orientation all_same_orientation"),
+                " CONTAINS NOTCONTAINS AFTER ALL_AFTER SOME_AFTER BEFORE ALL_BEFORE SOME_BEFORE STARTSWITH ENDSWITH WITH NOTWITH THEN NEXTTO ALL_NEXTTO SOME_NEXTTO MORETHAN NOTMORETHAN EXACTLY NOTEXACTLY REPRESSES INDUCES BINDS DRIVES ALL_REVERSE REVERSE SOME_REVERSE ALL_FORWARD FORWARD SOME_FORWARD SAME_ORIENTATION ALL_SAME_ORIENTATION SAME_COUNT"+
+                " contains notcontains after all_after some_after before all_before some_before startswith endswith with notwith then nextto all_nextto some_nextto morethan notmorethan exactly notexactly represses induces binds drives all_reverse reverse some_reverse all_forward forward some_forward same_orientation all_same_orientation same_count"),
         blockKeywords: words("else for if while"),
         atoms: words("true false null undefined"),
         hooks: {
