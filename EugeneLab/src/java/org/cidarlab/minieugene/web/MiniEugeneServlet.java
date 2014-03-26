@@ -279,44 +279,44 @@ public class MiniEugeneServlet
     	return lstStatsJSON;
     }
     
-    private JSONObject textualizeSolutions(List<Component[]> solutions) {
-        
-    	StringBuilder sb = new StringBuilder();
-    	sb.append("<table class=\"table table-bordered table-hover\" id=\"solutionList\">");
-    	if (null != solutions && !solutions.isEmpty()) {
-
-        	for(Component[] solution :  solutions) {	 
-        		sb.append("<tr><td>");
-        		for(int i=0; i<solution.length; i++) {
-        			Component component = solution[i];
-        			if(!component.isForward()) {
-        				sb.append("-");
-        			} 
-        			sb.append(component.getName());
-        			if(i != solution.length - 1) {
-        				sb.append(", ");
-        			}
-        		}
-        		sb.append("</td></tr>");
-        	}
-        }
-    	sb.append("</table>");
-    	
-    	System.out.println(sb.toString());
-    	
-    	/*
-    	 * put the HTML of the textual solutions table into JSON format
-    	 */
-    	JSONObject solutionsJSON = new JSONObject();
-    	try {
-    		solutionsJSON.put("solution", sb.toString());
-    	} catch(Exception e) {
-    		try {
-    			solutionsJSON.put("solution", "");
-    		} catch(Exception ee) {}
-    	}    	
-    	return solutionsJSON;
-    }
+//    private JSONObject textualizeSolutions(List<Component[]> solutions) {
+//        
+//    	StringBuilder sb = new StringBuilder();
+//    	sb.append("<table class=\"table table-bordered table-hover\" id=\"solutionList\">");
+//    	if (null != solutions && !solutions.isEmpty()) {
+//
+//        	for(Component[] solution :  solutions) {	 
+//        		sb.append("<tr><td>");
+//        		for(int i=0; i<solution.length; i++) {
+//        			Component component = solution[i];
+//        			if(!component.isForward()) {
+//        				sb.append("-");
+//        			} 
+//        			sb.append(component.getName());
+//        			if(i != solution.length - 1) {
+//        				sb.append(", ");
+//        			}
+//        		}
+//        		sb.append("</td></tr>");
+//        	}
+//        }
+//    	sb.append("</table>");
+//    	
+////    	System.out.println(sb.toString());
+//    	
+//    	/*
+//    	 * put the HTML of the textual solutions table into JSON format
+//    	 */
+//    	JSONObject solutionsJSON = new JSONObject();
+//    	try {
+//    		solutionsJSON.put("solution", sb.toString());
+//    	} catch(Exception e) {
+//    		try {
+//    			solutionsJSON.put("solution", "");
+//    		} catch(Exception ee) {}
+//    	}    	
+//    	return solutionsJSON;
+//    }
     
     private void collectScript(String sessionId, int N, String script) {
     	/*
