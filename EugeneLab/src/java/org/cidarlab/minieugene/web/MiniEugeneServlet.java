@@ -176,7 +176,6 @@ public class MiniEugeneServlet
              * finding ALL solutions 
              */    
         	me.solve(script);
- 
 
             /*
              * SolutionExporter, what else?
@@ -184,7 +183,7 @@ public class MiniEugeneServlet
             SolutionExporter se = new SolutionExporter(
             		me.getSolutions(),
             		me.getInteractions());
-            
+
             // pigeon
             List<JSONObject> lstPigeon = new ArrayList<JSONObject>();
             JSONObject pigeon = new JSONObject();
@@ -228,6 +227,7 @@ public class MiniEugeneServlet
     	} catch(Exception e) {
     		// ignore
     	}
+    	
         return returnJSON;
     }
     
@@ -246,13 +246,15 @@ public class MiniEugeneServlet
 		// rules
 		for(int i=0; i<rules.length; i++) {
 			if(!rules[i].trim().isEmpty()) {
-				sb.append(rules[i]);
-				if(!rules[i].endsWith(".")) {
-					sb.append(".").append("\r\n");
+				if(!rules[i].startsWith("//")) {
+					sb.append(rules[i]);
+					if(!rules[i].endsWith(".")) {
+						sb.append(".").append("\r\n");
+					}
 				}
 			}
 		}
-		
+
 		return sb.toString();
 	}
     
