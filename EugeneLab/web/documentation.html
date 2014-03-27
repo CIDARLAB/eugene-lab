@@ -36,20 +36,30 @@
                         // This is a line comment
                 </div>
                 <hr/>
+                <div id="basic_syntax">
+                    <h4>Disjunction of Constraints</h4>
+                        <p>For the time being, miniEugene supports the <a href="http://en.wikipedia.org/wiki/Conjunctive_normal_form" target="_blank">conjunctive normal form</a>, i.e., a conjunction of disjunction. Line feeds indicate a conjunction. In one line, it is possible to specify a disjunction of constraints.</p>
+                        <p>Examples:<br/> 
+                        1. The required design must contain a, d, and b or c.<br/>
+                        <p>CONTAINS a<br/>
+                        CONTAINS b OR CONTAINS c<br/>
+                        CONTAINS d</p>
+                        2. All components in the design must be either forward or reverse oriented.<br/>
+                        <p>ALL_FORWARD OR ALL_REVERSE</p>
+                </div>
+                <hr/>
                 <div id="rules">
-                        <h4>Rules</h4>
-                        <p>We categorize the rules into the following types of constraints: counting, positional, pairing, orientation, and interaction.</p>
+                        <h4>Constraints</h4>
+                        <p>We categorize the miniEugene constraints into the following types of constraints: counting, positioning, pairing, orientation, and interaction.</p>
                         <br>
                         <!-- COUNTING RULES + TABLE -->
-                        <p><strong>Counting Rules</strong></p>
-                        <p>Counting rules constrain the number of occurrences of genetic elements in a design. 
-<!--                          We define the cardinality of genetic elements as follows: |α| is the number of
-                            occurrences of α in the design. -->
+                        <p><strong>Counting Constraints</strong></p>
+                        <p>Counting Constraints constrain the number of occurrences of genetic elements in a design. 
                         </p>
                         <table class="table table-striped">  
                             <thead>  
                                 <tr>  
-                                    <th>Rule</th>  
+                                    <th>Constraint</th>  
                                     <th>Description</th>  
 <!--                                      <th>Formalization</th> -->  
                                     <th>Examples</th>  
@@ -134,13 +144,13 @@
                         </table>
                         <hr/>
                         <!-- POSITIONAL RULES + TABLE-->
-                        <p><strong>Positional Rules</strong></p>
-                        <p>Positional rules constraint the location of occurrence of genetic elements. 
+                        <p><strong>Positioning Constraints</strong></p>
+                        <p>Positioning Constraints constrain the location of occurrence of genetic elements. 
                         </p>
                         <table class="table table-striped">  
                             <thead>  
                                 <tr>  
-                                    <th>Rule</th>  
+                                    <th>Contraint</th>  
                                     <th>Description</th>  
 <!--                                     <th>Formalization</th> -->  
                                     <th>Examples</th>  
@@ -251,13 +261,13 @@
                         </table>
                         <hr/>
                         <!-- PAIRING RULES + TABLE -->
-                        <p><strong>Paring Rules</strong></p>
-                        <p>Pairing rules constrain the pair-wise occurrence of genetic elements.</p>
+                        <p><strong>Paring Constraints</strong></p>
+                        <p>Pairing Constraints constrain the pair-wise occurrence of genetic elements.</p>
                         <p><b>Note!</b>&nbsp;Eugene uses a zero-based indexing mechanism.</p>
                         <table class="table table-striped">  
                             <thead>  
                                 <tr>  
-                                    <th>Rule</th>  
+                                    <th>Constraint</th>  
                                     <th>Description</th>  
 <!--                                     <th>Formalization</th>   -->
                                     <th>Examples</th>  
@@ -314,12 +324,12 @@
                         </table>
                         
                         <!-- ORIENTATION RULES -->
-                        <p><strong>Orientation Rules</strong></p>
-                        <p>Pairing rules constrain the orientation of genetic elements.</p>
+                        <p><strong>Orientation Constraints</strong></p>
+                        <p>Pairing Constraints constrain the orientation of genetic elements.</p>
                         <table class="table table-striped">  
                             <thead>  
                                 <tr>  
-                                    <th>Rule</th>  
+                                    <th>Constraint</th>  
                                     <th>Description</th>  
                                     <th>Examples</th>  
                                 </tr>  
@@ -401,6 +411,24 @@
                                         <p>pBad ALL_SAME_ORIENTATION T7</p>
                                     </td>  
                                 </tr>  
+                                <tr>  
+                                    <td style="font-size:12px"><p><strong>ALTERNATE_ORIENTATION</strong></p>
+                                    </td>  
+                                    <td style="font-size:12px">the orientation of the design's component must alternate.</td>  
+                                    <td style="font-size:12px">
+                                        <p>ALTERNATE_ORIENTATION</p>
+                                    </td>  
+                                </tr>  
+<!--  
+                                <tr>  
+                                    <td style="font-size:12px"><p><strong>ALTERNATE_ORIENTATION</strong> α</p>
+                                    </td>  
+                                    <td style="font-size:12px">the orientations of α component must alternate.</td>  
+                                    <td style="font-size:12px">
+                                        <p>ALL_REVERSE</p>
+                                    </td>  
+                                </tr>  
+-->
 <!--  
                                 <tr>  
                                     <td style="font-size:12px">
@@ -419,12 +447,12 @@
                         </table>
                         
                         <!-- INTERACTION RULES -->
-                        <p><strong>Interaction Rules</strong></p>
-                        <p>Interaction rules constrain (regulatory) interactions and relations among components in a genetic design.</p>
+                        <p><strong>Interaction Constraints</strong></p>
+                        <p>Interaction Constraints constrain (regulatory) interactions and relations among components in a genetic design.</p>
                         <table class="table table-striped">  
                             <thead>  
                                 <tr>  
-                                    <th>Rule</th>  
+                                    <th>Constraint</th>  
                                     <th>Description</th>  
 <!--                                     <th>Formalization</th>   -->
                                     <th>Examples</th>  
@@ -470,15 +498,15 @@
                 <div id="examples">
                     <h3>Examples</h3>
                     <hr/>
-                            <h4>Genetic NOR Gate</h4><a href="examples/nor-gate/nor-gate.eug">Eugene Rules</a>
+                            <h4>Genetic NOR Gate</h4><a href="examples/nor-gate/nor-gate.eug">miniEugene script</a>
                             <hr/>
                             <img src="examples/nor-gate/nor-gates.png">
                             <hr/>
-                            <h4>Genetic Toggle Switch</h4><a href="examples/toggle-switch/toggle-switch.eug">Eugene Rules</a>
+                            <h4>Genetic Toggle Switch</h4><a href="examples/toggle-switch/toggle-switch.eug">miniEugene script</a>
                             <hr/>
                             <img src="examples/toggle-switch/toggle-switch.png">
                             <hr/>
-                            <h4>Genetic Inverter</h4><a href="examples/inverter/inverter.eug">Eugene Rules</a>
+                            <h4>Genetic Inverter</h4><a href="examples/inverter/inverter.eug">miniEugene script</a>
                             <hr/>
                             <img src="examples/inverter/inverter.png">
                             <hr/>
