@@ -160,9 +160,9 @@ public class WeyekinPoster {
                         //System.out.println(response2.getStatusLine());
                         HttpEntity entity2 = response2.getEntity();
                         mPigeonString = EntityUtils.toString(entity2);
-                        entity2.writeTo(System.out);
+//                        entity2.writeTo(System.out);
                         // do something useful with the response body
-                        System.out.println();
+//                        System.out.println();
                         // and ensure it is fully consumed
                         EntityUtils.consume(entity2);
                     } finally {

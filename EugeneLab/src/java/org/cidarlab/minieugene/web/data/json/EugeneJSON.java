@@ -4,17 +4,6 @@
  */
 package org.cidarlab.minieugene.web.data.json;
 
-/***
-import org.cidarlab.eugene.dom.components.Component;
-import org.cidarlab.eugene.dom.components.Device;
-import org.cidarlab.eugene.dom.components.Part;
-import org.cidarlab.eugene.dom.components.types.PartType;
-* ***/
-import java.util.ArrayList;
-import java.util.List;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 /**
  *

@@ -13,15 +13,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-
-
-
-/*
- * miniEugene imports
- */
 import org.cidarlab.minieugene.MiniEugene;
 import org.cidarlab.minieugene.MiniEugeneStatistics;
-import org.cidarlab.minieugene.dom.Component;
 import org.cidarlab.minieugene.stats.Measurement;
 import org.cidarlab.minieugene.util.SolutionExporter;
 import org.cidarlab.minieugene.web.data.ScriptCollector;
@@ -119,16 +112,16 @@ public class MiniEugeneServlet
                         	request.getSession().getId(), 
                         	sizeOfDesign, input, predefined, nrOfSolutions);
                 
-                	/*
-                	 * for ``data'' collection
-                	 * 
-                	 * IDEA: I can relate the rules to the SBOL file
-                	 * -> we can then do a lot of interesting stuff...
-                	 */                    
-                	collectScript(
-                			request.getSession().getId(), 
-                			sizeOfDesign, 
-                			input);
+            		/*
+            		 * for ``data'' collection
+            		 * 
+            		 * IDEA: I can relate the rules to the SBOL file
+            		 * -> we can then do a lot of interesting stuff...
+            		 */                    
+            		collectScript(
+            				request.getSession().getId(), 
+            				sizeOfDesign, 
+            				input);
 
                 	out.write(result.toString());
                 }
@@ -258,6 +251,7 @@ public class MiniEugeneServlet
 		return sb.toString();
 	}
     
+
     private List<JSONObject> processStatistics(MiniEugeneStatistics mes) {
         List<JSONObject> lstStatsJSON = new ArrayList<JSONObject>();
         
@@ -278,45 +272,6 @@ public class MiniEugeneServlet
     	
     	return lstStatsJSON;
     }
-    
-//    private JSONObject textualizeSolutions(List<Component[]> solutions) {
-//        
-//    	StringBuilder sb = new StringBuilder();
-//    	sb.append("<table class=\"table table-bordered table-hover\" id=\"solutionList\">");
-//    	if (null != solutions && !solutions.isEmpty()) {
-//
-//        	for(Component[] solution :  solutions) {	 
-//        		sb.append("<tr><td>");
-//        		for(int i=0; i<solution.length; i++) {
-//        			Component component = solution[i];
-//        			if(!component.isForward()) {
-//        				sb.append("-");
-//        			} 
-//        			sb.append(component.getName());
-//        			if(i != solution.length - 1) {
-//        				sb.append(", ");
-//        			}
-//        		}
-//        		sb.append("</td></tr>");
-//        	}
-//        }
-//    	sb.append("</table>");
-//    	
-////    	System.out.println(sb.toString());
-//    	
-//    	/*
-//    	 * put the HTML of the textual solutions table into JSON format
-//    	 */
-//    	JSONObject solutionsJSON = new JSONObject();
-//    	try {
-//    		solutionsJSON.put("solution", sb.toString());
-//    	} catch(Exception e) {
-//    		try {
-//    			solutionsJSON.put("solution", "");
-//    		} catch(Exception ee) {}
-//    	}    	
-//    	return solutionsJSON;
-//    }
     
     private void collectScript(String sessionId, int N, String script) {
     	/*

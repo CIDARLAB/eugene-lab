@@ -9,17 +9,18 @@ public class ScriptCollector
 
 	private String path;
 	private int N;
-	private String script;
+	private String[] rules;
 	
 	private static final String NEWLINE = System.getProperty("line.separator");
 	
 	public ScriptCollector(String path, int N, String script) {
 		this.path = path;
 		this.N = N;
-		this.script = script;
+		this.rules = script.split(NEWLINE);
 	}
 	
 	public void run() {
+		
 		/*
 		 * create the ``complete'' miniEugene script
 		 * i.e. including the first line (N=x) 
@@ -33,21 +34,37 @@ public class ScriptCollector
 		File f = createFile();
 
 		/*
-		 * create the path
+		 * write the script to the file
 		 */
-//		System.out.println("writing to "+f.getAbsolutePath()+"...");
-//		System.out.println(sScript);
-		
 		writeToFile(sScript, f);
 	}
 	
-	private String buildScript() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("N=").append(N).append(NEWLINE);
-		sb.append(this.script);
+    /**
+     * 
+     * @param N
+     * @param rules
+     * @return
+     */
+	public String buildScript() {
+    	StringBuilder sb = new StringBuilder();
+
+		// N = number .
+		sb.append("N=").append(this.N).append(".").append(NEWLINE);
+		
+		// rules
+		for(int i=0; i<this.rules.length; i++) {
+			if(!this.rules[i].trim().isEmpty()) {
+				if(!this.rules[i].startsWith("//")) {
+					sb.append(this.rules[i]);
+					if(!this.rules[i].endsWith(".")) {
+						sb.append(".").append(NEWLINE);
+					}
+				}
+			}
+		}
+
 		return sb.toString();
 	}
-	
 
 	private File createFile() {
 		File fPath = new File(this.path);
