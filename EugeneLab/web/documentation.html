@@ -73,15 +73,24 @@ selection             = id ( "|" selection )?
                     	<ul>
                     	<li>A <strong>Template Constraint</strong> defines a universally valid pattern. Template
                     	constraints require that the <strong>Length of the design</strong> is a <strong>multiple</strong> of the 
-                    	<strong>length of the template constraint</strong>. 
-                    	For example, a 
+                    	<strong>length of the template constraint</strong>. If the provided length of the design is not a multiple of the length of the template constraint, then 
+                    	an exception is thrown.
+                    	<br/>
+                    	Examples:
+                    	<ul>
+                    	<li>The  
                     	<pre>
 template p, r, c, t</pre> 
-						constraint and a length of 12 (3 * 4) provides the following design:<br/>
+						template constraint with a length of 12 (3 * 4) provides the following design:<br/>
                     	<pre>
 p, r, c, t, p, r, c, t, p, r, c, t</pre>
-                    	If the provided length of the design is not a multiple of the length of the template constraint, then 
-                    	an exception is thrown.<br/>
+                    	</li>
+                    	<li>
+                    	
+                    	</li>
+                    	</ul>
+                    	
+                    	<br/>
                     	
                     	<li>A <strong>Sequence Constraint</strong> defines an ordered set of components that must occur in a particular order.<br/> 
                     	For example, a 
