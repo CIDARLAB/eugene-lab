@@ -33,19 +33,95 @@
                     <h4>Comments</h4>
                         <p>miniEugene supports line comments.</p>
                         <p>Example:<br/>
-                        // This is a line comment
+                        <pre>// This is a line comment</pre>
                 </div>
                 <hr/>
+                <!-- CNF -->
                 <div id="basic_syntax">
                     <h4>Disjunction of Constraints</h4>
-                        <p>For the time being, miniEugene supports the <a href="http://en.wikipedia.org/wiki/Conjunctive_normal_form" target="_blank">conjunctive normal form</a>, i.e., a conjunction of disjunction. Line feeds indicate a conjunction. In one line, it is possible to specify a disjunction of constraints.</p>
+                        <p>miniEugene supports the <a href="http://en.wikipedia.org/wiki/Conjunctive_normal_form" target="_blank">conjunctive normal form</a>, i.e., a conjunction of disjunction. Line feeds indicate a conjunction. In one line, it is possible to specify a disjunction of constraints.</p>
                         <p>Examples:<br/> 
                         1. The required design must contain a, d, and b or c.<br/>
-                        <p>CONTAINS a<br/>
-                        CONTAINS b OR CONTAINS c<br/>
-                        CONTAINS d</p>
+                        <pre>
+CONTAINS a
+CONTAINS b OR CONTAINS c
+CONTAINS d</pre>
                         2. All components in the design must be either forward or reverse oriented.<br/>
-                        <p>ALL_FORWARD OR ALL_REVERSE</p>
+                        <pre>
+ALL_FORWARD OR ALL_REVERSE</pre>
+                </div>
+                <hr/>
+                <!-- TEMPLATING -->
+                <div id="basic_syntax">
+                    <h4>Templating Constraints</h4>
+                    	<p>The provided constraints in miniEugene are not expressive enough to specify various types 
+                    	of synthetic biology designs. For example, consider the design 
+                    	<pre>p, r, c, t, p, r, c, t</pre>
+                    	Therefore, we augmented miniEugene with <strong>Templating Constraints</strong>. 
+                    	
+                    	<!--  -->
+                    	<p>The EBNF of Templating Constraints:</p>
+<pre>
+templating            = templating_constraint list_of_ids
+templating_constraint = (name)? tconstraint_operator list_of_parameters
+name                  = [a-zA-Z]+
+tconstraint_operator  = ["template"|"TEMPLATE"|"sequence"|"SEQUENCE"]
+list_of_parameters    = ( "[" selection "]" | id ) ("," list_of_parameters)?
+selection             = id ( "|" selection )? 
+</pre>                    	
+                    	<strong>Templating Constraints</strong> are divided into:
+                    	<ul>
+                    	<li>A <strong>Template Constraint</strong> defines a universally valid pattern. Template
+                    	constraints require that the <strong>Length of the design</strong> is a <strong>multiple</strong> of the 
+                    	<strong>length of the template constraint</strong>. 
+                    	For example, a 
+                    	<pre>
+template p, r, c, t</pre> 
+						constraint and a length of 12 (3 * 4) provides the following design:<br/>
+                    	<pre>
+p, r, c, t, p, r, c, t, p, r, c, t</pre>
+                    	If the provided length of the design is not a multiple of the length of the template constraint, then 
+                    	an exception is thrown.<br/>
+                    	
+                    	<li>A <strong>Sequence Constraint</strong> defines an ordered set of components that must occur in a particular order.<br/> 
+                    	For example, a 
+                    	<pre>
+sequence p, r, c, t</pre> 
+						constraint and a provided length of 6 results in the following set of designs ('_' denotes place holders):<br/>
+                    	<pre>
+p, r, c, t, _, _
+_, p, r, c, t, _
+_, _, p, r, c, t</pre>
+<!--  
+                    	<li>A <strong>Group</strong> constraint defines an unordered set of components that always appear together. miniEugene 
+                    	builds all permutations of the group elements.<br/> 
+                    	For example, a 
+                    	<pre>
+group p, r, c, t</pre> 
+						constraint and a provided length of 6 results in the following set of designs ('_' denotes place holders):<br/>
+                    	<pre>
+p, r, c, t, _, _
+p, r, t, c, _, _
+p, c, r, t, _, _
+p, c, t, r, _, _
+...
+_, p, r, c, t, _
+_, p, r, t, c, _
+...
+_, _, t, c, r, p
+_, _, t, c, p, r</pre>
+-->
+                    	</ul>
+                    	<br/>
+                    	It is, of course, possible to utilize miniEugene's templating constraints in conjunction (and disjunction) with 
+                    	all other provided constraints. See the Examples section for more detailed examples.
+                    	<p><strong>Note:</strong>
+                    	<ul>
+                    	<li>For the time being, <strong>Templating Constraints</strong> do not allow features to constrain the 
+                    	orientation of the components constraint by a templating constraint. Please use the <strong>Orientation</strong> constraints. 
+                    	</ul>
+                    	</p>
+                    	
                 </div>
                 <hr/>
                 <div id="rules">
