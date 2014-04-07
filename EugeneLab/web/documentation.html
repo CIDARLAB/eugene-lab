@@ -58,7 +58,7 @@ ALL_FORWARD OR ALL_REVERSE</pre>
                     	of synthetic biology designs. For example, consider the design 
                     	<pre>p, r, c, t, p, r, c, t</pre>
                     	Therefore, we augmented miniEugene with <strong>Templating Constraints</strong>. 
-                    	
+                    	<br/>
                     	<!--  -->
                     	<p>The EBNF of Templating Constraints:</p>
 <pre>
@@ -69,7 +69,10 @@ tconstraint_operator  = ["template"|"TEMPLATE"|"sequence"|"SEQUENCE"]
 list_of_parameters    = ( "[" selection "]" | id ) ("," list_of_parameters)?
 selection             = id ( "|" selection )? 
 </pre>                    	
-                    	<strong>Templating Constraints</strong> are divided into:
+						<br/>
+						A selection provides a list of possible ids. The selection operator ("[ ]") selects a single id from the provided list.
+						<br/> 
+                    	<p><strong>Templating Constraints</strong> are divided into:
                     	<ul>
                     	<li>A <strong>Template Constraint</strong> defines a universally valid pattern. Template
                     	constraints require that the <strong>Length of the design</strong> is a <strong>multiple</strong> of the 
@@ -78,29 +81,50 @@ selection             = id ( "|" selection )?
                     	<br/>
                     	Examples:
                     	<ul>
-                    	<li>The  
+                    	<li>With a given length of 12 (3 * 4), the template constraint   
                     	<pre>
 template p, r, c, t</pre> 
-						template constraint with a length of 12 (3 * 4) provides the following design:<br/>
+						produces the following design:<br/>
                     	<pre>
 p, r, c, t, p, r, c, t, p, r, c, t</pre>
                     	</li>
-                    	<li>
-                    	
+
+                    	<li>With a given length of 1, the template constraint   
+                    	<pre>
+template [p|c]</pre> 
+						produces the following designs ('-' denotes reverse orientation):<br/>
+                    	<pre>
+p
+-p
+c
+-c</pre>
                     	</li>
                     	</ul>
                     	
                     	<br/>
                     	
                     	<li>A <strong>Sequence Constraint</strong> defines an ordered set of components that must occur in a particular order.<br/> 
-                    	For example, a 
-                    	<pre>
+                    	Examples:
+                    	<ul>
+                    	<li><pre>
 sequence p, r, c, t</pre> 
 						constraint and a provided length of 6 results in the following set of designs ('_' denotes place holders):<br/>
                     	<pre>
 p, r, c, t, _, _
 _, p, r, c, t, _
 _, _, p, r, c, t</pre>
+						</li>
+						<li>
+						The selection operator can also be utilized within sequence constraints. With a given length of 1, the 
+						<pre>sequence [p|r|c|t]</pre> 
+						sequence constraint enumerates the following designs ('-' denotes reverse orientation):<br/>
+                    	<pre>
+p
+-p
+c
+-c</pre>
+                    	</li>
+						</ul>
 <!--  
                     	<li>A <strong>Group</strong> constraint defines an unordered set of components that always appear together. miniEugene 
                     	builds all permutations of the group elements.<br/> 
@@ -127,9 +151,8 @@ _, _, t, c, p, r</pre>
                     	<p><strong>Note:</strong>
                     	<ul>
                     	<li>For the time being, <strong>Templating Constraints</strong> do not allow features to constrain the 
-                    	orientation of the components constraint by a templating constraint. Please use the <strong>Orientation</strong> constraints. 
+                    	orientation of the components constraint by a templating constraint. Please specify additional <strong>Orientation</strong> constraints. 
                     	</ul>
-                    	</p>
                     	
                 </div>
                 <hr/>
