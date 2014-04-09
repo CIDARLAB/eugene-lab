@@ -32,8 +32,8 @@
 
     $examples.load("documentationFiles/examples.html");
 
-    $("#content").html($what_is); // loads the initial content
-    $("#what_is").addClass('active');
+    //$("#content").html($what_is); // loads the initial content
+    //$("#what_is").addClass('active');
 
     // the various click events that will switch tabs and data
     $("#what_is").click(function(){ 
@@ -85,6 +85,13 @@
     	$("#pairing_constraints").addClass('active');
     	$( window ).scrollTop(0);
     });
+    
+    $("#orientation_constraints1").click(function(){ 
+    	$("#content").html($orientation_constraints);
+    	$(".active").removeClass('active');
+    	$("#orientation_constraints").addClass('active');
+    	$( window ).scrollTop(0);
+    });
 
     $("#orientation_constraints").click(function(){ 
     	$("#content").html($orientation_constraints);
@@ -121,9 +128,16 @@
     	$( window ).scrollTop(0);
     });
 
+    $("#examples1").click(function(){ 
+    	$("#content").html($examples);
+    	$(".active").removeClass('active');
+    	$("#examples").addClass('active');
+    	$( window ).scrollTop(0);
+    });
+
   });
   
-  $constraintLink.click(function() {
+  $("#constraintLink").click(function() {
 	  var $constraints = $('<div>');
 	  $constraints.load("documentationFiles/constraints.html");
 	  $("#content").html($constraints); // loads the initial content

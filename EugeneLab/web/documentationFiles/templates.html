@@ -1,69 +1,94 @@
                 <!-- TEMPLATING -->
                 <div id="basic_syntax">
                     <h4>Templating Constraints</h4>
-                    	<p>The provided constraints in miniEugene are not expressive enough to specify various types 
-                    	of synthetic biology designs. For example, consider the design 
+                    	<p>Consider the following required design: 
                     	<pre>p, r, c, t, p, r, c, t</pre>
-                    	Therefore, we augmented miniEugene with <strong>Templating Constraints</strong>. 
-                    	<br/>
-						A selection provides a list of possible ids. The selection operator ("[ ]") selects a single id from the provided list.
+                    	The provided set of primitive constraints in miniEugene is not expressive enough to specify such types 
+                    	of synthetic biology designs. Therefore, we augmented miniEugene with <strong>Templating Constraints</strong>. 
 						<br/> 
-                    	<p><strong>Templating Constraints</strong> are divided into:
+                    	<p>We offer the following <strong>Templating Constraints</strong>:
                     	<ul>
-                    	<li>A <strong>Template Constraint</strong> defines a universally valid pattern. Template
-                    	constraints require that the <strong>Length of the design</strong> is a <strong>multiple</strong> of the 
-                    	<strong>length of the template constraint</strong>. If the provided length of the design is not a multiple of the length of the template constraint, then 
-                    	an exception is thrown.
+                    	<li>A <strong>Template</strong> constrains designs to comply with a specified list of components.<br/>
+                    	Template constraints require that the <strong>Length of the design</strong> is a <strong>multiple</strong> of the 
+                    	<strong>number of components</strong> constraint by the template. Otherwise, no solution is found.
+                    	<br/>
                     	<br/>
                     	Examples:
                     	<ul>
-                    	<li>With a given length of 12 (3 * 4), the template constraint   
+                    	<li>With a given length of 12 ( = 3 * 4), the template constraint   
                     	<pre>
 template p, r, c, t</pre> 
-						produces the following design:<br/>
+						produces the following 4096 designs ('-' denotes reverse orientation):<br/>
                     	<pre>
-p, r, c, t, p, r, c, t, p, r, c, t</pre>
+ p,  r,  c,  t,  p,  r,  c,  t,  p,  r,  c,  t
+ p,  r,  c,  t,  p,  r,  c,  t,  p,  r,  c, -t
+ p,  r,  c,  t,  p,  r,  c,  t,  p,  r, -c,  t
+ p,  r,  c,  t,  p,  r,  c,  t,  p,  r, -c, -t
+...
+-p, -r, -c, -t, -p, -r, -c, -t, -p, -r, -c,  t
+-p, -r, -c, -t, -p, -r, -c, -t, -p, -r, -c, -t
+</pre>
                     	</li>
 
-                    	<li>With a given length of 1, the template constraint   
+                    	<li>A selection provides a list of possible components. The selection operator ("[ ]") selects one single component 
+						from the provided list. With a given length of 2, the template constraint   
                     	<pre>
-template [p|c]</pre> 
-						produces the following designs ('-' denotes reverse orientation):<br/>
+template [p1|p2], [c1|c2]</pre> 
+						produces the following 64 designs ('-' denotes reverse orientation):<br/>
                     	<pre>
-p
--p
-c
--c</pre>
+ p1,  c1
+ p1, -c1
+-p1,  c1
+-p1, -c1
+ p2,  c1
+ ...
+ p2,  c2
+-p2, -c2</pre>
                     	</li>
                     	</ul>
                     	
                     	<br/>
+                    	<br/>
                     	
-                    	<li>A <strong>Sequence Constraint</strong> defines an ordered set of components that must occur in a particular order.<br/> 
+                    	<li>A <strong>Sequence</strong> restricts that a set of components that must occur in a particular order. Sequences 
+                    	require that the <strong>Length of the design</strong> is <strong>greater or equal</strong> then the <strong>number of 
+                    	components</strong> constraint by a sequence. Otherwise, no solution is found.
+                    	<br/> 
+                    	<br/>
                     	Examples:
                     	<ul>
-                    	<li><pre>
+                    	<li>The<pre>
 sequence p, r, c, t</pre> 
-						constraint and a provided length of 6 results in the following set of designs ('_' denotes place holders):<br/>
+						constraint results in the following 3,072 designs when given a length of 6 ('_' denotes place holders and '-' denotes reverse orientation):<br/>
                     	<pre>
-p, r, c, t, _, _
-_, p, r, c, t, _
-_, _, p, r, c, t</pre>
+ p,  r,  c, t, _, _
+-p,  r,  c, t, _, _
+ p, -r,  c, t, _, _
+ p,  r, -c, t, _, _
+...
+_,  p,  r, c, t, _
+_, -p,  r, c, t, _
+_,  p, -r, c, t, _
+...
+_, _,  p,  r,  c,  t
+_, _, -p,  r,  c,  t
+...
+_, _, -p, -r, -c, -t</pre>
 						</li>
 						<li>
 						The selection operator can also be utilized within sequence constraints. With a given length of 1, the 
 						<pre>sequence [p|r|c|t]</pre> 
 						sequence constraint enumerates the following designs ('-' denotes reverse orientation):<br/>
                     	<pre>
-p
+ p
 -p
-c
+ c
 -c</pre>
                     	</li>
 						</ul>
 <!--  
                     	<li>A <strong>Group</strong> constraint defines an unordered set of components that always appear together. miniEugene 
-                    	builds all permutations of the group elements.<br/> 
+                    	builds all permutations of the group components.<br/> 
                     	For example, a 
                     	<pre>
 group p, r, c, t</pre> 
@@ -82,17 +107,21 @@ _, _, t, c, p, r</pre>
 -->
                     	</ul>
                     	<br/>
-                    	It is, of course, possible to utilize miniEugene's templating constraints in conjunction (and disjunction) with 
-                    	all other provided constraints. See the Examples section for more detailed examples.
+                    	It is, of course, possible to utilize miniEugene's <strong>Templating Constraints</strong> in conjunction (and disjunction) with 
+                    	all other provided constraints. See the <a id = "examples1" href = "#">Examples</a> section for more detailed examples.
                     	<br/>
-                    	<p><strong>Note!</strong>
+                    	<br/>
+                    	<strong>Note!</strong>
                     	<ul>
                     	<li>Currently, <strong>Templating Constraints</strong> are not efficiently implemented. As soon as we've solved this problem, 
                     	we'll announce it properly on this website.
                     	</li>
-                    	<li>For the time being, <strong>Templating Constraints</strong> do not allow features to constrain the 
-                    	orientation of the components constraint by a templating constraint. Please specify additional <strong>Orientation</strong> constraints.
+                    	<li><strong>Templating Constraints</strong> do not allow features to constrain the orientation of the 
+                    	constraint components. Please specify additional <a id = "orientation_constraints1" href = "#">Orientation Constraints</a>.
                     	</li> 
                     	</ul>
                     	
                 </div>
+                
+                <script src = "scripts/documentationController.js"> </script>
+                
