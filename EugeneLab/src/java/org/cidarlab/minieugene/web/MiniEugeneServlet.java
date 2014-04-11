@@ -96,8 +96,6 @@ public class MiniEugeneServlet
             	int sizeOfDesign = Integer.parseInt(
                         request.getParameter("N"));
                 String input = request.getParameter("input");                    
-                boolean predefined = Boolean.parseBoolean(
-                        request.getParameter("predefined"));
                 
                 /*
                  * currently, we find all solutions
@@ -110,19 +108,8 @@ public class MiniEugeneServlet
                 if(bOk) {
                 	result = executeMiniEugene(
                         	request.getSession().getId(), 
-                        	sizeOfDesign, input, predefined, nrOfSolutions);
+                        	sizeOfDesign, input, nrOfSolutions);
                 
-            		/*
-            		 * for ``data'' collection
-            		 * 
-            		 * IDEA: I can relate the rules to the SBOL file
-            		 * -> we can then do a lot of interesting stuff...
-            		 */                    
-            		collectScript(
-            				request.getSession().getId(), 
-            				sizeOfDesign, 
-            				input);
-
                 	out.write(result.toString());
                 }
             } else {
@@ -141,7 +128,7 @@ public class MiniEugeneServlet
 
     public JSONObject executeMiniEugene(
             String sessionId, 
-            int N, String input, boolean predefined, int nrOfSolutions) {
+            int N, String input, int nrOfSolutions) {
 
         JSONObject returnJSON = new JSONObject();
         
@@ -163,7 +150,17 @@ public class MiniEugeneServlet
         	 * then, we build the script
         	 */
         	String script = this.buildScript(N, rules);
-        	
+
+        	/*
+    		 * for ``data'' collection
+    		 * 
+    		 * IDEA: I can relate the rules to the SBOL file
+    		 * -> we can then do a lot of interesting stuff...
+    		 */                    
+    		collectScript(
+    				sessionId, script);
+
+
             /*
              * then, we solve the problem
              * finding ALL solutions 
@@ -208,7 +205,7 @@ public class MiniEugeneServlet
         } catch(Exception e) {
             try {
                 returnJSON.put("status", "exception");
-                returnJSON.put("results", e.toString());
+                returnJSON.put("results", e.getMessage());
             } catch(JSONException jse) {}
         }
 
@@ -273,7 +270,7 @@ public class MiniEugeneServlet
     	return lstStatsJSON;
     }
     
-    private void collectScript(String sessionId, int N, String script) {
+    private void collectScript(String sessionId, String script) {
     	/*
     	 * get the path (of the servlet context)
     	 */
@@ -287,6 +284,6 @@ public class MiniEugeneServlet
          * start a thread (the script collector) that 
          * writes the script to the given file
          */
-    	new ScriptCollector(scriptPath, N, script).run();    	
+    	new ScriptCollector(scriptPath, script).run();    	
     }
 }
