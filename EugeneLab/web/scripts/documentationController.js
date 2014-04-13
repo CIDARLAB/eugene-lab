@@ -135,6 +135,21 @@
     	$( window ).scrollTop(0);
     });
 
+    $("#constraints1").click(function(){ 
+    	alert("XXX");
+    	$("#content").html($constraints);
+    	$(".active").removeClass('active');
+    	$("#constraints").addClass('active');
+    	$( window ).scrollTop(0);
+    });
+    
+    $("#templating1").click(function(){ 
+    	$("#content").html($templates);
+    	$(".active").removeClass('active');
+    	$("#templates").addClass('active');
+    	$( window ).scrollTop(0);
+    });
+
   });
   
   $("#constraintLink").click(function() {

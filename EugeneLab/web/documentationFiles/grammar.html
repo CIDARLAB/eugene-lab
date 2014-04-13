@@ -9,12 +9,19 @@ script                = (cnf)+
 cnf                   = constraint ("or" cnf)? LINE_FEED 
 
 constraint            = ("NOT")? 
-                        ( ( (ID)? constraint_operator (ID | INT)? ) | 
-                            template_constraint )
+                        ( 
+                        ( (operand)? primitive_constraint (operand)? ) 
+                        | 
+                          templating 
+                        )
+
+operand               = ID | INT | index
+
+index                 = "[" INT "]"
 
 constraint_operator   = ["contains"|"CONTAINS"| ... |"drives"|"DRIVES"]
 
-template_constraint   = (name)? template_operator list_of_ids
+templating            = (ID)? template_operator list_of_ids
 
 template_operator     = ["template"|"TEMPLATE"|"sequence"|"SEQUENCE"]
 
@@ -22,7 +29,7 @@ list_of_ids           = ( "[" selection "]" | ID ) ("," list_of_ids)?
 
 selection             = ID ( "|" selection )? 
 
-ID                    = [a-zA-Z]+
+ID                    = [a-zA-Z][a-zA-Z0-9]*
 
 INT                   = [0-9]+
 </pre> 
