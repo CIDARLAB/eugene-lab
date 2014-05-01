@@ -174,17 +174,17 @@ public class MiniEugeneServlet
             		me.getSolutions(),
             		me.getInteractions());
 
-            // pigeon
-            List<JSONObject> lstPigeon = new ArrayList<JSONObject>();
-            JSONObject pigeon = new JSONObject();
-            pigeon.put("pigeon-uri", se.toPigeon());
-            lstPigeon.add(pigeon);
-            returnJSON.put("results", lstPigeon);
+            String uuid = UUID.randomUUID().toString();
 
-            // Eugene 
             String eugeneFilePath = Paths.get(this.getServletContext().getRealPath(""), "data", "eugene").toString();
             new File(eugeneFilePath).mkdirs();
-            String uuid = UUID.randomUUID().toString();
+
+            // pigeon
+            String imageName = eugeneFilePath+"/"+uuid+".png";
+            se.pigeonize(imageName, null, true, 10);
+            returnJSON.put("pigeon", "./data/eugene/"+uuid+".png");
+
+            // Eugene 
             String eugeneFile = eugeneFilePath+"/"+uuid+".eug";
             se.toEugene(eugeneFile);
             returnJSON.put("eugene", "data/eugene/"+uuid+".eug");

@@ -59,9 +59,7 @@ $(document).ready(function() {
                     	//$('#outputSolutionArea').html('<table class="table table-bordered table-hover" id="solutionList"><tr><td>p, c, r, t</td></tr><tr><td>p, c, t, r</td></tr><tr><td>p, r, c, t</td></tr><tr><td>p, r, t, c</td></tr><tr><td>p, t, c, r</td></tr><tr><td>p, t, r, c</td></tr><tr><td>r, c, p, t</td></tr><tr><td>r, c, t, p</td></tr><tr><td>r, p, t, c</td></tr><tr><td>r, p, c, t</td></tr><tr><td>r, t, c, p</td></tr><tr><td>r, t, p, c</td></tr><tr><td>c, p, r, t</td></tr><tr><td>c, p, t, r</td></tr><tr><td>c, r, p, t</td></tr><tr><td>c, r, t, p</td></tr><tr><td>c, t, r, p</td></tr><tr><td>c, t, p, r</td></tr><tr><td>t, c, p, r</td></tr><tr><td>t, c, r, p</td></tr><tr><td>t, r, p, c</td></tr><tr><td>t, r, c, p</td></tr><tr><td>t, p, r, c</td></tr><tr><td>t, p, c, r</td></tr></table>');
                     	// visualize the designs using pigeon
 
-                        $.each(response["results"], function() {
-                            $('#outputImageArea').html('<div class="item active"><img src="' + this["pigeon-uri"] + '"/></div>');
-                        });
+                        $('#outputImageArea').html('<div class="item active"><img src="' + response["pigeon"] + '"/></div>');
                         $('#visual').addClass('active');                    
                         $('#outputImageTab').addClass('active');
 
