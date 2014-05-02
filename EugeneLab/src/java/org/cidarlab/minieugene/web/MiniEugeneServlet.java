@@ -176,15 +176,18 @@ public class MiniEugeneServlet
 
             String uuid = UUID.randomUUID().toString();
 
-            String eugeneFilePath = Paths.get(this.getServletContext().getRealPath(""), "data", "eugene").toString();
-            new File(eugeneFilePath).mkdirs();
-
+            long T1 = System.nanoTime();
+            
             // pigeon
-            String imageName = eugeneFilePath+"/"+uuid+".png";
+            String pigeonFilePath = Paths.get(this.getServletContext().getRealPath(""), "pigeon").toString();
+            new File(pigeonFilePath).mkdirs();
+            String imageName = pigeonFilePath+"/"+uuid+".png";
             se.pigeonize(imageName, null, true, 10);
-            returnJSON.put("pigeon", "./data/eugene/"+uuid+".png");
+            returnJSON.put("pigeon", "./pigeon/"+uuid+".png");
 
             // Eugene 
+            String eugeneFilePath = Paths.get(this.getServletContext().getRealPath(""), "data", "eugene").toString();
+            new File(eugeneFilePath).mkdirs();
             String eugeneFile = eugeneFilePath+"/"+uuid+".eug";
             se.toEugene(eugeneFile);
             returnJSON.put("eugene", "data/eugene/"+uuid+".eug");
@@ -196,6 +199,10 @@ public class MiniEugeneServlet
             se.toSBOL(sbolFile);            
             returnJSON.put("sbol", "data/sbol/"+uuid+".sbol");
         	
+            long T2 = System.nanoTime();
+            
+            me.getStatistics().add("Solution Processing Time [sec]", (T2-T1) * Math.pow(10, -9));
+            
             // statistics
             returnJSON.put("stats", processStatistics(me.getStatistics()));
             
