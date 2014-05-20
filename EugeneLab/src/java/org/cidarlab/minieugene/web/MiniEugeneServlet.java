@@ -31,6 +31,7 @@ public class MiniEugeneServlet
 	private static final long serialVersionUID = 1608090753599454559L;
 	
 	private static final String SOLVE = "solve";
+	private static final int NR_OF_SOLUTIONS = 50000;
 	
     @Override
     public void init()
@@ -91,27 +92,27 @@ public class MiniEugeneServlet
             response.setContentType("application/json");
             out = response.getWriter();
             String command = request.getParameter("command");
+            /*
+             * SOLVE the problem
+             */
             if (MiniEugeneServlet.SOLVE.equals(command)) {
-                boolean bOk = true;
+            	
+            	// read the parameters from the request
             	int sizeOfDesign = Integer.parseInt(
                         request.getParameter("N"));
                 String input = request.getParameter("input");                    
                 
                 /*
-                 * currently, we find ``only'' 50000 solutions
-                 * -> we plan on allowing the user to specify a
-                 *    desired number of solutions
+                 * execute miniEugene to solve the problem
                  */
-                int nrOfSolutions = 50000;
+               	result = executeMiniEugene(
+                       	request.getSession().getId(), 
+                       	sizeOfDesign, input, NR_OF_SOLUTIONS);
                 
-                
-                if(bOk) {
-                	result = executeMiniEugene(
-                        	request.getSession().getId(), 
-                        	sizeOfDesign, input, nrOfSolutions);
-                
-                	out.write(result.toString());
-                }
+               	/*
+               	 * return the results to the client
+               	 */
+               	out.write(result.toString());
             } else {
             	result.put("status", "bad");
             }
@@ -165,7 +166,7 @@ public class MiniEugeneServlet
              * then, we solve the problem
              * finding ALL solutions 
              */    
-        	me.solve(script);
+        	me.solve(script, nrOfSolutions);
 
             /*
              * SolutionExporter, what else?
