@@ -98,11 +98,11 @@ public class MiniEugeneServlet
                 String input = request.getParameter("input");                    
                 
                 /*
-                 * currently, we find all solutions
+                 * currently, we find ``only'' 50000 solutions
                  * -> we plan on allowing the user to specify a
                  *    desired number of solutions
                  */
-                int nrOfSolutions = -1;
+                int nrOfSolutions = 50000;
                 
                 
                 if(bOk) {
