@@ -37,12 +37,7 @@ $(document).ready(function() {
                         $('#outputExceptionTab').removeClass('active');
 
                     	// STATISTICS
-                        var stats = '<div><table class="table table-bordered table-hover" id="outputList"><thead><tr><th>Name</th><th>Value</th><th></th></tr></thead><tbody>';
-                    	$.each(response["stats"], function() {
-                    		stats = stats + '<tr><td>' + this["name"] + '</td><td>' + this["value"] + '</td></tr>';
-                        });
-                    	stats = stats + '</tbody></table></div>';
-                    	$('#outputStatsArea').html(stats);
+                    	$('#outputStatsArea').html(response["statistics"]);
                     	$('#stats').removeClass('active');
                         $('#outputStatsTab').removeClass('active');
 

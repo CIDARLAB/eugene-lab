@@ -4,10 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -43,6 +42,12 @@ public class MiniEugeneServlet
     public void destroy() {
     }
 
+    
+    public void init(ServletConfig servletConfig) 
+    		throws ServletException{
+    	super.init(servletConfig);
+    }
+    
     /**
      * Handles the HTTP <code>GET</code> method.
      *
@@ -205,12 +210,13 @@ public class MiniEugeneServlet
             me.getStatistics().add("Solution Processing Time [sec]", (T2-T1) * Math.pow(10, -9));
             
             // statistics
-            returnJSON.put("stats", processStatistics(me.getStatistics()));
+            returnJSON.put("statistics", processStatistics(me.getStatistics()));
             
             // everything's good
             returnJSON.put("status", "good");
 
         } catch(Exception e) {
+        	e.printStackTrace();
             try {
                 returnJSON.put("status", "exception");
                 returnJSON.put("results", e.getMessage());
@@ -257,25 +263,28 @@ public class MiniEugeneServlet
 	}
     
 
-    private List<JSONObject> processStatistics(MiniEugeneStatistics mes) {
-        List<JSONObject> lstStatsJSON = new ArrayList<JSONObject>();
-        
+    private String processStatistics(MiniEugeneStatistics mes) {
+        /*
+         * var stats = '<div><table class="table table-bordered table-hover" id="outputList"><thead><tr><th>Name</th><th>Value</th><th></th></tr></thead><tbody>';
+                    	$.each(response["stats"], function() {
+                    		stats = stats + '<tr><td>' + this["name"] + '</td><td>' + this["value"] + '</td></tr>';
+                        });
+                    	stats = stats + '</tbody></table></div>';
+
+         */
+    	StringBuilder sb = new StringBuilder();
+    	sb.append("<div><table class=\"table table-bordered table-hover\" id=\"outputList\">")
+    	  .append("<thead><tr><th>Name</th><th>Value</th><th></th></tr></thead><tbody>");
+    	
     	if (null != mes && !mes.isEmpty()) {
         	
         	for(Measurement m : mes.getMeasurements()) {
-        		JSONObject statsJSON = new JSONObject();
-        		try {
-        			statsJSON.put("name", m.getKey());
-        			statsJSON.put("value", m.getValue());
-        			
-            		lstStatsJSON.add(statsJSON);	            		
-        		} catch(Exception e) {
-        			// don't know how to handle such an exception
-        		}
+        		sb.append("<tr><td>").append(m.getKey()).append("</td><td>")
+        			.append(m.getValue()).append("</td></tr>");
         	}
         }
-    	
-    	return lstStatsJSON;
+    	sb.append("</tbody></table></div>");
+    	return sb.toString();
     }
     
     private void collectScript(String sessionId, String script) {
